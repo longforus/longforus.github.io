@@ -1,0 +1,58 @@
+# REMEMBER TO EDIT THIS BEFORE DEPLOY!!!
+
+# the path to your blog's icon:
+favicon: /favicon.png
+
+# the path to manifest.json
+manifest: /manifest.json
+
+# show excerpt on post list
+show_excerpt: false
+
+# navigation config
+nav:
+  # the title displays in the upper left corner which won't change
+  title: Blog
+  # the items displays in the upper right corner
+  items:
+    # these items will display as a link
+    Archives: /archives
+    Friends: /friends
+    Projects: /projects
+    About: /about
+    # these will be automatically be an icon
+    GitHub: https://github.com/longforus
+    # CodePen: https://codepen.io/mrwillcom
+    # Patreon: https://www.patreon.com/MrWillCom
+
+# footer items
+footer:
+  # the title
+  Blog:
+    # the items after the title, display as links
+    Blog: /
+    Archives: /archives
+    Friends: /friends
+    Projects: /projects
+    Resume: /resume
+    About: /about
+    RSS: /atom.xml
+  # also the title
+  Projects:
+    # the items
+    MvpAutoCodePlus: https://github.com/longforus/MvpAutoCodePlus
+    
+  # the title
+  Me:
+    # items
+    GitHub: https://github.com/longforus
+    # CodePen: https://codepen.io/mrwillcom
+    # Patreon: https://www.patreon.com/MrWillCom
+    Email: mailto:longforus@outlook.com
+
+# the license your posts under
+license: CC BY-NC 4.0
+# the link of your license
+license_link: https://creativecommons.org/licenses/by-nc/4.0
+
+# REMEMBER TO EDIT THIS BEFORE DEPLOY!!!

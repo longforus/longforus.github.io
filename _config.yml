@@ -4,16 +4,16 @@
 
 # Site
 title: longforus
-subtitle: 'longforus blog'
-description: 'An Android code farmer'
+subtitle: 'An android code farmer blog'
+description: 'long for us'
 keywords:
-author: John Doe
+author: longforus
 language: en
 timezone: ''
 
 # URL
 ## Set your site url here. For example, if you use GitHub Page, set url as 'https://username.github.io/project'
-url: https://longforus.github.io/project
+url: https://longforus.github.io
 permalink: :year/:month/:day/:title/
 permalink_defaults:
 pretty_urls:
@@ -97,7 +97,7 @@ ignore:
 # Extensions
 ## Plugins: https://hexo.io/plugins/
 ## Themes: https://hexo.io/themes/
-theme: landscape
+theme: hexo-theme-cupertino
 
 # Deployment
 ## Docs: https://hexo.io/docs/one-command-deployment
