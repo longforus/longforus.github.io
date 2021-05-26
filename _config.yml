@@ -8,8 +8,8 @@ subtitle: 'An android code farmer blog'
 description: 'long for us'
 keywords:
 author: longforus
-language: en
-timezone: ''
+language: zh-CN
+timezone: 'Asia/Shanghai'
 
 # URL
 ## Set your site url here. For example, if you use GitHub Page, set url as 'https://username.github.io/project'
@@ -40,8 +40,11 @@ external_link:
   exclude: ''
 filename_case: 0
 render_drafts: false
-post_asset_folder: false
-relative_link: false
+post_asset_folder: true
+marked:
+  prependRoot: true
+  postAsset: true
+relative_link: true
 future: true
 highlight:
   enable: true
