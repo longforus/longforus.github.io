@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+  
+  <title>开启MultiDex仍然报65535方法数的一种情况的解决 - longforus</title>
+  
+    <link rel="shortcut icon" href="../../../../favicon.png">
+  
+  
+    <link rel='manifest' href='/manifest.json'>
+  
+
+  
+<link rel="stylesheet" href="../../../../css/var.css">
+
+  
+<link rel="stylesheet" href="../../../../css/main.css">
+
+  
+<link rel="stylesheet" href="../../../../css/typography.css">
+
+  
+<link rel="stylesheet" href="../../../../css/code-highlighting.css">
+
+  
+<link rel="stylesheet" href="../../../../css/components.css">
+
+  
+<link rel="stylesheet" href="../../../../css/nav.css">
+
+  
+<link rel="stylesheet" href="../../../../css/paginator.css">
+
+  
+<link rel="stylesheet" href="../../../../css/footer.css">
+
+  
+<link rel="stylesheet" href="../../../../css/post-list.css">
+
+  
+<link rel="stylesheet" href="../../../../css/waline.css">
+
+  
+  
+  
+<link rel="stylesheet" href="../../../../css/post.css">
+
+  
+
+  
+<meta name="generator" content="Hexo 5.4.0"></head>
+    <body>
+        <nav id="theme-nav">
+    <div class="inner">
+        <a class="title" href="/">Blog</a>
+        <div class="nav-arrow"></div>
+        <div class="nav-items">
+            <a class="nav-item nav-item-home" href="/">Home</a>
+            
+            
+            <a class="nav-item" href="../../../../archives">Archives</a>
+            
+            
+            
+            <a class="nav-item" href="../../../../friends">Friends</a>
+            
+            
+            
+            <a class="nav-item" href="../../../../projects">Projects</a>
+            
+            
+            
+            <a class="nav-item" href="../../../../about">About</a>
+            
+            
+            
+            <a class="nav-item nav-item-github nav-item-icon" href="../../../../https:/github.com/longforus" target="_blank">&nbsp;</a>
+            
+            
+        </div>
+    </div>
+</nav>
+        <article class="post">
+    <div class="meta">
+        
+        <div class="date" id="date">
+            
+            
+            
+            
+            
+            
+            <span>June</span>
+            
+            
+            
+            
+            
+            
+            
+            <span>1,</span>
+            <span>2021</span>
+        </div>
+        
+
+        <h2 class="title">开启MultiDex仍然报65535方法数的一种情况的解决</h2>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="content">
+        <p>最近项目打Release包的时候,爆出了65535的错误,之前一直是正常的.在网上搜索,都是叫开MultiDex,现在的正经项目,没有几个没开了的吧?我的肯定是开了的.但是MainDex还是爆了.我的maindexlist.txt也只keep了最主要的类:</p>
+<figure class="highlight tex"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">com/longforu/xx/SmAppProxy.class //TinkerApplication代理类</span><br><span class="line">androidx/multidex/MultiDex.class</span><br><span class="line">retrofit2/http/PATCH.class</span><br></pre></td></tr></table></figure>
+
+<p>有一篇文章讲到了这个情况<a target="_blank" rel="noopener" href="https://my.oschina.net/u/435726/blog/1518565">android studio开启multiDexEnabled后依然出现超出方法数的问题 - GoldenVein的个人空间 - OSCHINA - 中文开源技术交流社区</a>,里面说到2种解决方法:</p>
+<ol>
+<li><p>精简代码:</p>
+<p> ​    我真实的Application有3层继承,里面初始化了很多的库,包括自己封装的网络库,数据库,flutterBoost,Mob,aliTlog等等.都是挺必要的.几个月前第一次遇到这个问题的时候,就把tlog的初始化移到splashActivity里,暂时解决了这个问题.后来又不行了,只好删除了暂时没用到融云,坚持了没多久,上周又不行了,已经没用多少东西适合移动或删除了.精简比较难.</p>
+</li>
+<li><p>使用DexKnife开源库,定制mainDex具体的类:</p>
+<p> ​    这个库已经4年没有更新了,对于其中的具体细节也不甚了解,而且我还用了tinker,会不会造成影响呢?最终没有选择这个方法.</p>
+</li>
+</ol>
+<p>通过之前在Application中精简代码就可以暂时规避这个问题来说,我猜测是Application依赖的类太多了,被Application依赖的类的依赖也被引入到mainDex中,而且R8也不能自己分割这些依赖的类了,如果再继续把部分初始化代码移到splashActivity中,会不会有问题呢?再进程重建或者直接跳入其他activity启动app的时候,splashActivity中的这些初始化代码还能不能得到执行呢?当然是不会的,这样的话后续可能会造成一些莫名其妙的bug.这些库的初始化是很重要的, 库?…..初始化?……:thinking: ,忽然就想到了一个专门初始化库的库: <a target="_blank" rel="noopener" href="https://developer.android.google.cn/topic/libraries/app-startup">App Startup  | Android Developers (google.cn)</a>The App Startup library provides a straightforward, performant way to initialize components at application startup.我这种情况下是否适用呢?可是既然是在Application 启动的时候是否意味这这些初始化的代码还是需要打包到mainDex呢?如果是打包到mainDex那还是解决不了65535的问题.实践发现连<code>androidx.startup.Initializer</code>的实现类都不会打到mainDex中,而是在classes2.dex中,Initializer的执行时机是在<code>MultiDex: Installing application</code>之后,既然MultiDex已经安装好了,那么不在mainDex也没事了.</p>
+<p>目前我通过引入App Startup,移动部分库的初始化到Initializer中,暂时解决了开启MultiDex后还报65535的问题,如果你有同样的问题,也可以试一下.具体的代码很简单就不放了,但是要注意一下Initializer代码的执行时机:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">st=&gt;start: Start</span><br><span class="line">op=&gt;operation: com.longforus.core.base.CoreApplication#onBaseContextAttached</span><br><span class="line">op1=&gt;operation: androidx.startup.Initializer#create</span><br><span class="line">op2=&gt;operation: com.longforus.core.base.CoreApplication#onCreate</span><br><span class="line">e=&gt;end: End</span><br><span class="line">st-&gt;op-&gt;op1-&gt;op2-&gt;e</span><br></pre></td></tr></table></figure>
+
+<p>注意Initializer的代码和其他Initializer之间以及Application#onCreate之间的执行顺序,可以使用<code>androidx.startup.Initializer#dependencies</code>来辅助调整执行依赖.</p>
+<p>:smiley:ok,就这样.</p>
+
+    </div>
+
+    <div class="about">
+        <h1>About this Post</h1>
+        <p>This post is written by longforus, licensed under <a
+                target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc/4.0">CC BY-NC 4.0</a>.</p>
+    </div>
+
+    
+        
+    
+</article>
+        <footer>
+    <div class="inner">
+        <div class="links">
+            
+            <div class="group">
+                <h4 class="title">Blog</h4>
+                
+                <a href="/" class="item" target="_blank">Blog</a>
+                
+                <a href="/archives" class="item" target="_blank">Archives</a>
+                
+                <a href="/friends" class="item" target="_blank">Friends</a>
+                
+                <a href="/projects" class="item" target="_blank">Projects</a>
+                
+                <a href="/resume" class="item" target="_blank">Resume</a>
+                
+                <a href="/about" class="item" target="_blank">About</a>
+                
+                <a href="/atom.xml" class="item" target="_blank">RSS</a>
+                
+            </div>
+            
+            <div class="group">
+                <h4 class="title">Projects</h4>
+                
+                <a href="https://github.com/longforus/MvpAutoCodePlus" class="item" target="_blank">MvpAutoCodePlus</a>
+                
+            </div>
+            
+            <div class="group">
+                <h4 class="title">Me</h4>
+                
+                <a href="https://github.com/longforus" class="item" target="_blank">GitHub</a>
+                
+                <a href="mailto:longforus@outlook.com" class="item" target="_blank">Email</a>
+                
+            </div>
+            
+        </div>
+        &copy; 2021 longforus<br />
+        Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+</footer>
+
+        
+<script src="../../../../js/main.js"></script>
+
+        
+    </body>
+</html>
