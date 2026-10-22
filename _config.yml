@@ -68,6 +68,24 @@ index_generator:
   per_page: 12
   order_by: -date
 
+# Archive page setting
+## per_page: 0 disables pagination so the archive lists every post
+archive_generator:
+  per_page: 0
+  yearly: true
+  monthly: true
+  daily: false
+
+# Category page setting
+category_generator:
+  per_page: 0
+  order_by: -date
+
+# Tag page setting
+tag_generator:
+  per_page: 0
+  order_by: -date
+
 # Category & Tag
 default_category: uncategorized
 category_map:
