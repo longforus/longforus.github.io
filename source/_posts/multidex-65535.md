@@ -1,9 +1,12 @@
 ---
-title: 开启MultiDex仍然报65535方法数的一种情况的解决
-date: {{ date }}
-tags: [android,Android Studio]
+title: "开启 MultiDex 仍然报 65535 方法数的一种情况的解决"
+date: 2021-11-18 12:00:00
+updated: 2021-11-18 12:00:00
+categories: ["Android"]
+tags: ["MultiDex","Gradle","构建"]
+description: "最近项目打Release包的时候,爆出了65535的错误,之前一直是正常的.在网上搜索,都是叫开MultiDex,现在的正经项目,没有几个没开了的吧?我的肯定是开了的.但是MainDex还是爆了.我的maindexlis…"
+toc: true
 ---
-
 最近项目打Release包的时候,爆出了65535的错误,之前一直是正常的.在网上搜索,都是叫开MultiDex,现在的正经项目,没有几个没开了的吧?我的肯定是开了的.但是MainDex还是爆了.我的maindexlist.txt也只keep了最主要的类:
 
 ```tex
@@ -16,11 +19,11 @@ retrofit2/http/PATCH.class
 
 1. 精简代码:
 
-    ​	我真实的Application有3层继承,里面初始化了很多的库,包括自己封装的网络库,数据库,flutterBoost,Mob,aliTlog等等.都是挺必要的.几个月前第一次遇到这个问题的时候,就把tlog的初始化移到splashActivity里,暂时解决了这个问题.后来又不行了,只好删除了暂时没用到融云,坚持了没多久,上周又不行了,已经没用多少东西适合移动或删除了.精简比较难.
+    	我真实的Application有3层继承,里面初始化了很多的库,包括自己封装的网络库,数据库,flutterBoost,Mob,aliTlog等等.都是挺必要的.几个月前第一次遇到这个问题的时候,就把tlog的初始化移到splashActivity里,暂时解决了这个问题.后来又不行了,只好删除了暂时没用到融云,坚持了没多久,上周又不行了,已经没用多少东西适合移动或删除了.精简比较难.
 
 2. 使用DexKnife开源库,定制mainDex具体的类:
 
-    ​	这个库已经4年没有更新了,对于其中的具体细节也不甚了解,而且我还用了tinker,会不会造成影响呢?最终没有选择这个方法.
+    	这个库已经4年没有更新了,对于其中的具体细节也不甚了解,而且我还用了tinker,会不会造成影响呢?最终没有选择这个方法.
 
 通过之前在Application中精简代码就可以暂时规避这个问题来说,我猜测是Application依赖的类太多了,被Application依赖的类的依赖也被引入到mainDex中,而且R8也不能自己分割这些依赖的类了,如果再继续把部分初始化代码移到splashActivity中,会不会有问题呢?再进程重建或者直接跳入其他activity启动app的时候,splashActivity中的这些初始化代码还能不能得到执行呢?当然是不会的,这样的话后续可能会造成一些莫名其妙的bug.这些库的初始化是很重要的, 库?.....初始化?......:thinking: ,忽然就想到了一个专门初始化库的库: [App Startup  | Android Developers (google.cn)](https://developer.android.google.cn/topic/libraries/app-startup)The App Startup library provides a straightforward, performant way to initialize components at application startup.我这种情况下是否适用呢?可是既然是在Application 启动的时候是否意味这这些初始化的代码还是需要打包到mainDex呢?如果是打包到mainDex那还是解决不了65535的问题.实践发现连`androidx.startup.Initializer`的实现类都不会打到mainDex中,而是在classes2.dex中,Initializer的执行时机是在`MultiDex: Installing application`之后,既然MultiDex已经安装好了,那么不在mainDex也没事了.
 

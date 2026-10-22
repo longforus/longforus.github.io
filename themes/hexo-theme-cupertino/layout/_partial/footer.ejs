@@ -5,7 +5,11 @@
             <div class="group">
                 <h4 class="title"><%= i %></h4>
                 <% for (const n in theme.footer[i]) { %>
-                <a href="<%- theme.footer[i][n] %>" class="item" target="_blank"><%= n %></a>
+                <%
+                  const itemUrl = theme.footer[i][n];
+                  const isExternalItem = /^(https?:|mailto:)/i.test(itemUrl);
+                %>
+                <a href="<%- isExternalItem ? itemUrl : url_for(itemUrl) %>" class="item"<%- isExternalItem ? ' target="_blank" rel="noopener"' : '' %>><%= n %></a>
                 <% } %>
             </div>
             <% } %>

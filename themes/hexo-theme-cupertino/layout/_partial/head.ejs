@@ -1,9 +1,7 @@
-<!DOCTYPE html>
-<html>
-
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <%
   var title = page.title;
 
@@ -20,14 +18,27 @@
   } else if (is_tag()){
     title = __('tag') + ': ' + page.tag;
   }
+
+  var description = page.description || config.description || '';
   %>
+
   <title><% if (title){ %><%= title %> - <% } %><%= config.title %></title>
+
   <% if (theme.favicon){ %>
     <%- favicon_tag(theme.favicon) %>
   <% } %>
-  <% if (theme.manifest) { %>
-    <link rel='manifest' href='<%= theme.manifest %>'>
+
+  <meta name="description" content="<%= description %>">
+  <% if (config.keywords){ %>
+  <meta name="keywords" content="<%= config.keywords %>">
   <% } %>
+  <meta name="author" content="<%= config.author %>">
+  <meta name="theme-color" content="#0a84ff">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="<%= title || config.title %>">
+  <meta property="og:description" content="<%= description %>">
+  <meta property="og:site_name" content="<%= config.title %>">
 
   <%- css('css/var') %>
   <%- css('css/main') %>
@@ -45,6 +56,7 @@
   <% if (page.path != "index.html" && page.path != "archives/index.html") { %>
   <%- css('css/post') %>
   <% } %>
+  <%- css('css/custom') %>
 
   <% if (config.waline) { %>
     <script src='//cdn.jsdelivr.net/npm/@waline/client/dist/Waline.min.js'></script>

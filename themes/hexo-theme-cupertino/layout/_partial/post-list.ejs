@@ -1,0 +1,30 @@
+<div class="post-list">
+    <% page.posts.each(function (post) { %>
+    <article class="post-list-item">
+        <a href="<%- url_for(post.path) %>" class="post-list-link">
+            <% if (post.cover_image) { %>
+            <div class="cover-img">
+                <img src="<%= post.cover_image %>" alt="<%= post.cover_image_alt || post.title %>" loading="lazy">
+            </div>
+            <% } %>
+            <div class="content">
+                <div class="title">
+                    <%= post.title %>
+                </div>
+                <% if (post.description) { %>
+                <div class="excerpt">
+                    <%= post.description %>
+                </div>
+                <% } %>
+                <div class="time">
+                    <span><%= date(post.date, 'YYYY-MM-DD') %></span>
+                    <% if (post.categories && post.categories.length) { %>
+                    <span class="dot">·</span>
+                    <span class="category"><%= post.categories.first().name %></span>
+                    <% } %>
+                </div>
+            </div>
+        </a>
+    </article>
+    <% }) %>
+</div>

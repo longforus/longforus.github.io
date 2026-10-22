@@ -1,53 +1,46 @@
 # REMEMBER TO EDIT THIS BEFORE DEPLOY!!!
 
 # the path to your blog's icon:
-favicon: /favicon.png
-
-# the path to manifest.json
-manifest: /manifest.json
+favicon: /favicon.svg
 
 # show excerpt on post list
-show_excerpt: false
+show_excerpt: true
 
 # navigation config
 nav:
   # the title displays in the upper left corner which won't change
-  title: Blog
+  title: longforus
   # the items displays in the upper right corner
   items:
     # these items will display as a link
-    Archives: /archives
-    Friends: /friends
-    Projects: /projects
-    About: /about
+    归档: /archives
+    标签: /tags
+    分类: /categories
+    关于: /about
     # these will be automatically be an icon
     GitHub: https://github.com/longforus
-    # CodePen: https://codepen.io/mrwillcom
-    # Patreon: https://www.patreon.com/MrWillCom
 
 # footer items
 footer:
   # the title
-  Blog:
+  站点:
     # the items after the title, display as links
-    Blog: /
-    Archives: /archives
-    Friends: /friends
-    Projects: /projects
-    Resume: /resume
-    About: /about
-    RSS: /atom.xml
+    首页: /
+    归档: /archives
+    标签: /tags
+    分类: /categories
+    关于: /about
   # also the title
-  Projects:
+  项目:
     # the items
     MvpAutoCodePlus: https://github.com/longforus/MvpAutoCodePlus
-    
+    pgyerUpload4AndroidStudio: https://github.com/longforus/pgyerUpload4AndroidStudio
+    Android-drawable-preview-plugin: https://github.com/longforus/Android-drawable-preview-plugin
+
   # the title
-  Me:
+  联系:
     # items
     GitHub: https://github.com/longforus
-    # CodePen: https://codepen.io/mrwillcom
-    # Patreon: https://www.patreon.com/MrWillCom
     Email: mailto:longforus@outlook.com
 
 # the license your posts under

@@ -1,0 +1,10 @@
+<div class="container">
+    <header class="page-header">
+        <h1 class="page-title"><%= page.category %></h1>
+        <p class="page-subtitle">本页 <%= page.posts.length %> 篇笔记</p>
+    </header>
+
+    <%- partial('_partial/post-list') %>
+
+    <%- partial('_partial/paginator') %>
+</div>

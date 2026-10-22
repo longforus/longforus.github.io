@@ -1,61 +1,53 @@
+<%
+  var plainText = page.content.replace(/<[^>]*>/g, '');
+  var charCount = plainText.replace(/\s/g, '').length;
+  var readMinutes = Math.max(1, Math.ceil(charCount / 350));
+  var tocHtml = toc(page.content, { list_number: false, max_depth: 3 });
+  var updatedText = date(page.updated, 'YYYY-MM-DD');
+  var dateText = date(page.date, 'YYYY-MM-DD');
+%>
 <article class="post">
     <div class="meta">
-        <% if (!page.no_date) { %>
-        <div class="date" id="date">
-            <% if (page.date.month() == 0) { %>
-            <span>January</span>
+        <div class="post-meta">
+            <span class="post-date"><%= dateText %></span>
+            <% if (updatedText && updatedText !== dateText) { %>
+            <span class="dot">·</span>
+            <span class="post-updated">更新于 <%= updatedText %></span>
             <% } %>
-            <% if (page.date.month() == 1) { %>
-            <span>February</span>
-            <% } %>
-            <% if (page.date.month() == 2) { %>
-            <span>March</span>
-            <% } %>
-            <% if (page.date.month() == 3) { %>
-            <span>April</span>
-            <% } %>
-            <% if (page.date.month() == 4) { %>
-            <span>May</span>
-            <% } %>
-            <% if (page.date.month() == 5) { %>
-            <span>June</span>
-            <% } %>
-            <% if (page.date.month() == 6) { %>
-            <span>July</span>
-            <% } %>
-            <% if (page.date.month() == 7) { %>
-            <span>August</span>
-            <% } %>
-            <% if (page.date.month() == 8) { %>
-            <span>September</span>
-            <% } %>
-            <% if (page.date.month() == 9) { %>
-            <span>October</span>
-            <% } %>
-            <% if (page.date.month() == 10) { %>
-            <span>November</span>
-            <% } %>
-            <% if (page.date.month() == 11) { %>
-            <span>December</span>
-            <% } %>
-            <span><%- page.date.date() %>,</span>
-            <span><%- page.date.year() %></span>
+            <span class="dot">·</span>
+            <span class="post-reading"><%= readMinutes %> 分钟阅读</span>
+        </div>
+
+        <h1 class="title"><%= page.title %></h1>
+
+        <% if ((page.categories && page.categories.length) || (page.tags && page.tags.length)) { %>
+        <div class="post-taxonomy">
+            <% page.categories.each(function (category) { %>
+            <a class="chip chip-category" href="<%- url_for(category.path) %>"><%= category.name %></a>
+            <% }) %>
+            <% page.tags.each(function (tag) { %>
+            <a class="chip" href="<%- url_for(tag.path) %>"># <%= tag.name %></a>
+            <% }) %>
         </div>
         <% } %>
-
-        <h2 class="title"><%= page.title %></h2>
     </div>
 
     <div class="divider"></div>
+
+    <% if (tocHtml) { %>
+    <details class="toc-card">
+        <summary>目录</summary>
+        <%- tocHtml %>
+    </details>
+    <% } %>
 
     <div class="content">
         <%- page.content %>
     </div>
 
     <div class="about">
-        <h1><%= __('about_this_post') %></h1>
-        <p><%= __('this_post_is_written_by') %> <%- config.author %>, <%= __('licensed_under') %> <a
-                href="<%- theme.license_link %>"><%- theme.license %></a>.</p>
+        <h2>关于本文</h2>
+        <p>本文作者 <%- config.author %>，采用 <a href="<%- theme.license_link %>" target="_blank" rel="noopener"><%- theme.license %></a> 许可协议。转载请注明出处。</p>
     </div>
 
     <% if (!page.no_comments) { %>
