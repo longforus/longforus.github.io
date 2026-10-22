@@ -65,7 +65,7 @@
 
 
   
-<meta name="generator" content="Hexo 6.0.0"></head>
+<meta name="generator" content="Hexo 6.3.0"></head>
 
     <body>
         <nav id="theme-nav">
@@ -140,9 +140,10 @@
     <div class="content">
         <ul>
 <li><p>查看Activity启动耗时</p>
-<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">C:\Users\Administrator&gt;adb shell am <span class="built_in">start</span> <span class="literal">-W</span> com.fec.axkc/com.fec.yunmall.MainActivity</span><br><span class="line">Starting: Intent &#123; act=android.intent.action.MAIN <span class="built_in">cat</span>=[<span class="type">android.intent.category.LAUNCHER</span>] cmp=com.fec.axkc/com.fec.yunmall.MainActivity &#125;</span><br><span class="line">Status: ok</span><br><span class="line">Activity: com.fec.axkc/com.fec.yunmall.MainActivity</span><br><span class="line">ThisTime: <span class="number">488</span></span><br><span class="line">TotalTime: <span class="number">488</span></span><br><span class="line">WaitTime: <span class="number">505</span></span><br><span class="line">Complete</span><br></pre></td></tr></table></figure></li>
-</ul>
-<ul>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">C:\Users\Administrator&gt;adb shell am <span class="built_in">start</span> <span class="literal">-W</span> com.fec.axkc/com.fec.yunmall.MainActivity</span><br><span class="line">Starting: Intent &#123; act=android.intent.action.MAIN <span class="built_in">cat</span>=[<span class="type">android.intent.category.LAUNCHER</span>] cmp=com.fec.axkc/com.fec.yunmall.MainActivity &#125;</span><br><span class="line">Status: ok</span><br><span class="line">Activity: com.fec.axkc/com.fec.yunmall.MainActivity</span><br><span class="line">ThisTime: <span class="number">488</span></span><br><span class="line">TotalTime: <span class="number">488</span></span><br><span class="line">WaitTime: <span class="number">505</span></span><br><span class="line">Complete</span><br></pre></td></tr></table></figure>
+
+
+</li>
 <li><p>模拟进程强杀</p>
 <p>仅在当前进程处于后台时有效.</p>
 <figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">C:\Users\Administrator&gt;adb shell am <span class="built_in">kill</span> com.fec.axkc</span><br></pre></td></tr></table></figure></li>

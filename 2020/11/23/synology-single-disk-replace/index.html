@@ -65,7 +65,7 @@
 
 
   
-<meta name="generator" content="Hexo 6.0.0"></head>
+<meta name="generator" content="Hexo 6.3.0"></head>
 
     <body>
         <nav id="theme-nav">
@@ -153,7 +153,7 @@
 <li><p>群晖官方支持中心: <a target="_blank" rel="noopener" href="https://www.synology.cn/zh-cn/knowledgebase/DSM/tutorial/Storage/Can_I_use_larger_hard_drive_s_to_expand_the_storage_capacity_on_Synology_Product_for_DSM_2_2_and_onward">请问我是否可以更换硬盘来扩大 Synology 产品上的储存容量(适用于 DSM 2.2 与之前的版本）？</a>这个才他么的是坑爹的.看他是这么说的:</p>
   <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">是。您可以在不丢失数据的前提下，按照下列步骤更换硬盘。</span><br><span class="line"></span><br><span class="line">针对 1 颗硬盘机种：</span><br><span class="line"></span><br><span class="line">关闭 Synology 产品。</span><br><span class="line">把内部硬盘更换成较大容量的硬盘。</span><br><span class="line">打开 Synology 产品。</span><br><span class="line">重新安装系统。</span><br><span class="line">使用外部硬盘驱动盒，将置换下来的硬盘接上 USB 或 eSATA 端口。</span><br><span class="line">将数据从置换下来的硬盘复制到新硬盘上。</span><br><span class="line">取下置换下来的硬盘。</span><br></pre></td></tr></table></figure>
 
-<p>  前一个方法不行,我只能寄托希望于这个方法了,等了2天移动硬盘盒到了,装是旧盘,插入,可以识别到插入了移动硬盘,但是FileStation里面不会显示旧盘,用ssh登陆到群晖下,/dev下有旧盘,但是无法mount,提示<code> unknown filesystem type &#39;linux_raid_member&#39;</code>,自己的系统下啊,都不能识别.今天看到有网友说<a target="_blank" rel="noopener" href="https://tieba.baidu.com/p/6322629484?red_tag=2098980120">需要购买套件内的extACCESS。 黑裙是无法买的。</a></p>
+<p>  前一个方法不行,我只能寄托希望于这个方法了,等了2天移动硬盘盒到了,装是旧盘,插入,可以识别到插入了移动硬盘,但是FileStation里面不会显示旧盘,用ssh登陆到群晖下,&#x2F;dev下有旧盘,但是无法mount,提示<code> unknown filesystem type &#39;linux_raid_member&#39;</code>,自己的系统下啊,都不能识别.今天看到有网友说<a target="_blank" rel="noopener" href="https://tieba.baidu.com/p/6322629484?red_tag=2098980120">需要购买套件内的extACCESS。 黑裙是无法买的。</a></p>
 </li>
 <li><p>尝试加载btrfs文件系统,后来搜到一篇文章<a target="_blank" rel="noopener" href="https://blog.csdn.net/endzhi/article/details/91389826?biz_id=102&utm_term=mdadm%20--assemble%20--scan&utm_medium=distribute.pc_search_result.none-task-blog-2~all~sobaiduweb~default-4-91389826&spm=1018.2118.3001.4449">&lt;Centos7挂载ESXI黑群晖NAS磁盘&gt;</a>按照操作终于用MBP连接硬盘盒内装的旧盘,在VMware的centOS7虚拟机下挂载成功.但是死活连不上群晖的NFS,而且无线网没有千兆,考虑到速度的最终没有在MBP的虚拟机下传输.</p>
 </li>

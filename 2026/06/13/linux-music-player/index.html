@@ -65,7 +65,7 @@
 
 
   
-<meta name="generator" content="Hexo 6.0.0"></head>
+<meta name="generator" content="Hexo 6.3.0"></head>
 
     <body>
         <nav id="theme-nav">
@@ -163,31 +163,33 @@
 <ol>
 <li><p><strong>安装 MPD：</strong></p>
 <p> Bash</p>
- <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo apt update</span><br><span class="line">sudo apt install mpd mpc</span><br></pre></td></tr></table></figure></li>
+ <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo apt update</span><br><span class="line">sudo apt install mpd mpc</span><br></pre></td></tr></table></figure>
+</li>
 <li><p><strong>配置配置 Bit-Perfect 直通：</strong> 修改 <code>/etc/mpd.conf</code>（或用户目录下的配置），在 <code>audio_output</code> 部分指定你的 SMSL DAC 硬件地址（也就是你之前查到的 <code>hw:1,0</code>），让它彻底绕过 PipeWire：</p>
 <p> 代码段</p>
- <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">audio_output &#123;</span><br><span class="line">    type            &quot;alsa&quot;</span><br><span class="line">    name            &quot;SMSL DAC&quot;</span><br><span class="line">    device          &quot;hw:1,0&quot;      # 锁定硬件直通</span><br><span class="line">    mixer_type      &quot;none&quot;        # 禁用软件混音，保证源码输出</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+ <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">audio_output &#123;</span><br><span class="line">    type            &quot;alsa&quot;</span><br><span class="line">    name            &quot;SMSL DAC&quot;</span><br><span class="line">    device          &quot;hw:1,0&quot;      # 锁定硬件直通</span><br><span class="line">    mixer_type      &quot;none&quot;        # 禁用软件混音，保证源码输出</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
 <li><p><strong>手机端下载 App（客户端）：</strong></p>
 <ul>
 <li><strong>Android 推荐：</strong> <strong>M.A.L.P.</strong> (免费开源，界面非常现代美观) 或 <strong>MPDroid</strong>。</li>
 <li><strong>iOS 推荐：</strong> <strong>Rigelian</strong> 或 <strong>MaximumMPD</strong>。</li>
 </ul>
 </li>
-<li><p><strong>控制体验：</strong> 在手机 App 里输入你 Kubuntu 的局域网 IP 连上后，你可以在手机上<strong>完美浏览电脑里的本地音乐文件夹、按艺术家/专辑分类、自由创建和切换歌单、查看精美的封面</strong>。而电脑端没有任何图形界面，只是极度纯净地将音频流喂给你的 SMSL DAC。</p>
+<li><p><strong>控制体验：</strong> 在手机 App 里输入你 Kubuntu 的局域网 IP 连上后，你可以在手机上<strong>完美浏览电脑里的本地音乐文件夹、按艺术家&#x2F;专辑分类、自由创建和切换歌单、查看精美的封面</strong>。而电脑端没有任何图形界面，只是极度纯净地将音频流喂给你的 SMSL DAC。</p>
 </li>
 <li><p>启动并设置开机自启</p>
-<p> 在终端中执行以下命令（因为修改的是系统级别的 <code>/etc/mpd.conf</code>，需要加上 <code>sudo</code>）：</p>
-<p> Bash</p>
- <figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 启动 mpd 服务</span></span><br><span class="line">sudo systemctl start mpd</span><br><span class="line"><span class="comment"># 设置开机自动启动</span></span><br><span class="line">sudo systemctl <span class="built_in">enable</span> mpd</span><br></pre></td></tr></table></figure>
+<p>在终端中执行以下命令（因为修改的是系统级别的 <code>/etc/mpd.conf</code>，需要加上 <code>sudo</code>）：</p>
+<p>Bash</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 启动 mpd 服务</span></span><br><span class="line"><span class="built_in">sudo</span> systemctl start mpd</span><br><span class="line"><span class="comment"># 设置开机自动启动</span></span><br><span class="line"><span class="built_in">sudo</span> systemctl <span class="built_in">enable</span> mpd</span><br></pre></td></tr></table></figure>
 
 <ol start="6">
 <li>检查运行状态（验证是否成功独占 DAC）</li>
 </ol>
-<p> 启动后，强烈建议检查一下 mpd 是否正常跑起来了，有没有报错：</p>
-<p> Bash</p>
- <figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">sudo systemctl status mpd</span><br><span class="line">● mpd.service - Music Player Daemon</span><br><span class="line">Loaded: loaded (/usr/lib/systemd/system/mpd.service; enabled; preset: enabled)</span><br><span class="line">Active: active (running) since Sun 2026-06-07 19:02:18 CST; 6 days ago</span><br><span class="line">Invocation: 751dcf4d858749208fbfe644aa674435</span><br><span class="line">TriggeredBy: ○ mpd.socket</span><br><span class="line">Docs: man:mpd(1)</span><br><span class="line">man:mpd.conf(5)</span><br><span class="line">file:///usr/share/doc/mpd/html/user.html</span><br><span class="line">Main PID: 3262675 (mpd)</span><br><span class="line">Tasks: 7 (<span class="built_in">limit</span>: 33540)</span><br><span class="line">Memory: 13.4M (peak: 1.3G, swap: 10.4M, swap peak: 10.4M)</span><br><span class="line">CPU: 2min 48.767s</span><br><span class="line">CGroup: /system.slice/mpd.service</span><br><span class="line">└─3262675 /usr/bin/mpd --systemd</span><br><span class="line"></span><br><span class="line">6月 08 08:51:32 void-metacube mpd[3262675]: player: played <span class="string">&quot;古典歌剧类/Ólafur Arnalds - Eulogy for Evolution/03 .0952.wav&quot;</span></span><br><span class="line">6月 08 08:58:29 void-metacube mpd[3262675]: player: played <span class="string">&quot;古典歌剧类/Ólafur Arnalds - Eulogy for Evolution/04 .1440.wav&quot;</span></span><br><span class="line">6月 08 09:02:59 void-metacube mpd[3262675]: player: played <span class="string">&quot;古典歌剧类/Ólafur Arnalds - Eulogy for Evolution/05 .1953.wav&quot;</span></span><br><span class="line">6月 08 09:09:56 void-metacube mpd[3262675]: player: played <span class="string">&quot;古典歌剧类/Ólafur Arnalds - Eulogy for Evolution/05 .1953.wav&quot;</span></span><br><span class="line">6月 08 09:13:57 void-metacube mpd[3262675]: player: played <span class="string">&quot;dsd/蔡琴 - 渡口.dff&quot;</span></span><br><span class="line">6月 08 09:16:39 void-metacube mpd[3262675]: player: played <span class="string">&quot;dsd/蔡琴 - 被遗忘的时光(电影「无间道」插曲).dff&quot;</span></span><br><span class="line">6月 08 09:20:34 void-metacube mpd[3262675]: player: played <span class="string">&quot;dsd/陈慧娴 - 飘雪.dff&quot;</span></span><br><span class="line">6月 08 09:24:02 void-metacube mpd[3262675]: player: played <span class="string">&quot;dsd/陈百强 - 偏偏喜欢你.dff&quot;</span></span><br><span class="line">6月 08 09:28:59 void-metacube mpd[3262675]: player: played <span class="string">&quot;dsd/雷婷 - 你的選擇.dsf&quot;</span></span><br><span class="line">6月 08 09:31:28 void-metacube mpd[3262675]: player: played <span class="string">&quot;dsd/雷婷 - 挪威的森林.dsf&quot;</span></span><br></pre></td></tr></table></figure>
+<p>启动后，强烈建议检查一下 mpd 是否正常跑起来了，有没有报错：</p>
+<p>Bash</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> systemctl status mpd</span><br><span class="line">● mpd.service - Music Player Daemon</span><br><span class="line">Loaded: loaded (/usr/lib/systemd/system/mpd.service; enabled; preset: enabled)</span><br><span class="line">Active: active (running) since Sun 2026-06-07 19:02:18 CST; 6 days ago</span><br><span class="line">Invocation: 751dcf4d858749208fbfe644aa674435</span><br><span class="line">TriggeredBy: ○ mpd.socket</span><br><span class="line">Docs: man:mpd(1)</span><br><span class="line">man:mpd.conf(5)</span><br><span class="line">file:///usr/share/doc/mpd/html/user.html</span><br><span class="line">Main PID: 3262675 (mpd)</span><br><span class="line">Tasks: 7 (<span class="built_in">limit</span>: 33540)</span><br><span class="line">Memory: 13.4M (peak: 1.3G, swap: 10.4M, swap peak: 10.4M)</span><br><span class="line">CPU: 2min 48.767s</span><br><span class="line">CGroup: /system.slice/mpd.service</span><br><span class="line">└─3262675 /usr/bin/mpd --systemd</span><br><span class="line"></span><br><span class="line">6月 08 08:51:32 void-metacube mpd[3262675]: player: played <span class="string">&quot;古典歌剧类/Ólafur Arnalds - Eulogy for Evolution/03 .0952.wav&quot;</span></span><br><span class="line">6月 08 08:58:29 void-metacube mpd[3262675]: player: played <span class="string">&quot;古典歌剧类/Ólafur Arnalds - Eulogy for Evolution/04 .1440.wav&quot;</span></span><br><span class="line">6月 08 09:02:59 void-metacube mpd[3262675]: player: played <span class="string">&quot;古典歌剧类/Ólafur Arnalds - Eulogy for Evolution/05 .1953.wav&quot;</span></span><br><span class="line">6月 08 09:09:56 void-metacube mpd[3262675]: player: played <span class="string">&quot;古典歌剧类/Ólafur Arnalds - Eulogy for Evolution/05 .1953.wav&quot;</span></span><br><span class="line">6月 08 09:13:57 void-metacube mpd[3262675]: player: played <span class="string">&quot;dsd/蔡琴 - 渡口.dff&quot;</span></span><br><span class="line">6月 08 09:16:39 void-metacube mpd[3262675]: player: played <span class="string">&quot;dsd/蔡琴 - 被遗忘的时光(电影「无间道」插曲).dff&quot;</span></span><br><span class="line">6月 08 09:20:34 void-metacube mpd[3262675]: player: played <span class="string">&quot;dsd/陈慧娴 - 飘雪.dff&quot;</span></span><br><span class="line">6月 08 09:24:02 void-metacube mpd[3262675]: player: played <span class="string">&quot;dsd/陈百强 - 偏偏喜欢你.dff&quot;</span></span><br><span class="line">6月 08 09:28:59 void-metacube mpd[3262675]: player: played <span class="string">&quot;dsd/雷婷 - 你的選擇.dsf&quot;</span></span><br><span class="line">6月 08 09:31:28 void-metacube mpd[3262675]: player: played <span class="string">&quot;dsd/雷婷 - 挪威的森林.dsf&quot;</span></span><br></pre></td></tr></table></figure>
 
-<p> 如果看到绿色的 **<code>active (running)</code>**，说明服务已经正常拉起了。</p>
+<p>如果看到绿色的 **<code>active (running)</code>**，说明服务已经正常拉起了。</p>
 </li>
 </ol>
 <p>唯一的问题是M.A.L.P.不太符合我的操作习惯,  也不是很漂亮,也试过navidrome 无论是docker部署还是直装都不能DSD直出,选不了JUKEBOX,都是转码的,而且电脑前只能用网页端播放,跟着AI调了半天也不行.先就这么用吧.</p>
@@ -216,13 +218,14 @@
  <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[General]</span><br><span class="line">Class = 0x20041C</span><br><span class="line">DiscoverableTimeout = 0</span><br></pre></td></tr></table></figure>
 
 <ul>
-<li><code>Class = 0x20041C</code> 会告诉手机：“我是一个高品质音频渲染设备/音箱”。</li>
+<li><code>Class = 0x20041C</code> 会告诉手机：“我是一个高品质音频渲染设备&#x2F;音箱”。</li>
 <li><code>DiscoverableTimeout = 0</code> 表示蓝牙可见时间不设限制，方便随时连接。</li>
 </ul>
 </li>
 <li><p>找到或添加 <code>[Policy]</code> 标签，确保启用自动连接：</p>
 <p> Ini, TOML</p>
- <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[Policy]</span><br><span class="line">AutoConnect=true</span><br></pre></td></tr></table></figure></li>
+ <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[Policy]</span><br><span class="line">AutoConnect=true</span><br></pre></td></tr></table></figure>
+</li>
 <li><p>保存并退出，然后重启蓝牙服务：</p>
 <p> Bash</p>
  <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo systemctl restart bluetooth</span><br></pre></td></tr></table></figure></li>
@@ -231,23 +234,26 @@
 <ol>
 <li><p>在终端输入：</p>
 <p> Bash</p>
- <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bluetoothctl</span><br></pre></td></tr></table></figure></li>
+ <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bluetoothctl</span><br></pre></td></tr></table></figure>
+</li>
 <li><p>进入蓝牙控制台后，依次输入以下命令开启发现和配对功能：</p>
 <p> Plaintext</p>
- <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">power on</span><br><span class="line">agent on</span><br><span class="line">default-agent</span><br><span class="line">discoverable on</span><br><span class="line">pairable on</span><br></pre></td></tr></table></figure></li>
+ <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">power on</span><br><span class="line">agent on</span><br><span class="line">default-agent</span><br><span class="line">discoverable on</span><br><span class="line">pairable on</span><br></pre></td></tr></table></figure>
+</li>
 <li><p><strong>在手机上操作</strong>：打开手机蓝牙，搜索你的 Ubuntu 主机名称，点击连接。</p>
 </li>
 <li><p><strong>回到终端</strong>：终端会弹出配对请求，提示类似 <code>[agent] Confirm passkey xxxxxx (yes/no):</code>，输入 <code>yes</code> 并回车。手机端同样点击确认配对。</p>
 </li>
 <li><p><strong>信任设备</strong>（非常重要，这样以后手机开蓝牙就会自动连上，不需要每次都确认）： 在终端中找到你手机的 MAC 地址（形式如 <code>AA:BB:CC:DD:EE:FF</code>），输入：</p>
 <p> Plaintext</p>
- <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">trust AA:BB:CC:DD:EE:FF</span><br></pre></td></tr></table></figure></li>
+ <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">trust AA:BB:CC:DD:EE:FF</span><br></pre></td></tr></table></figure>
+</li>
 <li><p>输入 <code>quit</code> 退出蓝牙控制台。</p>
 </li>
 </ol>
 <h4 id="第四步：音频输出路由（让声卡出声）"><a href="#第四步：音频输出路由（让声卡出声）" class="headerlink" title="第四步：音频输出路由（让声卡出声）"></a>第四步：音频输出路由（让声卡出声）</h4><p>默认情况下，一旦手机连接成功并在播放音乐，PipeWire 会<strong>自动</strong>把手机的蓝牙音频流路由到你 Ubuntu 当前默认的音频输出设备（即你的声卡）。</p>
 <p>如果你发现手机显示在播放，但声卡没有声音，可以通过以下方式检查和切换：</p>
-<h5 id="方案-A：使用图形界面（最直观）"><a href="#方案-A：使用图形界面（最直观）" class="headerlink" title="方案 A：使用图形界面（最直观）"></a>方案 A：使用图形界面（最直观）</h5><p>如果你有图形界面（比如通过 Wayland/X11 连了显示器或远程桌面），打开系统的 <strong>Settings（设置）-&gt; Sound（声音）</strong>。</p>
+<h5 id="方案-A：使用图形界面（最直观）"><a href="#方案-A：使用图形界面（最直观）" class="headerlink" title="方案 A：使用图形界面（最直观）"></a>方案 A：使用图形界面（最直观）</h5><p>如果你有图形界面（比如通过 Wayland&#x2F;X11 连了显示器或远程桌面），打开系统的 <strong>Settings（设置）-&gt; Sound（声音）</strong>。</p>
 <ul>
 <li>在 <strong>Output（输出）</strong> 列表中，确保选中的是你想出声的那块声卡。</li>
 <li>在 <strong>Volume Levels（音量）</strong> 或播放列表中，你应该能看到手机作为一个输入源正在传输音频，拉大它的音量即可。</li>
@@ -262,7 +268,8 @@
 </li>
 <li><p><strong>如果需要切换默认声卡</strong>：</p>
 <p> Bash</p>
- <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wpctl set-default &lt;声卡ID&gt;</span><br></pre></td></tr></table></figure></li>
+ <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wpctl set-default &lt;声卡ID&gt;</span><br></pre></td></tr></table></figure>
+</li>
 <li><p><strong>调整音量</strong>： 可以通过 <code>alsamixer</code> 或 <code>amixer</code> 确保主音量和 PCM 音量没有被静音（Mute）。</p>
 </li>
 </ol>
