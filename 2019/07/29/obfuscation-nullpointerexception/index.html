@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+
+  <title>一个混淆后报 NullPointerException 的问题 - longforus</title>
+
+  
+    <link rel="shortcut icon" href="../../../../favicon.svg">
+  
+
+  <meta name="description" content="最近的项目中需要集成一些扫描枪厂家的第三方SDK,前面都还算顺利,今天集成的这一家,开始也没有问题,但是开启了混淆后,会报NullPointerException,提示sdk包中的类找不到.问题比较少见,比较意外,多方尝…">
+  
+  <meta name="keywords" content="Android,Java,Kotlin,逆向,Linux,Hexo">
+  
+  <meta name="author" content="longforus">
+  <meta name="theme-color" content="#0a84ff">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="一个混淆后报 NullPointerException 的问题">
+  <meta property="og:description" content="最近的项目中需要集成一些扫描枪厂家的第三方SDK,前面都还算顺利,今天集成的这一家,开始也没有问题,但是开启了混淆后,会报NullPointerException,提示sdk包中的类找不到.问题比较少见,比较意外,多方尝…">
+  <meta property="og:site_name" content="longforus">
+
+  
+<link rel="stylesheet" href="../../../../css/var.css">
+
+  
+<link rel="stylesheet" href="../../../../css/main.css">
+
+  
+<link rel="stylesheet" href="../../../../css/typography.css">
+
+  
+<link rel="stylesheet" href="../../../../css/code-highlighting.css">
+
+  
+<link rel="stylesheet" href="../../../../css/components.css">
+
+  
+<link rel="stylesheet" href="../../../../css/nav.css">
+
+  
+<link rel="stylesheet" href="../../../../css/paginator.css">
+
+  
+<link rel="stylesheet" href="../../../../css/footer.css">
+
+  
+<link rel="stylesheet" href="../../../../css/post-list.css">
+
+  
+<link rel="stylesheet" href="../../../../css/waline.css">
+
+  
+  
+  
+<link rel="stylesheet" href="../../../../css/post.css">
+
+  
+  
+<link rel="stylesheet" href="../../../../css/custom.css">
+
+
+  
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+    <body>
+        <nav id="theme-nav">
+    <div class="inner">
+        <a class="title" href="../../../../index.html">longforus</a>
+        <div class="nav-arrow"></div>
+        <div class="nav-items">
+            <a class="nav-item nav-item-home" href="../../../../index.html">主页</a>
+            
+            
+            
+            <a class="nav-item" href="../../../../archives">归档</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../tags">标签</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../categories">分类</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../about">关于</a>
+            
+            
+            
+            
+            <a class="nav-item nav-item-github nav-item-icon" href="https://github.com/longforus" target="_blank" rel="noopener" aria-label="GitHub">&nbsp;</a>
+            
+            
+        </div>
+    </div>
+</nav>
+
+        
+<article class="post">
+    <div class="meta">
+        <div class="post-meta">
+            <span class="post-date">2019-07-29</span>
+            
+            <span class="dot">·</span>
+            <span class="post-updated">更新于 2025-11-16</span>
+            
+            <span class="dot">·</span>
+            <span class="post-reading">4 分钟阅读</span>
+        </div>
+
+        <h1 class="title">一个混淆后报 NullPointerException 的问题</h1>
+
+        
+        <div class="post-taxonomy">
+            
+            <a class="chip chip-category" href="../../../../categories/Android/">Android</a>
+            
+            
+            <a class="chip" href="../../../../tags/%E6%B7%B7%E6%B7%86/"># 混淆</a>
+            
+            <a class="chip" href="../../../../tags/ProGuard/"># ProGuard</a>
+            
+        </div>
+        
+    </div>
+
+    <div class="divider"></div>
+
+    
+    <details class="toc-card">
+        <summary>目录</summary>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%97%AE%E9%A2%98%E8%A1%A8%E7%8E%B0"><span class="toc-text">问题表现</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B0%9D%E8%AF%95%E8%A7%A3%E5%86%B3"><span class="toc-text">尝试解决</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A7%A3%E5%86%B3"><span class="toc-text">解决</span></a></li></ol>
+    </details>
+    
+
+    <div class="content">
+        <p>最近的项目中需要集成一些扫描枪厂家的第三方SDK,前面都还算顺利,今天集成的这一家,开始也没有问题,但是开启了混淆后,会报NullPointerException,提示sdk包中的类找不到.问题比较少见,比较意外,多方尝试后才得到解决.背后的原理也还没有理清,记录备查.</p>
+<h2 id="问题表现"><a href="#问题表现" class="headerlink" title="问题表现"></a>问题表现</h2><p>在一个有扫描功能的抽象类中,实例化一个sdk中的类,非常简单.</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scanManager = ScanManager()</span><br></pre></td></tr></table></figure>
+
+<p>混淆过后,该行代码报NullPointerException.显然是ScanManager()报的.在這里断点,进来以后一执行ScanManager()就报错了.关闭混淆的情况下,则可以成功构造出实例.</p>
+<h2 id="尝试解决"><a href="#尝试解决" class="headerlink" title="尝试解决"></a>尝试解决</h2><ol>
+<li><p>首先当然是添加这个jar包的,混淆保持策略,整个包保存,这个sdk的包名,不是很常见,用的是安卓系统类型的包名:<code>android.device.ScanManager</code>,<code>android.device.DeviceManager</code>这种.在:app的proguard-rules.pro中添加:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-keep class android.device.** &#123; *; &#125;</span><br></pre></td></tr></table></figure>
+
+<p>keep整个包不被混淆,跑起来问题还是一样.</p>
+</li>
+<li><p>怀疑是混淆策略没有起效,这个包内的类还是被混淆了,手动拖入混淆后的apk到as中,查看dex结构.发现:</p>
+<p><img src="%E6%B7%B7%E6%B7%86%E6%8A%A5%E9%94%991.png"></p>
+<p>目标包并没有被混淆,</p>
+<p><img src="%E6%B7%B7%E6%B7%86%E6%8A%A5%E9%94%992.png"></p>
+<p>我自己的类已经混淆成功了.同事尝试keep 调用ScanManager的类的所有代码也无效.问题依旧.</p>
+</li>
+<li><p>还有很多其他的尝试,keep ScanManager到mainDex等,最后都没有效果.</p>
+</li>
+</ol>
+<h2 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h2><p>虽然最终也没有搞清楚是什么原因引起的,但是经过上面的分析,我确定混淆规则确实是起效了的,ScanManager并没有被混淆,可能是因为比较特殊的包名,在读取这个class的时候,classLoader没有找到,或则不被支持等问题.这个也是臆测,要是class没有找到难道不应该报<em>ClassNotFoundException</em>么?反正最后也没能搞清楚原因.但是说到了classLoader就想起了Tinker热修复实现原理中,让classLoader提前找到要修复的类返回的操作.那么這里是不是因为classLoader没有找到ScanManager或者是找的过程中出现了什么问题呢?修改ScanManager初始化代码如下:</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scanManager = Class.forName(<span class="string">&quot;android.device.ScanManager&quot;</span>,<span class="literal">true</span>,classLoader).newInstance() <span class="keyword">as</span> ScanManager?</span><br></pre></td></tr></table></figure>
+
+<p>其实也没有深入到classLoader的具体使用,只是简单的用反射创建新实例.相当意外的.问题得到了解决,开启混淆后,這里也不会报错了,感觉还是类加载过程中出现的问题.具体是为什么呢?//todo 2019-7-29 16:25:07</p>
+
+    </div>
+
+    <div class="about">
+        <h2>关于本文</h2>
+        <p>本文作者 longforus，采用 <a href="https://creativecommons.org/licenses/by-nc/4.0" target="_blank" rel="noopener">CC BY-NC 4.0</a> 许可协议。转载请注明出处。</p>
+    </div>
+
+    
+        
+    
+</article>
+
+        <footer>
+    <div class="inner">
+        <div class="links">
+            
+            <div class="group">
+                <h4 class="title">站点</h4>
+                
+                
+                <a href="../../../../index.html" class="item">首页</a>
+                
+                
+                <a href="../../../../archives" class="item">归档</a>
+                
+                
+                <a href="../../../../tags" class="item">标签</a>
+                
+                
+                <a href="../../../../categories" class="item">分类</a>
+                
+                
+                <a href="../../../../about" class="item">关于</a>
+                
+            </div>
+            
+            <div class="group">
+                <h4 class="title">项目</h4>
+                
+                
+                <a href="https://github.com/longforus/MvpAutoCodePlus" class="item" target="_blank" rel="noopener">MvpAutoCodePlus</a>
+                
+                
+                <a href="https://github.com/longforus/pgyerUpload4AndroidStudio" class="item" target="_blank" rel="noopener">pgyerUpload4AndroidStudio</a>
+                
+                
+                <a href="https://github.com/longforus/Android-drawable-preview-plugin" class="item" target="_blank" rel="noopener">Android-drawable-preview-plugin</a>
+                
+            </div>
+            
+            <div class="group">
+                <h4 class="title">联系</h4>
+                
+                
+                <a href="https://github.com/longforus" class="item" target="_blank" rel="noopener">GitHub</a>
+                
+                
+                <a href="mailto:longforus@outlook.com" class="item" target="_blank" rel="noopener">Email</a>
+                
+            </div>
+            
+        </div>
+        &copy; 2026 longforus<br />
+        驱动自 <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+</footer>
+
+        
+<script src="../js/main.js"></script>
+
+        
+<script src="../js/custom.js"></script>
+
+        
+    </body>
+</html>

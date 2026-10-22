@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+
+  <title>怎么从 WillPopScope 迁移到 PopScope - longforus</title>
+
+  
+    <link rel="shortcut icon" href="../../../../favicon.svg">
+  
+
+  <meta name="description" content="Flutter 中从 WillPopScope 迁移到 PopScope 的异步返回拦截方案。">
+  
+  <meta name="keywords" content="Android,Java,Kotlin,逆向,Linux,Hexo">
+  
+  <meta name="author" content="longforus">
+  <meta name="theme-color" content="#0a84ff">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="怎么从 WillPopScope 迁移到 PopScope">
+  <meta property="og:description" content="Flutter 中从 WillPopScope 迁移到 PopScope 的异步返回拦截方案。">
+  <meta property="og:site_name" content="longforus">
+
+  
+<link rel="stylesheet" href="../../../../css/var.css">
+
+  
+<link rel="stylesheet" href="../../../../css/main.css">
+
+  
+<link rel="stylesheet" href="../../../../css/typography.css">
+
+  
+<link rel="stylesheet" href="../../../../css/code-highlighting.css">
+
+  
+<link rel="stylesheet" href="../../../../css/components.css">
+
+  
+<link rel="stylesheet" href="../../../../css/nav.css">
+
+  
+<link rel="stylesheet" href="../../../../css/paginator.css">
+
+  
+<link rel="stylesheet" href="../../../../css/footer.css">
+
+  
+<link rel="stylesheet" href="../../../../css/post-list.css">
+
+  
+<link rel="stylesheet" href="../../../../css/waline.css">
+
+  
+  
+  
+<link rel="stylesheet" href="../../../../css/post.css">
+
+  
+  
+<link rel="stylesheet" href="../../../../css/custom.css">
+
+
+  
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+    <body>
+        <nav id="theme-nav">
+    <div class="inner">
+        <a class="title" href="../../../../index.html">longforus</a>
+        <div class="nav-arrow"></div>
+        <div class="nav-items">
+            <a class="nav-item nav-item-home" href="../../../../index.html">主页</a>
+            
+            
+            
+            <a class="nav-item" href="../../../../archives">归档</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../tags">标签</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../categories">分类</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../about">关于</a>
+            
+            
+            
+            
+            <a class="nav-item nav-item-github nav-item-icon" href="https://github.com/longforus" target="_blank" rel="noopener" aria-label="GitHub">&nbsp;</a>
+            
+            
+        </div>
+    </div>
+</nav>
+
+        
+<article class="post">
+    <div class="meta">
+        <div class="post-meta">
+            <span class="post-date">2024-11-08</span>
+            
+            <span class="dot">·</span>
+            <span class="post-updated">更新于 2026-04-30</span>
+            
+            <span class="dot">·</span>
+            <span class="post-reading">7 分钟阅读</span>
+        </div>
+
+        <h1 class="title">怎么从 WillPopScope 迁移到 PopScope</h1>
+
+        
+        <div class="post-taxonomy">
+            
+            <a class="chip chip-category" href="../../../../categories/Flutter/">Flutter</a>
+            
+            
+            <a class="chip" href="../../../../tags/Flutter/"># Flutter</a>
+            
+            <a class="chip" href="../../../../tags/Android/"># Android</a>
+            
+        </div>
+        
+    </div>
+
+    <div class="divider"></div>
+
+    
+
+    <div class="content">
+        <p> 最近把flutter升级到了3.22.0-0.1.pre,3.19的正式版在我的项目上有些问题,先到预览版过渡一下.</p>
+<p>发现WillPopScope被弃用了:</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Deprecated</span>(</span><br><span class="line">  <span class="string">&#x27;Use PopScope instead. &#x27;</span></span><br><span class="line">  <span class="string">&#x27;This feature was deprecated after v3.12.0-1.0.pre.&#x27;</span>,</span><br><span class="line">)</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">WillPopScope</span> <span class="keyword">extends</span> <span class="title">StatefulWidget</span> </span>&#123;</span><br></pre></td></tr></table></figure>
+
+<p>迁移到了PopScope,但是PopScope接受的是否pop的参数和WillPopScope相比变化较大,</p>
+<p>WillPopScope:</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/// <span class="markdown">Called to veto attempts by the user to dismiss the enclosing [ModalRoute].</span></span></span><br><span class="line"><span class="comment">///</span></span><br><span class="line"><span class="comment">/// <span class="markdown">If the callback returns a Future that resolves to false, the enclosing</span></span></span><br><span class="line"><span class="comment">/// <span class="markdown">route will not be popped.</span></span></span><br><span class="line"><span class="keyword">final</span> WillPopCallback? onWillPop;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> WillPopCallback = Future&lt;<span class="built_in">bool</span>&gt; <span class="built_in">Function</span>();</span><br></pre></td></tr></table></figure>
+
+<p>本来是接收一个返回Future<bool> 的callback的,方便我们在里面进行一些异步的操作判断当前是否需要pop,用起来是非常方便的.但是PopScope的改成了:</p>
+ <figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">  <span class="comment">/// <span class="markdown">&#123;@template flutter.widgets.PopScope.canPop&#125;</span></span></span><br><span class="line">  <span class="comment">/// <span class="markdown">When false, blocks the current route from being popped.</span></span></span><br><span class="line">  <span class="comment">///</span></span><br><span class="line">  <span class="comment">/// <span class="markdown">This includes the root route, where upon popping, the Flutter app would</span></span></span><br><span class="line">  <span class="comment">/// <span class="markdown">exit.</span></span></span><br><span class="line">  <span class="comment">///</span></span><br><span class="line">  <span class="comment">/// <span class="markdown">If multiple [PopScope] widgets appear in a route&#x27;s widget subtree, then</span></span></span><br><span class="line">  <span class="comment">/// <span class="markdown">each and every <span class="code">`canPop`</span> must be <span class="code">`true`</span> in order for the route to be</span></span></span><br><span class="line">  <span class="comment">/// <span class="markdown">able to pop.</span></span></span><br><span class="line">  <span class="comment">///</span></span><br><span class="line">  <span class="comment">/// <span class="markdown">[<span class="string">Android&#x27;s predictive back</span>](<span class="link">https://developer.android.com/guide/navigation/predictive-back-gesture</span>)</span></span></span><br><span class="line">  <span class="comment">/// <span class="markdown">feature will not animate when this boolean is false.</span></span></span><br><span class="line">  <span class="comment">/// <span class="markdown">&#123;@endtemplate&#125;</span></span></span><br><span class="line">  <span class="keyword">final</span> <span class="built_in">bool</span> canPop;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/// <span class="markdown">&#123;@template flutter.widgets.PopScope.onPopInvoked&#125;</span></span></span><br><span class="line">  <span class="comment">/// <span class="markdown">Called after a route pop was handled.</span></span></span><br><span class="line">  <span class="comment">/// <span class="markdown">&#123;@endtemplate&#125;</span></span></span><br><span class="line">  <span class="comment">///</span></span><br><span class="line">  <span class="comment">/// <span class="markdown">It&#x27;s not possible to prevent the pop from happening at the time that this</span></span></span><br><span class="line">  <span class="comment">/// <span class="markdown">method is called; the pop has already happened. Use [canPop] to</span></span></span><br><span class="line">  <span class="comment">/// <span class="markdown">disable pops in advance.</span></span></span><br><span class="line">  <span class="comment">///</span></span><br><span class="line">  <span class="comment">/// <span class="markdown">This will still be called even when the pop is canceled. A pop is canceled</span></span></span><br><span class="line">  <span class="comment">/// <span class="markdown">when the relevant [Route.popDisposition] returns false, such as when</span></span></span><br><span class="line">  <span class="comment">/// <span class="markdown">[canPop] is set to false on a [PopScope]. The <span class="code">`didPop`</span> parameter</span></span></span><br><span class="line">  <span class="comment">/// <span class="markdown">indicates whether or not the back navigation actually happened</span></span></span><br><span class="line">  <span class="comment">/// <span class="markdown">successfully.</span></span></span><br><span class="line">  <span class="comment">///</span></span><br><span class="line">  <span class="comment">/// <span class="markdown">See also:</span></span></span><br><span class="line">  <span class="comment">///</span></span><br><span class="line">  <span class="comment">/// <span class="markdown"><span class="bullet"> *</span> [Route.onPopInvoked], which is similar.</span></span></span><br><span class="line">  <span class="keyword">final</span> PopInvokedCallback? onPopInvoked;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> PopInvokedCallback = <span class="keyword">void</span> <span class="built_in">Function</span>(<span class="built_in">bool</span> didPop);</span><br></pre></td></tr></table></figure>
+
+<p>直接接收一个bool,和一个不好用的回调,不能再愉快的进行异步调用判断是否要pop了,个人觉得是反向升级.那么在PopScope下怎么进行异步判断呢?</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">  <span class="keyword">return</span> WillPopScope(</span><br><span class="line">    onWillPop: () <span class="keyword">async</span> &#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">await</span> checkHasNoUpload();</span><br><span class="line">&#125;,</span><br><span class="line">child:child</span><br><span class="line">&#125;;</span><br><span class="line">-------------------------------------------------------</span><br><span class="line"> <span class="keyword">return</span> PopScope(</span><br><span class="line">    canPop: <span class="keyword">false</span>,</span><br><span class="line">    onPopInvoked: (didPop) <span class="keyword">async</span> &#123;</span><br><span class="line">      <span class="keyword">if</span>(didPop)&#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">if</span> (<span class="keyword">await</span> checkHasNoUpload()) &#123;</span><br><span class="line">        Get.back();</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    child:child</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>麻烦了不少.</p>
+
+    </div>
+
+    <div class="about">
+        <h2>关于本文</h2>
+        <p>本文作者 longforus，采用 <a href="https://creativecommons.org/licenses/by-nc/4.0" target="_blank" rel="noopener">CC BY-NC 4.0</a> 许可协议。转载请注明出处。</p>
+    </div>
+
+    
+        
+    
+</article>
+
+        <footer>
+    <div class="inner">
+        <div class="links">
+            
+            <div class="group">
+                <h4 class="title">站点</h4>
+                
+                
+                <a href="../../../../index.html" class="item">首页</a>
+                
+                
+                <a href="../../../../archives" class="item">归档</a>
+                
+                
+                <a href="../../../../tags" class="item">标签</a>
+                
+                
+                <a href="../../../../categories" class="item">分类</a>
+                
+                
+                <a href="../../../../about" class="item">关于</a>
+                
+            </div>
+            
+            <div class="group">
+                <h4 class="title">项目</h4>
+                
+                
+                <a href="https://github.com/longforus/MvpAutoCodePlus" class="item" target="_blank" rel="noopener">MvpAutoCodePlus</a>
+                
+                
+                <a href="https://github.com/longforus/pgyerUpload4AndroidStudio" class="item" target="_blank" rel="noopener">pgyerUpload4AndroidStudio</a>
+                
+                
+                <a href="https://github.com/longforus/Android-drawable-preview-plugin" class="item" target="_blank" rel="noopener">Android-drawable-preview-plugin</a>
+                
+            </div>
+            
+            <div class="group">
+                <h4 class="title">联系</h4>
+                
+                
+                <a href="https://github.com/longforus" class="item" target="_blank" rel="noopener">GitHub</a>
+                
+                
+                <a href="mailto:longforus@outlook.com" class="item" target="_blank" rel="noopener">Email</a>
+                
+            </div>
+            
+        </div>
+        &copy; 2026 longforus<br />
+        驱动自 <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+</footer>
+
+        
+<script src="../js/main.js"></script>
+
+        
+<script src="../js/custom.js"></script>
+
+        
+    </body>
+</html>

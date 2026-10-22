@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+
+  <title>双网口小主机 All in one 除 PVE 外的另一种选择 - longforus</title>
+
+  
+    <link rel="shortcut icon" href="../../../../favicon.svg">
+  
+
+  <meta name="description" content="关于双网口小主机All in one,网上的主流方案大多是用PVE作为底层,在作为软路由,NAS为主或者需要虚拟windwos的情况下,这可能是合理的选择,PVE作为专业的虚拟机平台,在这管理虚拟机方面,肯定有它的优势,…">
+  
+  <meta name="keywords" content="Android,Java,Kotlin,逆向,Linux,Hexo">
+  
+  <meta name="author" content="longforus">
+  <meta name="theme-color" content="#0a84ff">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="双网口小主机 All in one 除 PVE 外的另一种选择">
+  <meta property="og:description" content="关于双网口小主机All in one,网上的主流方案大多是用PVE作为底层,在作为软路由,NAS为主或者需要虚拟windwos的情况下,这可能是合理的选择,PVE作为专业的虚拟机平台,在这管理虚拟机方面,肯定有它的优势,…">
+  <meta property="og:site_name" content="longforus">
+
+  
+<link rel="stylesheet" href="../../../../css/var.css">
+
+  
+<link rel="stylesheet" href="../../../../css/main.css">
+
+  
+<link rel="stylesheet" href="../../../../css/typography.css">
+
+  
+<link rel="stylesheet" href="../../../../css/code-highlighting.css">
+
+  
+<link rel="stylesheet" href="../../../../css/components.css">
+
+  
+<link rel="stylesheet" href="../../../../css/nav.css">
+
+  
+<link rel="stylesheet" href="../../../../css/paginator.css">
+
+  
+<link rel="stylesheet" href="../../../../css/footer.css">
+
+  
+<link rel="stylesheet" href="../../../../css/post-list.css">
+
+  
+<link rel="stylesheet" href="../../../../css/waline.css">
+
+  
+  
+  
+<link rel="stylesheet" href="../../../../css/post.css">
+
+  
+  
+<link rel="stylesheet" href="../../../../css/custom.css">
+
+
+  
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+    <body>
+        <nav id="theme-nav">
+    <div class="inner">
+        <a class="title" href="../../../../index.html">longforus</a>
+        <div class="nav-arrow"></div>
+        <div class="nav-items">
+            <a class="nav-item nav-item-home" href="../../../../index.html">主页</a>
+            
+            
+            
+            <a class="nav-item" href="../../../../archives">归档</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../tags">标签</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../categories">分类</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../about">关于</a>
+            
+            
+            
+            
+            <a class="nav-item nav-item-github nav-item-icon" href="https://github.com/longforus" target="_blank" rel="noopener" aria-label="GitHub">&nbsp;</a>
+            
+            
+        </div>
+    </div>
+</nav>
+
+        
+<article class="post">
+    <div class="meta">
+        <div class="post-meta">
+            <span class="post-date">2025-12-21</span>
+            
+            <span class="dot">·</span>
+            <span class="post-reading">5 分钟阅读</span>
+        </div>
+
+        <h1 class="title">双网口小主机 All in one 除 PVE 外的另一种选择</h1>
+
+        
+        <div class="post-taxonomy">
+            
+            <a class="chip chip-category" href="../../../../categories/%E7%B3%BB%E7%BB%9F%E8%BF%90%E7%BB%B4/">系统运维</a>
+            
+            
+            <a class="chip" href="../../../../tags/%E8%BD%AF%E8%B7%AF%E7%94%B1/"># 软路由</a>
+            
+            <a class="chip" href="../../../../tags/%E8%99%9A%E6%8B%9F%E5%8C%96/"># 虚拟化</a>
+            
+            <a class="chip" href="../../../../tags/%E7%A1%AC%E4%BB%B6/"># 硬件</a>
+            
+        </div>
+        
+    </div>
+
+    <div class="divider"></div>
+
+    
+
+    <div class="content">
+        <p>  关于双网口小主机All in one,网上的主流方案大多是用PVE作为底层,在作为软路由,NAS为主或者需要虚拟windwos的情况下,这可能是合理的选择,PVE作为专业的虚拟机平台,在这管理虚拟机方面,肯定有它的优势,但是在需要重度使用除软路由,NAS之外的其他虚拟机的情况下,我觉得使用PVE不是一个好的选择,1是在虚拟机需求显卡的情况下,折腾PVE显卡直通看起来很复杂,使用体验也说不上很好,2是PVE创建的虚拟机性能即便损耗较小,但是也有损耗,在需要重度使用其他虚拟机的情况下,感觉不合适.结合我需要主要使用ubuntu编译安卓源码,附带解决软路由上网和飞牛看剧的需求来看,直装ubuntu,再用kvm虚拟istoreos和fnos的选择更实用,1是直接运行ubuntu避免虚拟化损耗最大化利用小主机性能,2是不用折腾显卡直通这些麻烦问题,日常使用也更方便.</p>
+<p>  最终的网络结构如下:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">                             Internet</span><br><span class="line">                                 │</span><br><span class="line">                          光猫 / 上级网络</span><br><span class="line">                                 │</span><br><span class="line">                 ┌───────────────▼───────────────┐</span><br><span class="line">                 │   物理网卡RTL8125 (05:00.0)    │</span><br><span class="line">                 │   PCI VFIO 直通给 VM           │</span><br><span class="line">                 └───────────────┬───────────────┘</span><br><span class="line">                                 │</span><br><span class="line">                           eth1  (WAN)</span><br><span class="line">                      ┌──────────▼─────────────┐</span><br><span class="line">                      │     iStoreOS VM        │</span><br><span class="line">                      │    （软路由）           │</span><br><span class="line">                      │                        │</span><br><span class="line">                      │ eth0 (LAN) 192.168.1.1 │</span><br><span class="line">                      └──────────┬─────────────┘</span><br><span class="line">                                 │</span><br><span class="line">                          virtio / vnet</span><br><span class="line">                                 │</span><br><span class="line">                           br0 (192.168.1.2)</span><br><span class="line">         ┌─────────────┬─────────┼───────────────┬─────────────┐</span><br><span class="line">         │             │         │               │             │</span><br><span class="line">  物理网卡eno1   宿主机kubuntu  其他VM(fnOs)    Docker Host    （二层）</span><br><span class="line">RTL8125(03:00.0)      IP        vnetX        网络栈/docker0</span><br><span class="line">         │                                       │</span><br><span class="line">         │                                       │</span><br><span class="line">         │                                       │</span><br><span class="line">         │                               Docker NAT → br0</span><br><span class="line">         │                                       │</span><br><span class="line">         │                                       │</span><br><span class="line">         ▼                                       ▼</span><br><span class="line"> ┌───────────────┐                    ┌───────────────────┐</span><br><span class="line"> │ nx1-t AP/交换机│                    │ Docker Containers │ home assistant等</span><br><span class="line"> │ 192.168.1.201 │                    │ 172.17/16 …       │</span><br><span class="line"> │ DHCP/NAT 关   │                    │ NAT -&gt; Host IP    │</span><br><span class="line"> └───────┬───────┘                    └───────────────────┘</span><br><span class="line">         │</span><br><span class="line">         │</span><br><span class="line">    有线/Wi-Fi设备</span><br><span class="line">（PC / 手机 / IoT / 群晖）</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<ol>
+<li>是完全可以达成需求,毕竟istoreos和fnos的性能需求并不高,docker也可以脱离这2个系统直接在ubuntu中运行.</li>
+<li>不用折腾显卡直通,只需要直通1个网卡给istoreos作为wan口就行了</li>
+<li>kubuntu的桌面直接日常使用,长期开机,未使用桌面时的功耗并没有比我之前单独使用j1900装istoreos高多少.虚拟机里面的istoreos比j1900的物理机装的istoreos快很多,之前openclash更新代理需要好几秒,新的虚拟机更新几乎瞬间完成.</li>
+</ol>
+<p>这种方案很适合需要重度使用linux的情况,其实我感觉需要重度使用Windows需要兼顾虚拟机的情况也是可以的,直装Windows另外用vmware虚拟istoreos和fnos也未必不行.优点是完全发挥主用系统的性能,且不需要折腾显卡直通.</p>
+
+    </div>
+
+    <div class="about">
+        <h2>关于本文</h2>
+        <p>本文作者 longforus，采用 <a href="https://creativecommons.org/licenses/by-nc/4.0" target="_blank" rel="noopener">CC BY-NC 4.0</a> 许可协议。转载请注明出处。</p>
+    </div>
+
+    
+        
+    
+</article>
+
+        <footer>
+    <div class="inner">
+        <div class="links">
+            
+            <div class="group">
+                <h4 class="title">站点</h4>
+                
+                
+                <a href="../../../../index.html" class="item">首页</a>
+                
+                
+                <a href="../../../../archives" class="item">归档</a>
+                
+                
+                <a href="../../../../tags" class="item">标签</a>
+                
+                
+                <a href="../../../../categories" class="item">分类</a>
+                
+                
+                <a href="../../../../about" class="item">关于</a>
+                
+            </div>
+            
+            <div class="group">
+                <h4 class="title">项目</h4>
+                
+                
+                <a href="https://github.com/longforus/MvpAutoCodePlus" class="item" target="_blank" rel="noopener">MvpAutoCodePlus</a>
+                
+                
+                <a href="https://github.com/longforus/pgyerUpload4AndroidStudio" class="item" target="_blank" rel="noopener">pgyerUpload4AndroidStudio</a>
+                
+                
+                <a href="https://github.com/longforus/Android-drawable-preview-plugin" class="item" target="_blank" rel="noopener">Android-drawable-preview-plugin</a>
+                
+            </div>
+            
+            <div class="group">
+                <h4 class="title">联系</h4>
+                
+                
+                <a href="https://github.com/longforus" class="item" target="_blank" rel="noopener">GitHub</a>
+                
+                
+                <a href="mailto:longforus@outlook.com" class="item" target="_blank" rel="noopener">Email</a>
+                
+            </div>
+            
+        </div>
+        &copy; 2026 longforus<br />
+        驱动自 <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+</footer>
+
+        
+<script src="../js/main.js"></script>
+
+        
+<script src="../js/custom.js"></script>
+
+        
+    </body>
+</html>

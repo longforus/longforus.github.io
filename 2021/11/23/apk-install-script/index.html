@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+
+  <title>双击安装Apk,可选目标设备的小脚本 - longforus</title>
+
+  
+    <link rel="shortcut icon" href="../../../../favicon.svg">
+  
+
+  <meta name="description" content="在逆向或者开发的时候经常需要安装Apk到设备,一般都用adb install z:/xxx.apk进行安装,如果adb只连了一个设备还好,要是多连了几个就麻烦了,需要adb -s 设备号 install z:/xxx.a…">
+  
+  <meta name="keywords" content="Android,Java,Kotlin,逆向,Linux,Hexo">
+  
+  <meta name="author" content="longforus">
+  <meta name="theme-color" content="#0a84ff">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="双击安装Apk,可选目标设备的小脚本">
+  <meta property="og:description" content="在逆向或者开发的时候经常需要安装Apk到设备,一般都用adb install z:/xxx.apk进行安装,如果adb只连了一个设备还好,要是多连了几个就麻烦了,需要adb -s 设备号 install z:/xxx.a…">
+  <meta property="og:site_name" content="longforus">
+
+  
+<link rel="stylesheet" href="../../../../css/var.css">
+
+  
+<link rel="stylesheet" href="../../../../css/main.css">
+
+  
+<link rel="stylesheet" href="../../../../css/typography.css">
+
+  
+<link rel="stylesheet" href="../../../../css/code-highlighting.css">
+
+  
+<link rel="stylesheet" href="../../../../css/components.css">
+
+  
+<link rel="stylesheet" href="../../../../css/nav.css">
+
+  
+<link rel="stylesheet" href="../../../../css/paginator.css">
+
+  
+<link rel="stylesheet" href="../../../../css/footer.css">
+
+  
+<link rel="stylesheet" href="../../../../css/post-list.css">
+
+  
+<link rel="stylesheet" href="../../../../css/waline.css">
+
+  
+  
+  
+<link rel="stylesheet" href="../../../../css/post.css">
+
+  
+  
+<link rel="stylesheet" href="../../../../css/custom.css">
+
+
+  
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+    <body>
+        <nav id="theme-nav">
+    <div class="inner">
+        <a class="title" href="../../../../index.html">longforus</a>
+        <div class="nav-arrow"></div>
+        <div class="nav-items">
+            <a class="nav-item nav-item-home" href="../../../../index.html">主页</a>
+            
+            
+            
+            <a class="nav-item" href="../../../../archives">归档</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../tags">标签</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../categories">分类</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../about">关于</a>
+            
+            
+            
+            
+            <a class="nav-item nav-item-github nav-item-icon" href="https://github.com/longforus" target="_blank" rel="noopener" aria-label="GitHub">&nbsp;</a>
+            
+            
+        </div>
+    </div>
+</nav>
+
+        
+<article class="post">
+    <div class="meta">
+        <div class="post-meta">
+            <span class="post-date">2021-11-23</span>
+            
+            <span class="dot">·</span>
+            <span class="post-updated">更新于 2024-07-21</span>
+            
+            <span class="dot">·</span>
+            <span class="post-reading">16 分钟阅读</span>
+        </div>
+
+        <h1 class="title">双击安装Apk,可选目标设备的小脚本</h1>
+
+        
+        <div class="post-taxonomy">
+            
+            <a class="chip chip-category" href="../../../../categories/Android/">Android</a>
+            
+            
+            <a class="chip" href="../../../../tags/adb/"># adb</a>
+            
+            <a class="chip" href="../../../../tags/%E8%84%9A%E6%9C%AC/"># 脚本</a>
+            
+            <a class="chip" href="../../../../tags/Windows/"># Windows</a>
+            
+        </div>
+        
+    </div>
+
+    <div class="divider"></div>
+
+    
+    <details class="toc-card">
+        <summary>目录</summary>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%8E%AF%E5%A2%83"><span class="toc-text">环境</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%84%9A%E6%9C%AC"><span class="toc-text">脚本</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#apkInstall-sh"><span class="toc-text">apkInstall.sh</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#adbInstall-bat"><span class="toc-text">adbInstall.bat</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8"><span class="toc-text">使用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%89%E8%A3%85%E6%96%B9%E6%B3%95"><span class="toc-text">安装方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8-1"><span class="toc-text">使用</span></a></li></ol></li></ol>
+    </details>
+    
+
+    <div class="content">
+        <p>在逆向或者开发的时候经常需要安装Apk到设备,一般都用<code>adb install z:/xxx.apk</code>进行安装,如果adb只连了一个设备还好,要是多连了几个就麻烦了,需要<code>adb -s 设备号 install z:/xxx.apk</code>来进行安装,设备号或者是<code>IP:端口</code>还一长串,要么直接手输,要么先<code>adb devices</code>进行复制,非常的不方便.有了这个小脚本就方便了,如果只连了一个设备双击就可以直接安装,如果有多个设备则只需要多输入一个代表index的数字就可以了,还是很方便的.</p>
+<h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><ul>
+<li>win11</li>
+<li>Git</li>
+<li>adb</li>
+</ul>
+<h2 id="脚本"><a href="#脚本" class="headerlink" title="脚本"></a>脚本</h2><h3 id="apkInstall-sh"><a href="#apkInstall-sh" class="headerlink" title="apkInstall.sh"></a>apkInstall.sh</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> <span class="built_in">source</span> ~/.bash_profile</span></span><br><span class="line">echo &quot;$1&quot;</span><br><span class="line">cmdRes1=`adb devices -l`</span><br><span class="line">array=($&#123;cmdRes1//n/ &#125;)  #用\n来分开</span><br><span class="line">index=1</span><br><span class="line">dev=&quot;device&quot;</span><br><span class="line">da=()</span><br><span class="line">dArrayIndex=0</span><br><span class="line">for var in $&#123;array[@]&#125;</span><br><span class="line">do</span><br><span class="line">   if [ &quot;$var&quot; == &quot;$dev&quot; ];then</span><br><span class="line">        da[dArrayIndex]=$&#123;array[index-2]&#125; #找到设备号</span><br><span class="line">        # echo &quot;[ =$&#123;da[dArrayIndex]&#125;=  $index   $dArrayIndex ]&quot;</span><br><span class="line">        let dArrayIndex+=1</span><br><span class="line">   fi</span><br><span class="line">   let index+=1</span><br><span class="line">done</span><br><span class="line">run=&quot;&quot;</span><br><span class="line"></span><br><span class="line">if [ -n &quot;$&#123;da[1]&#125;&quot; ];then</span><br><span class="line">       echo &quot;***************** has more than one device ****************&quot;</span><br><span class="line">       for var in $&#123;da[@]&#125;</span><br><span class="line">        do</span><br><span class="line">        echo $var</span><br><span class="line">        done</span><br><span class="line">    echo &quot;************* input index select target device **************&quot;</span><br><span class="line">    read -p &quot;input index to install or enter install to device 0 : &quot; target</span><br><span class="line">    echo -e &quot;\n&quot;</span><br><span class="line">    if [ -n &quot;$&#123;target&#125;&quot; ];then</span><br><span class="line">        if [ $&#123;target&#125; -gt 0 ] 2&gt;/dev/null ;then</span><br><span class="line">            if [ $&#123;target&#125; -gt $&#123;dArrayIndex&#125; ];then</span><br><span class="line">                echo &quot;$target out of range!!!    wow~ ⊙o⊙&quot;</span><br><span class="line">                target=0</span><br><span class="line">            fi</span><br><span class="line">        else</span><br><span class="line">            echo &quot;input is not number!!!   O__O \&quot;…&quot;</span><br><span class="line">            target=0</span><br><span class="line">        fi</span><br><span class="line">       echo -e &quot;(((((((((((っ･ω･)っ Σ(σ｀･ω･´)σ 起飞！ start install to $&#123;da[target]&#125;\n&quot;</span><br><span class="line">       run=`adb -s $&#123;da[target]&#125; install -r $1`</span><br><span class="line">    else</span><br><span class="line">        echo -e &quot;(((((((((((っ･ω･)っ Σ(σ｀･ω･´)σ 起飞！ start install to $&#123;da[0]&#125;\n&quot;</span><br><span class="line">        run=`adb -s $&#123;da[0]&#125; install -r $1`</span><br><span class="line">    fi</span><br><span class="line">else</span><br><span class="line">    echo -e &quot;(((((((((((っ･ω･)っ Σ(σ｀･ω･´)σ 起飞！ start install to only device :  $&#123;da[0]&#125;\n&quot;</span><br><span class="line">    run=`adb install -r $1`</span><br><span class="line">fi</span><br><span class="line">echo -e &quot;$run \n&quot;</span><br><span class="line">echo -e &quot;(^・ω・^ )( ^・ω・^)Install Complete(^・ω・^ )( ^・ω・^)&quot;</span><br></pre></td></tr></table></figure>
+
+<h3 id="adbInstall-bat"><a href="#adbInstall-bat" class="headerlink" title="adbInstall.bat"></a>adbInstall.bat</h3><p>win上如果直接使用.sh脚本作为apk的默认打开方式的话,会提示此应用无法在你的电脑上运行.所以需要一个额外的.bat文件来启动.linux和mac的话是不需要的,但是我工作电脑是win,这2个系统就没有测试了,按道理来说,顶多改改就能用.</p>
+<figure class="highlight bat"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">C:\<span class="title">Git</span>\<span class="title">git</span>-<span class="title">bash.exe</span> <span class="title">D</span>:\<span class="title">MyDocuments</span>\<span class="title">Desktop</span>\<span class="title">apkInstall.sh</span> %1</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><p>右击apk文件,<code>打开方式</code>-&gt;<code>选择其他应用</code>,<code>更多应用</code>-&gt;<code>在这台电脑上选择其他应用</code>,找到<code>adbInstall.bat</code>打开,并勾选<code>始终使用此应用打开.apk文件</code>.就大功告成了.</p>
+<p>以后使用直接双击apk文件即可.</p>
+<p><img src="image-20211123172253877.png" alt="image-20211123172253877"></p>
+<p>会列出已经连接adb的设备,直接回车|输入0|输入不合法,都会安装到默认的第0个设备上,输入1则会安装到第1个设备上,非常的简单方便.</p>
+<p>完了.</p>
+<p>2024年6月7日 18:41:06更新 Directory Opus 13.6 可用的apk文件右键菜单脚本:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// apk文件的右键经过adb安装的脚本,可以在多个设备中选择</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">OnClick</span>(<span class="params">clickData</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line"></span><br><span class="line"> 		<span class="comment">// 检查是否选中了文件</span></span><br><span class="line">        <span class="keyword">if</span> (clickData.func.sourcetab.selected_files.count == <span class="number">0</span>) &#123;</span><br><span class="line">            DOpus.Output(<span class="string">&quot;没有选中任何文件&quot;</span>);</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 获取选中的文件名</span></span><br><span class="line">        <span class="keyword">var</span> selectedFile = clickData.func.sourcetab.selected_files(<span class="number">0</span>).realpath;</span><br><span class="line">        DOpus.Output(<span class="string">&quot;选中的文件: &quot;</span> + selectedFile);</span><br><span class="line">        <span class="comment">// 创建 WScript.Shell 对象</span></span><br><span class="line">        <span class="keyword">var</span> WshShell = <span class="keyword">new</span> ActiveXObject(<span class="string">&quot;WScript.Shell&quot;</span>);</span><br><span class="line">        <span class="comment">// 调试输出，确认 WshShell 对象是否创建成功</span></span><br><span class="line">        DOpus.Output(<span class="string">&quot;WshShell 对象创建成功&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 使用完整路径或确保 adb 在环境变量路径中</span></span><br><span class="line">        <span class="keyword">var</span> adbPath = <span class="string">&quot;adb&quot;</span>; <span class="comment">// 如果 adb 在环境变量中</span></span><br><span class="line">        <span class="keyword">var</span> adbExec = WshShell.Exec(adbPath + <span class="string">&quot; devices -l&quot;</span>);</span><br><span class="line">        <span class="comment">// 调试输出，确认命令是否成功执行</span></span><br><span class="line">        DOpus.Output(<span class="string">&quot;adb 命令已执行&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 等待命令执行完成</span></span><br><span class="line">        <span class="keyword">while</span> (adbExec.Status == <span class="number">0</span>) &#123;</span><br><span class="line">            DOpus.Output(<span class="string">&quot;等待 adb 命令完成...&quot;</span>);</span><br><span class="line">            DOpus.Delay(<span class="number">500</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 输出命令的退出代码</span></span><br><span class="line">        DOpus.Output(<span class="string">&quot;adb 命令退出代码: &quot;</span> + adbExec.ExitCode);</span><br><span class="line">        <span class="comment">// 输出命令的标准输出</span></span><br><span class="line">        <span class="keyword">var</span> output = adbExec.StdOut.ReadAll();</span><br><span class="line">        DOpus.Output(<span class="string">&quot;adb 命令输出: &quot;</span> + output);</span><br><span class="line">        <span class="comment">// 输出命令的错误输出</span></span><br><span class="line">        <span class="keyword">var</span> errorOutput = adbExec.StdErr.ReadAll();</span><br><span class="line">        <span class="keyword">if</span> (errorOutput) &#123;</span><br><span class="line">            DOpus.Output(<span class="string">&quot;adb 命令错误输出: &quot;</span> + errorOutput);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 解析 adb 命令的输出，提取设备信息</span></span><br><span class="line">        <span class="keyword">var</span> deviceList = [];</span><br><span class="line">        <span class="keyword">var</span> lines = output.split(<span class="string">&#x27;\n&#x27;</span>);</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">1</span>; i &lt; lines.length; i++) &#123;</span><br><span class="line">            <span class="keyword">var</span> line = lines[i];</span><br><span class="line">            <span class="keyword">if</span> (line) &#123;</span><br><span class="line">                <span class="keyword">var</span> parts = line.split(<span class="regexp">/\s+/</span>);</span><br><span class="line">                <span class="keyword">if</span> (parts.length &gt; <span class="number">2</span>) &#123;</span><br><span class="line">                    <span class="keyword">var</span> deviceId = parts[<span class="number">0</span>];</span><br><span class="line">                    <span class="keyword">var</span> model = <span class="string">&quot;&quot;</span>;</span><br><span class="line">                    <span class="keyword">for</span> (<span class="keyword">var</span> j = <span class="number">0</span>; j &lt; parts.length; j++) &#123;</span><br><span class="line">                        <span class="keyword">if</span> (parts[j].indexOf(<span class="string">&quot;model:&quot;</span>) === <span class="number">0</span>) &#123;</span><br><span class="line">                            model = parts[j].split(<span class="string">&#x27;:&#x27;</span>)[<span class="number">1</span>];</span><br><span class="line">                            <span class="keyword">break</span>;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">					DOpus.Output(<span class="string">&quot;deviceId &quot;</span>+deviceId+<span class="string">&quot; model  &quot;</span>+model);</span><br><span class="line">                    deviceList.push(&#123;<span class="attr">id</span>: deviceId, <span class="attr">model</span>: model&#125;);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 如果没有设备，输出提示信息</span></span><br><span class="line">        <span class="keyword">if</span> (deviceList.length === <span class="number">0</span>) &#123;</span><br><span class="line">            DOpus.Output(<span class="string">&quot;没有检测到设备&quot;</span>+deviceList);</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 创建选择对话框</span></span><br><span class="line">        <span class="keyword">var</span> dlg = clickData.func.dlg;</span><br><span class="line">        dlg.title = <span class="string">&quot;选择设备&quot;</span>;</span><br><span class="line">        dlg.message = <span class="string">&quot;请选择一个设备进行安装:&quot;</span>;</span><br><span class="line">        <span class="keyword">var</span> buttons = <span class="string">&quot;&quot;</span>;</span><br><span class="line">       <span class="keyword">for</span> (<span class="keyword">var</span> k = deviceList.length - <span class="number">1</span>; k &gt;= <span class="number">0</span>; k--) &#123;</span><br><span class="line">            <span class="keyword">if</span> (buttons.length &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                buttons += <span class="string">&quot;|&quot;</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            buttons += deviceList[k].model;</span><br><span class="line">        &#125;</span><br><span class="line">        dlg.buttons = buttons;</span><br><span class="line">        dlg.Show();</span><br><span class="line"></span><br><span class="line">         <span class="keyword">var</span> selectedIndex = dlg.result;</span><br><span class="line">		 DOpus.Output(<span class="string">&quot;selectedIndex = &quot;</span>+selectedIndex);</span><br><span class="line">        <span class="keyword">if</span> (selectedIndex &lt; <span class="number">0</span>) &#123;</span><br><span class="line">            DOpus.Output(<span class="string">&quot;用户未选择任何设备&quot;</span>);</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 根据选择的索引获取设备ID</span></span><br><span class="line">        <span class="keyword">var</span> deviceId = deviceList[selectedIndex].id;</span><br><span class="line">        <span class="comment">// 执行 adb install 命令</span></span><br><span class="line">        <span class="keyword">var</span> apkPath = selectedFile; <span class="comment">// 使用选中的 APK 文件路径</span></span><br><span class="line">        <span class="keyword">var</span> installCmd = adbPath + <span class="string">&quot; -s &quot;</span> + deviceId + <span class="string">&quot; install &quot;</span> + apkPath;</span><br><span class="line">        DOpus.Output(<span class="string">&quot;执行命令: &quot;</span> + installCmd);</span><br><span class="line">        <span class="keyword">var</span> installExec = WshShell.Exec(installCmd);</span><br><span class="line">        <span class="comment">// 等待安装命令完成</span></span><br><span class="line">        <span class="keyword">while</span> (installExec.Status == <span class="number">0</span>) &#123;</span><br><span class="line">            DOpus.Output(<span class="string">&quot;等待 adb install 命令完成...&quot;</span>);</span><br><span class="line">            DOpus.Delay(<span class="number">500</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 输出安装命令的退出代码</span></span><br><span class="line">        DOpus.Output(<span class="string">&quot;adb install 命令退出代码: &quot;</span> + installExec.ExitCode);</span><br><span class="line">         <span class="comment">// 输出安装命令的标准输出</span></span><br><span class="line">        <span class="keyword">var</span> installOutput = installExec.StdOut.ReadAll();</span><br><span class="line">        DOpus.Output(<span class="string">&quot;adb install 命令输出: &quot;</span> + installOutput);</span><br><span class="line">        <span class="comment">// 输出安装命令的错误输出</span></span><br><span class="line">        <span class="keyword">var</span> installErrorOutput = installExec.StdErr.ReadAll();</span><br><span class="line">        <span class="keyword">if</span> (installErrorOutput) &#123;</span><br><span class="line">            DOpus.Output(<span class="string">&quot;adb install 命令错误输出: &quot;</span> + installErrorOutput);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (e) &#123;</span><br><span class="line">        <span class="comment">// 捕获并输出错误信息</span></span><br><span class="line">        DOpus.Output(<span class="string">&quot;发生错误: &quot;</span> + e.message);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="安装方法"><a href="#安装方法" class="headerlink" title="安装方法"></a>安装方法</h3><ol>
+<li><p> Directory Opus 13.6 设置-&gt;文件类型:</p>
+</li>
+<li><p>搜索apk</p>
+<p> <img src="image-20240607184629074.png" alt="image-20240607184629074"></p>
+</li>
+<li><p>选择新建</p>
+<p> <img src="image-20240607184812069.png" alt="image-20240607184812069"></p>
+</li>
+</ol>
+<h3 id="使用-1"><a href="#使用-1" class="headerlink" title="使用"></a>使用</h3><p><img src="image-20240607184915018.png" alt="image-20240607184915018"></p>
+<p><img src="image-20240607185006278.png" alt="image-20240607185006278"></p>
+<p>选择对应的设备就可以了,存在的问题是会弹出命令行的黑框.但是比输序号还是要方便,优雅一些</p>
+
+    </div>
+
+    <div class="about">
+        <h2>关于本文</h2>
+        <p>本文作者 longforus，采用 <a href="https://creativecommons.org/licenses/by-nc/4.0" target="_blank" rel="noopener">CC BY-NC 4.0</a> 许可协议。转载请注明出处。</p>
+    </div>
+
+    
+        
+    
+</article>
+
+        <footer>
+    <div class="inner">
+        <div class="links">
+            
+            <div class="group">
+                <h4 class="title">站点</h4>
+                
+                
+                <a href="../../../../index.html" class="item">首页</a>
+                
+                
+                <a href="../../../../archives" class="item">归档</a>
+                
+                
+                <a href="../../../../tags" class="item">标签</a>
+                
+                
+                <a href="../../../../categories" class="item">分类</a>
+                
+                
+                <a href="../../../../about" class="item">关于</a>
+                
+            </div>
+            
+            <div class="group">
+                <h4 class="title">项目</h4>
+                
+                
+                <a href="https://github.com/longforus/MvpAutoCodePlus" class="item" target="_blank" rel="noopener">MvpAutoCodePlus</a>
+                
+                
+                <a href="https://github.com/longforus/pgyerUpload4AndroidStudio" class="item" target="_blank" rel="noopener">pgyerUpload4AndroidStudio</a>
+                
+                
+                <a href="https://github.com/longforus/Android-drawable-preview-plugin" class="item" target="_blank" rel="noopener">Android-drawable-preview-plugin</a>
+                
+            </div>
+            
+            <div class="group">
+                <h4 class="title">联系</h4>
+                
+                
+                <a href="https://github.com/longforus" class="item" target="_blank" rel="noopener">GitHub</a>
+                
+                
+                <a href="mailto:longforus@outlook.com" class="item" target="_blank" rel="noopener">Email</a>
+                
+            </div>
+            
+        </div>
+        &copy; 2026 longforus<br />
+        驱动自 <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+</footer>
+
+        
+<script src="../js/main.js"></script>
+
+        
+<script src="../js/custom.js"></script>
+
+        
+    </body>
+</html>

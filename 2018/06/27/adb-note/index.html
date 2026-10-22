@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+
+  <title>ADB Note - longforus</title>
+
+  
+    <link rel="shortcut icon" href="../../../../favicon.svg">
+  
+
+  <meta name="description" content="记录 ADB 常用命令与调试技巧。">
+  
+  <meta name="keywords" content="Android,Java,Kotlin,逆向,Linux,Hexo">
+  
+  <meta name="author" content="longforus">
+  <meta name="theme-color" content="#0a84ff">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="ADB Note">
+  <meta property="og:description" content="记录 ADB 常用命令与调试技巧。">
+  <meta property="og:site_name" content="longforus">
+
+  
+<link rel="stylesheet" href="../../../../css/var.css">
+
+  
+<link rel="stylesheet" href="../../../../css/main.css">
+
+  
+<link rel="stylesheet" href="../../../../css/typography.css">
+
+  
+<link rel="stylesheet" href="../../../../css/code-highlighting.css">
+
+  
+<link rel="stylesheet" href="../../../../css/components.css">
+
+  
+<link rel="stylesheet" href="../../../../css/nav.css">
+
+  
+<link rel="stylesheet" href="../../../../css/paginator.css">
+
+  
+<link rel="stylesheet" href="../../../../css/footer.css">
+
+  
+<link rel="stylesheet" href="../../../../css/post-list.css">
+
+  
+<link rel="stylesheet" href="../../../../css/waline.css">
+
+  
+  
+  
+<link rel="stylesheet" href="../../../../css/post.css">
+
+  
+  
+<link rel="stylesheet" href="../../../../css/custom.css">
+
+
+  
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+    <body>
+        <nav id="theme-nav">
+    <div class="inner">
+        <a class="title" href="../../../../index.html">longforus</a>
+        <div class="nav-arrow"></div>
+        <div class="nav-items">
+            <a class="nav-item nav-item-home" href="../../../../index.html">主页</a>
+            
+            
+            
+            <a class="nav-item" href="../../../../archives">归档</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../tags">标签</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../categories">分类</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../about">关于</a>
+            
+            
+            
+            
+            <a class="nav-item nav-item-github nav-item-icon" href="https://github.com/longforus" target="_blank" rel="noopener" aria-label="GitHub">&nbsp;</a>
+            
+            
+        </div>
+    </div>
+</nav>
+
+        
+<article class="post">
+    <div class="meta">
+        <div class="post-meta">
+            <span class="post-date">2018-06-27</span>
+            
+            <span class="dot">·</span>
+            <span class="post-updated">更新于 2025-11-16</span>
+            
+            <span class="dot">·</span>
+            <span class="post-reading">2 分钟阅读</span>
+        </div>
+
+        <h1 class="title">ADB Note</h1>
+
+        
+        <div class="post-taxonomy">
+            
+            <a class="chip chip-category" href="../../../../categories/Android/">Android</a>
+            
+            
+            <a class="chip" href="../../../../tags/adb/"># adb</a>
+            
+            <a class="chip" href="../../../../tags/%E5%B7%A5%E5%85%B7/"># 工具</a>
+            
+        </div>
+        
+    </div>
+
+    <div class="divider"></div>
+
+    
+
+    <div class="content">
+        <ul>
+<li><p>查看Activity启动耗时</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">C:\Users\Administrator&gt;adb shell am <span class="built_in">start</span> <span class="literal">-W</span> com.fec.axkc/com.fec.yunmall.MainActivity</span><br><span class="line">Starting: Intent &#123; act=android.intent.action.MAIN <span class="built_in">cat</span>=[<span class="type">android.intent.category.LAUNCHER</span>] cmp=com.fec.axkc/com.fec.yunmall.MainActivity &#125;</span><br><span class="line">Status: ok</span><br><span class="line">Activity: com.fec.axkc/com.fec.yunmall.MainActivity</span><br><span class="line">ThisTime: <span class="number">488</span></span><br><span class="line">TotalTime: <span class="number">488</span></span><br><span class="line">WaitTime: <span class="number">505</span></span><br><span class="line">Complete</span><br></pre></td></tr></table></figure></li>
+</ul>
+<ul>
+<li><p>模拟进程强杀</p>
+<p>仅在当前进程处于后台时有效.</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">C:\Users\Administrator&gt;adb shell am <span class="built_in">kill</span> com.fec.axkc</span><br></pre></td></tr></table></figure></li>
+</ul>
+
+    </div>
+
+    <div class="about">
+        <h2>关于本文</h2>
+        <p>本文作者 longforus，采用 <a href="https://creativecommons.org/licenses/by-nc/4.0" target="_blank" rel="noopener">CC BY-NC 4.0</a> 许可协议。转载请注明出处。</p>
+    </div>
+
+    
+        
+    
+</article>
+
+        <footer>
+    <div class="inner">
+        <div class="links">
+            
+            <div class="group">
+                <h4 class="title">站点</h4>
+                
+                
+                <a href="../../../../index.html" class="item">首页</a>
+                
+                
+                <a href="../../../../archives" class="item">归档</a>
+                
+                
+                <a href="../../../../tags" class="item">标签</a>
+                
+                
+                <a href="../../../../categories" class="item">分类</a>
+                
+                
+                <a href="../../../../about" class="item">关于</a>
+                
+            </div>
+            
+            <div class="group">
+                <h4 class="title">项目</h4>
+                
+                
+                <a href="https://github.com/longforus/MvpAutoCodePlus" class="item" target="_blank" rel="noopener">MvpAutoCodePlus</a>
+                
+                
+                <a href="https://github.com/longforus/pgyerUpload4AndroidStudio" class="item" target="_blank" rel="noopener">pgyerUpload4AndroidStudio</a>
+                
+                
+                <a href="https://github.com/longforus/Android-drawable-preview-plugin" class="item" target="_blank" rel="noopener">Android-drawable-preview-plugin</a>
+                
+            </div>
+            
+            <div class="group">
+                <h4 class="title">联系</h4>
+                
+                
+                <a href="https://github.com/longforus" class="item" target="_blank" rel="noopener">GitHub</a>
+                
+                
+                <a href="mailto:longforus@outlook.com" class="item" target="_blank" rel="noopener">Email</a>
+                
+            </div>
+            
+        </div>
+        &copy; 2026 longforus<br />
+        驱动自 <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+</footer>
+
+        
+<script src="../js/main.js"></script>
+
+        
+<script src="../js/custom.js"></script>
+
+        
+    </body>
+</html>

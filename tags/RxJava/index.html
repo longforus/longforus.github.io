@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+
+  <title>标签: RxJava - longforus</title>
+
+  
+    <link rel="shortcut icon" href="../../favicon.svg">
+  
+
+  <meta name="description" content="记录代码与折腾">
+  
+  <meta name="keywords" content="Android,Java,Kotlin,逆向,Linux,Hexo">
+  
+  <meta name="author" content="longforus">
+  <meta name="theme-color" content="#0a84ff">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="标签: RxJava">
+  <meta property="og:description" content="记录代码与折腾">
+  <meta property="og:site_name" content="longforus">
+
+  
+<link rel="stylesheet" href="../../css/var.css">
+
+  
+<link rel="stylesheet" href="../../css/main.css">
+
+  
+<link rel="stylesheet" href="../../css/typography.css">
+
+  
+<link rel="stylesheet" href="../../css/code-highlighting.css">
+
+  
+<link rel="stylesheet" href="../../css/components.css">
+
+  
+<link rel="stylesheet" href="../../css/nav.css">
+
+  
+<link rel="stylesheet" href="../../css/paginator.css">
+
+  
+<link rel="stylesheet" href="../../css/footer.css">
+
+  
+<link rel="stylesheet" href="../../css/post-list.css">
+
+  
+<link rel="stylesheet" href="../../css/waline.css">
+
+  
+  
+  
+<link rel="stylesheet" href="../../css/post.css">
+
+  
+  
+<link rel="stylesheet" href="../../css/custom.css">
+
+
+  
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+    <body>
+        <nav id="theme-nav">
+    <div class="inner">
+        <a class="title" href="../../index.html">longforus</a>
+        <div class="nav-arrow"></div>
+        <div class="nav-items">
+            <a class="nav-item nav-item-home" href="../../index.html">主页</a>
+            
+            
+            
+            <a class="nav-item" href="../../archives">归档</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../tags">标签</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../categories">分类</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../about">关于</a>
+            
+            
+            
+            
+            <a class="nav-item nav-item-github nav-item-icon" href="https://github.com/longforus" target="_blank" rel="noopener" aria-label="GitHub">&nbsp;</a>
+            
+            
+        </div>
+    </div>
+</nav>
+
+        <div class="container">
+    <header class="page-header">
+        <h1 class="page-title"># RxJava</h1>
+        <p class="page-subtitle">本页 4 篇笔记</p>
+    </header>
+
+    <div class="post-list">
+    
+    <article class="post-list-item">
+        <a href="../../2019/10/08/rxjava-filter-all-items/" class="post-list-link">
+            
+            <div class="content">
+                <div class="title">
+                    RxJava 使用 filter 时如何知道是否所有 item 都被过滤了
+                </div>
+                
+                <div class="excerpt">
+                    有时候会使用rxJava的filter操作符来过滤重复的数据,用起来非常的方便,返回true的元素会通过,返回false的元素则会被丢弃.但是存在这样一种情况,如果所有的元素都被过滤掉了,丢弃了,后续subscribe的…
+                </div>
+                
+                <div class="time">
+                    <span>2019-10-08</span>
+                    
+                    <span class="dot">·</span>
+                    <span class="category">Android</span>
+                    
+                </div>
+            </div>
+        </a>
+    </article>
+    
+    <article class="post-list-item">
+        <a href="../../2019/03/28/rxjava-tolist-subscribe/" class="post-list-link">
+            
+            <div class="content">
+                <div class="title">
+                    RxJava 在 toList() 后 subscribe() 不执行的问题
+                </div>
+                
+                <div class="excerpt">
+                    今天在项目中遇到一个问题:需要遍历一个list在经过2次异步调用修改list中的一些值之后,刷新adapter,通知数据修改.略显复杂,一般的同步修改倒是没有什么了,但是需要进行2次异步调用修改,而且要跳过一些item,…
+                </div>
+                
+                <div class="time">
+                    <span>2019-03-28</span>
+                    
+                    <span class="dot">·</span>
+                    <span class="category">Android</span>
+                    
+                </div>
+            </div>
+        </a>
+    </article>
+    
+    <article class="post-list-item">
+        <a href="../../2018/05/30/rxjava-note/" class="post-list-link">
+            
+            <div class="content">
+                <div class="title">
+                    RxJava Note
+                </div>
+                
+                <div class="excerpt">
+                    RxJava 常用操作符与实践经验笔记。
+                </div>
+                
+                <div class="time">
+                    <span>2018-05-30</span>
+                    
+                    <span class="dot">·</span>
+                    <span class="category">Android</span>
+                    
+                </div>
+            </div>
+        </a>
+    </article>
+    
+    <article class="post-list-item">
+        <a href="../../2018/05/29/rxjava-observable-sequential/" class="post-list-link">
+            
+            <div class="content">
+                <div class="title">
+                    RxJava 实际应用实例：Observable 的依次订阅
+                </div>
+                
+                <div class="excerpt">
+                    最近项目的图片上传中遇到一个问题.后台限制只能一次上传一张图片,且不可以并发上传,必须等前一张上传完毕后才能上传第二张图片.依次将多张图片上传完毕后,才能进行下一步操作.这里不吐槽后台的无能.我开始使用递归调用带回调解决…
+                </div>
+                
+                <div class="time">
+                    <span>2018-05-29</span>
+                    
+                    <span class="dot">·</span>
+                    <span class="category">Android</span>
+                    
+                </div>
+            </div>
+        </a>
+    </article>
+    
+</div>
+
+
+    
+</div>
+
+        <footer>
+    <div class="inner">
+        <div class="links">
+            
+            <div class="group">
+                <h4 class="title">站点</h4>
+                
+                
+                <a href="../../index.html" class="item">首页</a>
+                
+                
+                <a href="../../archives" class="item">归档</a>
+                
+                
+                <a href="../../tags" class="item">标签</a>
+                
+                
+                <a href="../../categories" class="item">分类</a>
+                
+                
+                <a href="../../about" class="item">关于</a>
+                
+            </div>
+            
+            <div class="group">
+                <h4 class="title">项目</h4>
+                
+                
+                <a href="https://github.com/longforus/MvpAutoCodePlus" class="item" target="_blank" rel="noopener">MvpAutoCodePlus</a>
+                
+                
+                <a href="https://github.com/longforus/pgyerUpload4AndroidStudio" class="item" target="_blank" rel="noopener">pgyerUpload4AndroidStudio</a>
+                
+                
+                <a href="https://github.com/longforus/Android-drawable-preview-plugin" class="item" target="_blank" rel="noopener">Android-drawable-preview-plugin</a>
+                
+            </div>
+            
+            <div class="group">
+                <h4 class="title">联系</h4>
+                
+                
+                <a href="https://github.com/longforus" class="item" target="_blank" rel="noopener">GitHub</a>
+                
+                
+                <a href="mailto:longforus@outlook.com" class="item" target="_blank" rel="noopener">Email</a>
+                
+            </div>
+            
+        </div>
+        &copy; 2026 longforus<br />
+        驱动自 <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+</footer>
+
+        
+<script src="../js/main.js"></script>
+
+        
+<script src="../js/custom.js"></script>
+
+        
+    </body>
+</html>

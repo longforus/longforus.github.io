@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+
+  <title>Frida Java.classFactory.loader: Cannot assign to &#39;loader&#39; because it is a read-only property - longforus</title>
+
+  
+    <link rel="shortcut icon" href="../../../../favicon.svg">
+  
+
+  <meta name="description" content="使用 Frida hook 非默认 ClassLoader 加载的类时遇到的只读属性错误处理。">
+  
+  <meta name="keywords" content="Android,Java,Kotlin,逆向,Linux,Hexo">
+  
+  <meta name="author" content="longforus">
+  <meta name="theme-color" content="#0a84ff">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Frida Java.classFactory.loader: Cannot assign to &#39;loader&#39; because it is a read-only property">
+  <meta property="og:description" content="使用 Frida hook 非默认 ClassLoader 加载的类时遇到的只读属性错误处理。">
+  <meta property="og:site_name" content="longforus">
+
+  
+<link rel="stylesheet" href="../../../../css/var.css">
+
+  
+<link rel="stylesheet" href="../../../../css/main.css">
+
+  
+<link rel="stylesheet" href="../../../../css/typography.css">
+
+  
+<link rel="stylesheet" href="../../../../css/code-highlighting.css">
+
+  
+<link rel="stylesheet" href="../../../../css/components.css">
+
+  
+<link rel="stylesheet" href="../../../../css/nav.css">
+
+  
+<link rel="stylesheet" href="../../../../css/paginator.css">
+
+  
+<link rel="stylesheet" href="../../../../css/footer.css">
+
+  
+<link rel="stylesheet" href="../../../../css/post-list.css">
+
+  
+<link rel="stylesheet" href="../../../../css/waline.css">
+
+  
+  
+  
+<link rel="stylesheet" href="../../../../css/post.css">
+
+  
+  
+<link rel="stylesheet" href="../../../../css/custom.css">
+
+
+  
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+    <body>
+        <nav id="theme-nav">
+    <div class="inner">
+        <a class="title" href="../../../../index.html">longforus</a>
+        <div class="nav-arrow"></div>
+        <div class="nav-items">
+            <a class="nav-item nav-item-home" href="../../../../index.html">主页</a>
+            
+            
+            
+            <a class="nav-item" href="../../../../archives">归档</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../tags">标签</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../categories">分类</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../about">关于</a>
+            
+            
+            
+            
+            <a class="nav-item nav-item-github nav-item-icon" href="https://github.com/longforus" target="_blank" rel="noopener" aria-label="GitHub">&nbsp;</a>
+            
+            
+        </div>
+    </div>
+</nav>
+
+        
+<article class="post">
+    <div class="meta">
+        <div class="post-meta">
+            <span class="post-date">2024-11-08</span>
+            
+            <span class="dot">·</span>
+            <span class="post-updated">更新于 2025-11-19</span>
+            
+            <span class="dot">·</span>
+            <span class="post-reading">6 分钟阅读</span>
+        </div>
+
+        <h1 class="title">Frida Java.classFactory.loader: Cannot assign to &#39;loader&#39; because it is a read-only property</h1>
+
+        
+        <div class="post-taxonomy">
+            
+            <a class="chip chip-category" href="../../../../categories/Android/">Android</a>
+            
+            
+            <a class="chip" href="../../../../tags/Frida/"># Frida</a>
+            
+            <a class="chip" href="../../../../tags/%E9%80%86%E5%90%91/"># 逆向</a>
+            
+        </div>
+        
+    </div>
+
+    <div class="divider"></div>
+
+    
+
+    <div class="content">
+        <p>当在使用fridia hook非默认的classloader加载的class(也就是插件化,动态化使用<code>dalvik.system.PathClassLoader</code>进行加载的)的时候,我们按照前辈的经验写下:</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">Java.enumerateClassLoaders(&#123;</span><br><span class="line">        <span class="string">&quot;onMatch&quot;</span>: <span class="function"><span class="keyword">function</span>(<span class="params">loader</span>) </span>&#123;</span><br><span class="line">            <span class="keyword">if</span> (loader.toString().indexOf(<span class="string">&quot;main.so&quot;</span>) &gt;= <span class="number">0</span> ) &#123;</span><br><span class="line">                Java.classFactory.loader = loader;</span><br><span class="line">                <span class="built_in">console</span>.log(<span class="string">&quot;loader = &quot;</span>,loader.toString());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="string">&quot;onComplete&quot;</span>: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">            <span class="built_in">console</span>.log(<span class="string">&quot;success&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br></pre></td></tr></table></figure>
+
+<p>的时候,我的Pycharm(我用Pycharm来写的typeScript)提示我:<code>Attempt to assign to const or readonly variable TS2540: Cannot assign to &#39;loader&#39; because it is a read-only property.</code>点进loader去看</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Class loader currently being used. For the default class factory this</span></span><br><span class="line"><span class="comment"> * is updated by the first call to `Java.perform()`.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">readonly</span> loader: Wrapper | <span class="literal">null</span>;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>果然是readonly的,是fridia的api升级了吗?还是因为我用的ts的原因?没有仔细研究,不过也正好发现了上面的:</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Gets the class factory instance for a given class loader, or the</span></span><br><span class="line"><span class="comment"> * default factory when passing `null`.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * The default class factory used behind the scenes only interacts</span></span><br><span class="line"><span class="comment"> * with the application&#x27;s main class loader. Other class loaders</span></span><br><span class="line"><span class="comment"> * can be discovered through APIs such as `Java.enumerateMethods()` and</span></span><br><span class="line"><span class="comment"> * `Java.enumerateClassLoaders()`, and subsequently interacted with</span></span><br><span class="line"><span class="comment"> * through this API.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">static</span> get(classLoader: Wrapper | <span class="literal">null</span>): ClassFactory;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>经过一番尝试,发现了正确的使用姿势:</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">Java.enumerateClassLoaders(&#123;</span><br><span class="line">        <span class="string">&quot;onMatch&quot;</span>: <span class="function"><span class="keyword">function</span>(<span class="params">loader</span>) </span>&#123;</span><br><span class="line">            <span class="keyword">if</span> (loader.toString().indexOf(<span class="string">&quot;main.so&quot;</span>) &gt;= <span class="number">0</span> ) &#123;</span><br><span class="line">                <span class="built_in">console</span>.log(<span class="string">&quot;loader = &quot;</span>,loader.toString());</span><br><span class="line">                <span class="comment">//Java.classFactory.loader = loader;</span></span><br><span class="line">                <span class="keyword">var</span> secondFactory =  Java.ClassFactory.get(loader)</span><br><span class="line">                <span class="keyword">var</span>  clazz =  secondFactory.use(<span class="string">&#x27;com.xxx.TargetClass&#x27;</span>);</span><br><span class="line">                <span class="comment">//这里就可以对clazz正常使用了</span></span><br><span class="line">                clazz.xxx.implementation = <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">                    ......</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="string">&quot;onComplete&quot;</span>: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">            <span class="built_in">console</span>.log(<span class="string">&quot;onComplete&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br></pre></td></tr></table></figure>
+
+<p>随便水水.::laughing:</p>
+
+    </div>
+
+    <div class="about">
+        <h2>关于本文</h2>
+        <p>本文作者 longforus，采用 <a href="https://creativecommons.org/licenses/by-nc/4.0" target="_blank" rel="noopener">CC BY-NC 4.0</a> 许可协议。转载请注明出处。</p>
+    </div>
+
+    
+        
+    
+</article>
+
+        <footer>
+    <div class="inner">
+        <div class="links">
+            
+            <div class="group">
+                <h4 class="title">站点</h4>
+                
+                
+                <a href="../../../../index.html" class="item">首页</a>
+                
+                
+                <a href="../../../../archives" class="item">归档</a>
+                
+                
+                <a href="../../../../tags" class="item">标签</a>
+                
+                
+                <a href="../../../../categories" class="item">分类</a>
+                
+                
+                <a href="../../../../about" class="item">关于</a>
+                
+            </div>
+            
+            <div class="group">
+                <h4 class="title">项目</h4>
+                
+                
+                <a href="https://github.com/longforus/MvpAutoCodePlus" class="item" target="_blank" rel="noopener">MvpAutoCodePlus</a>
+                
+                
+                <a href="https://github.com/longforus/pgyerUpload4AndroidStudio" class="item" target="_blank" rel="noopener">pgyerUpload4AndroidStudio</a>
+                
+                
+                <a href="https://github.com/longforus/Android-drawable-preview-plugin" class="item" target="_blank" rel="noopener">Android-drawable-preview-plugin</a>
+                
+            </div>
+            
+            <div class="group">
+                <h4 class="title">联系</h4>
+                
+                
+                <a href="https://github.com/longforus" class="item" target="_blank" rel="noopener">GitHub</a>
+                
+                
+                <a href="mailto:longforus@outlook.com" class="item" target="_blank" rel="noopener">Email</a>
+                
+            </div>
+            
+        </div>
+        &copy; 2026 longforus<br />
+        驱动自 <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+</footer>
+
+        
+<script src="../js/main.js"></script>
+
+        
+<script src="../js/custom.js"></script>
+
+        
+    </body>
+</html>

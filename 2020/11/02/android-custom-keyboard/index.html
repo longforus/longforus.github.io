@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+
+  <title>Android 自定义键盘的几个小点 - longforus</title>
+
+  
+    <link rel="shortcut icon" href="../../../../favicon.svg">
+  
+
+  <meta name="description" content="Android 自定义键盘开发中需要注意的布局、焦点与按键处理细节。">
+  
+  <meta name="keywords" content="Android,Java,Kotlin,逆向,Linux,Hexo">
+  
+  <meta name="author" content="longforus">
+  <meta name="theme-color" content="#0a84ff">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Android 自定义键盘的几个小点">
+  <meta property="og:description" content="Android 自定义键盘开发中需要注意的布局、焦点与按键处理细节。">
+  <meta property="og:site_name" content="longforus">
+
+  
+<link rel="stylesheet" href="../../../../css/var.css">
+
+  
+<link rel="stylesheet" href="../../../../css/main.css">
+
+  
+<link rel="stylesheet" href="../../../../css/typography.css">
+
+  
+<link rel="stylesheet" href="../../../../css/code-highlighting.css">
+
+  
+<link rel="stylesheet" href="../../../../css/components.css">
+
+  
+<link rel="stylesheet" href="../../../../css/nav.css">
+
+  
+<link rel="stylesheet" href="../../../../css/paginator.css">
+
+  
+<link rel="stylesheet" href="../../../../css/footer.css">
+
+  
+<link rel="stylesheet" href="../../../../css/post-list.css">
+
+  
+<link rel="stylesheet" href="../../../../css/waline.css">
+
+  
+  
+  
+<link rel="stylesheet" href="../../../../css/post.css">
+
+  
+  
+<link rel="stylesheet" href="../../../../css/custom.css">
+
+
+  
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+    <body>
+        <nav id="theme-nav">
+    <div class="inner">
+        <a class="title" href="../../../../index.html">longforus</a>
+        <div class="nav-arrow"></div>
+        <div class="nav-items">
+            <a class="nav-item nav-item-home" href="../../../../index.html">主页</a>
+            
+            
+            
+            <a class="nav-item" href="../../../../archives">归档</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../tags">标签</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../categories">分类</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../about">关于</a>
+            
+            
+            
+            
+            <a class="nav-item nav-item-github nav-item-icon" href="https://github.com/longforus" target="_blank" rel="noopener" aria-label="GitHub">&nbsp;</a>
+            
+            
+        </div>
+    </div>
+</nav>
+
+        
+<article class="post">
+    <div class="meta">
+        <div class="post-meta">
+            <span class="post-date">2020-11-02</span>
+            
+            <span class="dot">·</span>
+            <span class="post-updated">更新于 2025-11-16</span>
+            
+            <span class="dot">·</span>
+            <span class="post-reading">18 分钟阅读</span>
+        </div>
+
+        <h1 class="title">Android 自定义键盘的几个小点</h1>
+
+        
+        <div class="post-taxonomy">
+            
+            <a class="chip chip-category" href="../../../../categories/Android/">Android</a>
+            
+            
+            <a class="chip" href="../../../../tags/%E8%87%AA%E5%AE%9A%E4%B9%89View/"># 自定义View</a>
+            
+            <a class="chip" href="../../../../tags/%E8%BE%93%E5%85%A5%E6%B3%95/"># 输入法</a>
+            
+        </div>
+        
+    </div>
+
+    <div class="divider"></div>
+
+    
+    <details class="toc-card">
+        <summary>目录</summary>
+        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8C%89%E9%94%AE%E4%B8%8D%E5%A4%9F%E6%97%B6%E5%A6%82%E4%BD%95%E8%AE%A9%E9%94%AE%E7%9B%98%E9%93%BA%E6%BB%A1%E5%BA%95%E9%83%A8"><span class="toc-text">按键不够时如何让键盘铺满底部</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#9%E9%94%AE%E6%97%B69%E9%94%AE%E4%B8%8D%E5%B1%85%E4%B8%AD"><span class="toc-text">9键时9键不居中</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#InputConnection%E5%A6%82%E4%BD%95%E6%B8%85%E7%A9%BA%E5%BD%93%E5%89%8D%E7%9A%84%E8%BE%93%E5%85%A5%E5%86%85%E5%AE%B9"><span class="toc-text">InputConnection如何清空当前的输入内容</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BD%AC%E5%8F%91EditorAction%E7%BB%99EditText"><span class="toc-text">转发EditorAction给EditText</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#EditText%E7%A6%81%E7%94%A8%E9%95%BF%E6%8C%89%E5%BC%B9%E5%87%BA%E5%A4%8D%E5%88%B6%E8%8F%9C%E5%8D%95"><span class="toc-text">EditText禁用长按弹出复制菜单</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8A%8A%E8%87%AA%E5%B7%B1%E7%9A%84%E9%94%AE%E7%9B%98%E8%AE%BE%E4%B8%BA%E7%B3%BB%E7%BB%9F%E9%BB%98%E8%AE%A4"><span class="toc-text">把自己的键盘设为系统默认</span></a></li></ol>
+    </details>
+    
+
+    <div class="content">
+        <p>最近的项目中需要输入字母,且环境有一些特殊的要求:</p>
+<ul>
+<li>不能跳出当前APP</li>
+<li>只需输入大写字母和数字</li>
+</ul>
+<p>一般的第三方输入法都有跳出当前APP的路径,这是不允许存在的,机器7.0自带的键盘也非常的不好用,复杂而且不符合国人习惯.项目之前是用RecycleView在应用界面内实现输入数字,避免调起系统舒服法来解决上面的这些问题的,但是现在需要输入字母,那个方案就不行了,而且占用较大的界面面积,改版后需要弹出键盘输入.势必要改了.</p>
+<p>之前的项目因为有的第三方输入法在使用蓝牙设备输入的时候会自动转成拼音,导致输入错误,所以当时就做过一个键盘,是根据&lt;<a target="_blank" rel="noopener" href="https://www.jianshu.com/p/12bcfd8c2c6e">Android InputMethodService|KeyboardView 自定义输入法和键盘 01</a>&gt;这个demo修改的.当时做得很简单没有遇到什么问题,大家跟着操作就好.但是这次的要求更复杂些,改的时候也遇到了一些问题,记录一下.</p>
+<h3 id="按键不够时如何让键盘铺满底部"><a href="#按键不够时如何让键盘铺满底部" class="headerlink" title="按键不够时如何让键盘铺满底部"></a>按键不够时如何让键盘铺满底部</h3><p>全键盘的时候还好,但是做9键的时候遇到了因为按键不够,键盘不能铺满屏幕底部的问题.开始我用<code>android:horizontalGap=&quot;32.3%p&quot;</code>这个属性来把按键撑开,看起来确实有点效果,但是1是很难调整,2是按键会比看起来的大,撑开的距离也是按键的范围,点击也是有响应的.后来通过修改键盘的测量尺寸解决:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onMeasure</span><span class="params">(<span class="keyword">int</span> widthMeasureSpec, <span class="keyword">int</span> heightMeasureSpec)</span> </span>&#123;</span><br><span class="line">    setMeasuredDimension(screenWidth, getKeyboard().getHeight());</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="9键时9键不居中"><a href="#9键时9键不居中" class="headerlink" title="9键时9键不居中"></a>9键时9键不居中</h3><p>默认的按键布局是从左起的,也没有发现什么控制gravity的方法.后来通过给每一个键的x加一个偏移量,实现整个9键的居中显示:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">mKeyboardNum = <span class="keyword">new</span> Keyboard(context,R.xml.digit,<span class="number">0</span>, screenWidth, ViewGroup.LayoutParams.WRAP_CONTENT);</span><br><span class="line"><span class="keyword">int</span> addWidth = (<span class="keyword">int</span>) (screenWidth * <span class="number">0.33</span>);</span><br><span class="line"><span class="keyword">for</span> (Keyboard.Key key : mKeyboardNum.getKeys()) &#123;</span><br><span class="line">    key.x += addWidth;</span><br><span class="line">&#125;</span><br><span class="line">setKeyboard(mKeyboardNum);</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="InputConnection如何清空当前的输入内容"><a href="#InputConnection如何清空当前的输入内容" class="headerlink" title="InputConnection如何清空当前的输入内容"></a>InputConnection如何清空当前的输入内容</h3><p>键盘有做清空的功能,但是拿到InputConnection实例后,发现没有clear,remove之类名字的api可供调用清空,难道這么简单的功能也没提供?百度 <em>inputconnection 清空</em>也毫无结果,删除一个char的话调用的是<code>boolean deleteSurroundingText(int beforeLength, int afterLength);</code>那么多个呢?观察这个方法的注释:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"> * <span class="meta">@param</span> beforeLength The number of characters before the cursor to be deleted, in code unit.</span><br><span class="line"> *        If <span class="keyword">this</span> is greater than the number of existing characters between the beginning of the</span><br><span class="line"> *        text and the cursor, then <span class="keyword">this</span> method does not fail but deletes all the characters in</span><br><span class="line"> *        that range.</span><br><span class="line"> * <span class="meta">@param</span> afterLength The number of characters after the cursor to be deleted, in code unit.</span><br><span class="line"> *        If <span class="keyword">this</span> is greater than the number of existing characters between the cursor and</span><br><span class="line"> *        the end of the text, then <span class="keyword">this</span> method does not fail but deletes all the characters in</span><br><span class="line"> *        that range.</span><br><span class="line"> * <span class="meta">@return</span> <span class="keyword">true</span> on success, <span class="keyword">false</span> <span class="keyword">if</span> the input connection is no longer valid.</span><br><span class="line"> */</span><br><span class="line"><span class="function"><span class="keyword">boolean</span> <span class="title">deleteSurroundingText</span><span class="params">(<span class="keyword">int</span> beforeLength, <span class="keyword">int</span> afterLength)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p>那么清空就很简单了.</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ic.deleteSurroundingText(Integer.MAX_VALUE,Integer.MAX_VALUE);</span><br></pre></td></tr></table></figure>
+
+<h3 id="转发EditorAction给EditText"><a href="#转发EditorAction给EditText" class="headerlink" title="转发EditorAction给EditText"></a>转发EditorAction给EditText</h3><p>要通过InputConnection$sendKeyEvent,当前焦点的EditText的OnEditorActionListener才能收到action.</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ic.sendKeyEvent(<span class="keyword">new</span> KeyEvent(eventTime,eventTime,KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_ENTER,<span class="number">0</span>,<span class="number">0</span>,KeyCharacterMap.VIRTUAL_KEYBOARD,<span class="number">0</span>,</span><br><span class="line">                       KeyEvent.FLAG_SOFT_KEYBOARD | KeyEvent.FLAG_KEEP_TOUCH_MODE | KeyEvent.FLAG_EDITOR_ACTION));</span><br></pre></td></tr></table></figure>
+
+<h3 id="EditText禁用长按弹出复制菜单"><a href="#EditText禁用长按弹出复制菜单" class="headerlink" title="EditText禁用长按弹出复制菜单"></a>EditText禁用长按弹出复制菜单</h3><p>长按菜单中会有分享,可能导致跳出当前app,所以要禁用掉.</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">mVB.etCode.customSelectionActionModeCallback = <span class="keyword">object</span> : android.view.ActionMode.Callback &#123;</span><br><span class="line">  <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onCreateActionMode</span><span class="params">(mode: <span class="type">android</span>.<span class="type">view</span>.<span class="type">ActionMode</span>?, menu: <span class="type">Menu</span>?)</span></span>: <span class="built_in">Boolean</span> =</span><br><span class="line">      <span class="literal">false</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onPrepareActionMode</span><span class="params">(mode: <span class="type">android</span>.<span class="type">view</span>.<span class="type">ActionMode</span>?, menu: <span class="type">Menu</span>?)</span></span>: <span class="built_in">Boolean</span> =</span><br><span class="line">      <span class="literal">false</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onActionItemClicked</span><span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">      mode: <span class="type">android</span>.<span class="type">view</span>.<span class="type">ActionMode</span>?,</span></span></span><br><span class="line"><span class="params"><span class="function">      item: <span class="type">MenuItem</span>?</span></span></span><br><span class="line"><span class="params"><span class="function">  )</span></span>: <span class="built_in">Boolean</span> = <span class="literal">false</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onDestroyActionMode</span><span class="params">(mode: <span class="type">android</span>.<span class="type">view</span>.<span class="type">ActionMode</span>?)</span></span> &#123;</span><br><span class="line"></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="把自己的键盘设为系统默认"><a href="#把自己的键盘设为系统默认" class="headerlink" title="把自己的键盘设为系统默认"></a>把自己的键盘设为系统默认</h3><p>即使当前系统以及切换到我们的键盘,但是如果我们的键盘升级重装的话,默认输入法又会被恢复为默认是系统键盘,如何自动的再切到我们的键盘呢?通过<code>Settings.Secure.getString(context.contentResolver, Settings.Secure.DEFAULT_INPUT_METHOD)</code>可以获取到当前的默认输入法ID.而且还有一个方法<code>Settings.Secure.putString(context.contentResolver, Settings.Secure.DEFAULT_INPUT_METHOD,SmInputMethod.INPUT_METHOD_ID)</code>可以设置默认输入法的ID,是不是我们调用这个方法就可以了呢?当然没有这么简单,这个操作需要<code>android.permission.WRITE_SECURE_SETTINGS</code>权限,需要是系统APP才能调用,还有没有其他办法呢?如果机器是root了的话,是可以的.</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> execCmd = ShellUtils.execCmd(</span><br><span class="line">    <span class="string">&quot;settings put secure default_input_method <span class="subst">$&#123;MyInputMethod.INPUT_METHOD_ID&#125;</span>&quot;</span>,</span><br><span class="line">    <span class="literal">true</span>,</span><br><span class="line">    <span class="literal">true</span></span><br><span class="line">)</span><br><span class="line">LogUtils.d(TAG,execCmd?.result)</span><br><span class="line"><span class="keyword">val</span> imm = getSystemService(Context.INPUT_METHOD_SERVICE) <span class="keyword">as</span> InputMethodManager</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> string = Settings.Secure.getString(</span><br><span class="line">    contentResolver,</span><br><span class="line">    Settings.Secure.DEFAULT_INPUT_METHOD</span><br><span class="line">)</span><br><span class="line">LogUtils.d(TAG, <span class="string">&quot;cur ime: <span class="variable">$string</span>&quot;</span>)</span><br><span class="line"><span class="keyword">val</span> find = imm.enabledInputMethodList.find &#123; it.id == SmInputMethod.INPUT_METHOD_ID &#125;</span><br><span class="line"><span class="keyword">if</span> (find == <span class="literal">null</span>) &#123;</span><br><span class="line">    <span class="keyword">val</span> keyBordIntent = Intent()</span><br><span class="line">    keyBordIntent.action = Settings.ACTION_INPUT_METHOD_SETTINGS</span><br><span class="line">    RxActivityResult.on(<span class="keyword">this</span><span class="symbol">@RelaunchActivity</span>).startIntent(keyBordIntent)</span><br><span class="line">        .subscribe &#123; result -&gt;</span><br><span class="line">            result.targetUI().apply &#123;</span><br><span class="line">                    imm.showInputMethodPicker()</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这样就可以了,关于修改secure Settings,我还发现一种方法.</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">setDefaultInputMethod</span><span class="params">()</span></span> &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">val</span> pathname = <span class="string">&quot;/data/system/users/0/settings_secure.xml&quot;</span></span><br><span class="line">            ztlManager.execRootCmdSilent(<span class="string">&quot;chmod 777 <span class="variable">$pathname</span>&quot;</span>)</span><br><span class="line">            <span class="keyword">val</span> localFile = File(filesDir, <span class="string">&quot;settings_secure.xml&quot;</span>)</span><br><span class="line">            ztlManager.execRootCmdSilent(<span class="string">&quot;cp -f <span class="variable">$pathname</span> <span class="subst">$&#123;localFile.absolutePath&#125;</span>&quot;</span>)</span><br><span class="line">            ztlManager.execRootCmdSilent(<span class="string">&quot;chmod 777 <span class="subst">$&#123;localFile.absolutePath&#125;</span>&quot;</span>)</span><br><span class="line">            <span class="keyword">val</span> factory = DocumentBuilderFactory.newInstance()</span><br><span class="line">            <span class="keyword">val</span> builder = factory.newDocumentBuilder()</span><br><span class="line">            <span class="keyword">val</span> doc = builder.parse(localFile)</span><br><span class="line">            <span class="keyword">val</span> root = doc.getElementsByTagName(<span class="string">&quot;settings&quot;</span>)</span><br><span class="line">            <span class="keyword">val</span> item = root.item(<span class="number">0</span>)</span><br><span class="line">            <span class="keyword">val</span> childNodes = item.childNodes</span><br><span class="line">            <span class="symbol">loopOut@</span> <span class="keyword">for</span> (i <span class="keyword">in</span> <span class="number">0</span> until childNodes.length) &#123;</span><br><span class="line">                <span class="keyword">val</span> node = childNodes.item(i)</span><br><span class="line">                <span class="keyword">val</span> attributes = node.attributes ?: <span class="keyword">continue</span><span class="symbol">@loopOut</span></span><br><span class="line">                <span class="keyword">for</span> (j <span class="keyword">in</span> <span class="number">0</span> until attributes.length) &#123;</span><br><span class="line">                    <span class="keyword">val</span> item1 = attributes.item(j)</span><br><span class="line">                    <span class="keyword">if</span> (item1.nodeValue == Settings.Secure.DEFAULT_INPUT_METHOD) &#123;</span><br><span class="line">                        <span class="keyword">val</span> item2 = attributes.item(j + <span class="number">1</span>)</span><br><span class="line">                        item2.nodeValue = SmInputMethod.INPUT_METHOD_ID</span><br><span class="line">                        <span class="keyword">val</span> item3 = attributes.item(j + <span class="number">2</span>)</span><br><span class="line">                        item3.nodeValue = packageName</span><br><span class="line">                        LogUtils.d(TAG, <span class="string">&quot;find target <span class="subst">$&#123;item2.toString()&#125;</span>&quot;</span>)</span><br><span class="line">                        <span class="keyword">break</span><span class="symbol">@loopOut</span></span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">val</span> tFactory = TransformerFactory.newInstance();<span class="comment">// 将内存中的Dom保存到文件</span></span><br><span class="line">            <span class="keyword">val</span> transformer = tFactory.newTransformer();</span><br><span class="line"><span class="comment">//            // 设置输出的xml的格式，utf-8</span></span><br><span class="line">            transformer.setOutputProperty(<span class="string">&quot;encoding&quot;</span>, <span class="string">&quot;utf-8&quot;</span>);</span><br><span class="line">            <span class="keyword">val</span> source = DOMSource(doc)</span><br><span class="line"><span class="comment">//            //xml的存放位置</span></span><br><span class="line">            <span class="keyword">val</span> src = StreamResult(localFile)</span><br><span class="line">            transformer.transform(source, src)</span><br><span class="line">            ztlManager.execRootCmdSilent(<span class="string">&quot;chmod 777 <span class="variable">$pathname</span>&quot;</span>)</span><br><span class="line">            ztlManager.execRootCmdSilent(<span class="string">&quot;rm -f <span class="variable">$pathname</span>&quot;</span>)</span><br><span class="line">            <span class="keyword">val</span> execCmd =</span><br><span class="line">                ShellUtils.execCmd(<span class="string">&quot;cp -f <span class="subst">$&#123;localFile.absolutePath&#125;</span> <span class="variable">$pathname</span>&quot;</span>, <span class="literal">true</span>, <span class="literal">true</span>)</span><br><span class="line">            LogUtils.d(TAG,  execCmd?.errorMsg)</span><br><span class="line"><span class="comment">//            ztlManager.execRootCmdSilent(&quot;cp -f $&#123;localFile.absolutePath&#125; $pathname&quot;)</span></span><br><span class="line">        &#125; <span class="keyword">catch</span> (e: Exception) &#123;</span><br><span class="line">            e.printStackTrace()</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>发现可以<code>settings put secure default_input_method $&#123;MyInputMethod.INPUT_METHOD_ID&#125;</code>之前我是這么实现的,好像有用.也算一个方法吧,对于不支持直接adb shell命令的内容修改,还是可以尝试的.</p>
+<p>综上遇到的几个小点.</p>
+
+    </div>
+
+    <div class="about">
+        <h2>关于本文</h2>
+        <p>本文作者 longforus，采用 <a href="https://creativecommons.org/licenses/by-nc/4.0" target="_blank" rel="noopener">CC BY-NC 4.0</a> 许可协议。转载请注明出处。</p>
+    </div>
+
+    
+        
+    
+</article>
+
+        <footer>
+    <div class="inner">
+        <div class="links">
+            
+            <div class="group">
+                <h4 class="title">站点</h4>
+                
+                
+                <a href="../../../../index.html" class="item">首页</a>
+                
+                
+                <a href="../../../../archives" class="item">归档</a>
+                
+                
+                <a href="../../../../tags" class="item">标签</a>
+                
+                
+                <a href="../../../../categories" class="item">分类</a>
+                
+                
+                <a href="../../../../about" class="item">关于</a>
+                
+            </div>
+            
+            <div class="group">
+                <h4 class="title">项目</h4>
+                
+                
+                <a href="https://github.com/longforus/MvpAutoCodePlus" class="item" target="_blank" rel="noopener">MvpAutoCodePlus</a>
+                
+                
+                <a href="https://github.com/longforus/pgyerUpload4AndroidStudio" class="item" target="_blank" rel="noopener">pgyerUpload4AndroidStudio</a>
+                
+                
+                <a href="https://github.com/longforus/Android-drawable-preview-plugin" class="item" target="_blank" rel="noopener">Android-drawable-preview-plugin</a>
+                
+            </div>
+            
+            <div class="group">
+                <h4 class="title">联系</h4>
+                
+                
+                <a href="https://github.com/longforus" class="item" target="_blank" rel="noopener">GitHub</a>
+                
+                
+                <a href="mailto:longforus@outlook.com" class="item" target="_blank" rel="noopener">Email</a>
+                
+            </div>
+            
+        </div>
+        &copy; 2026 longforus<br />
+        驱动自 <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+</footer>
+
+        
+<script src="../js/main.js"></script>
+
+        
+<script src="../js/custom.js"></script>
+
+        
+    </body>
+</html>

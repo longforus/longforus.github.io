@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+
+  <title>如何使用 Android Studio / IDEA 合并 GitHub 的 pull request - longforus</title>
+
+  
+    <link rel="shortcut icon" href="../../../../favicon.svg">
+  
+
+  <meta name="description" content="有时候我们使用gitHub上面的一些开源库,需要对库的代码进行一些修改,以符合我们自己的要求,但是如果原作者后续有了更新,我们如何让我们fork的仓库也获得这些更新呢?这个时候就需要我们new pull request,…">
+  
+  <meta name="keywords" content="Android,Java,Kotlin,逆向,Linux,Hexo">
+  
+  <meta name="author" content="longforus">
+  <meta name="theme-color" content="#0a84ff">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="如何使用 Android Studio / IDEA 合并 GitHub 的 pull request">
+  <meta property="og:description" content="有时候我们使用gitHub上面的一些开源库,需要对库的代码进行一些修改,以符合我们自己的要求,但是如果原作者后续有了更新,我们如何让我们fork的仓库也获得这些更新呢?这个时候就需要我们new pull request,…">
+  <meta property="og:site_name" content="longforus">
+
+  
+<link rel="stylesheet" href="../../../../css/var.css">
+
+  
+<link rel="stylesheet" href="../../../../css/main.css">
+
+  
+<link rel="stylesheet" href="../../../../css/typography.css">
+
+  
+<link rel="stylesheet" href="../../../../css/code-highlighting.css">
+
+  
+<link rel="stylesheet" href="../../../../css/components.css">
+
+  
+<link rel="stylesheet" href="../../../../css/nav.css">
+
+  
+<link rel="stylesheet" href="../../../../css/paginator.css">
+
+  
+<link rel="stylesheet" href="../../../../css/footer.css">
+
+  
+<link rel="stylesheet" href="../../../../css/post-list.css">
+
+  
+<link rel="stylesheet" href="../../../../css/waline.css">
+
+  
+  
+  
+<link rel="stylesheet" href="../../../../css/post.css">
+
+  
+  
+<link rel="stylesheet" href="../../../../css/custom.css">
+
+
+  
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+    <body>
+        <nav id="theme-nav">
+    <div class="inner">
+        <a class="title" href="../../../../index.html">longforus</a>
+        <div class="nav-arrow"></div>
+        <div class="nav-items">
+            <a class="nav-item nav-item-home" href="../../../../index.html">主页</a>
+            
+            
+            
+            <a class="nav-item" href="../../../../archives">归档</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../tags">标签</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../categories">分类</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../about">关于</a>
+            
+            
+            
+            
+            <a class="nav-item nav-item-github nav-item-icon" href="https://github.com/longforus" target="_blank" rel="noopener" aria-label="GitHub">&nbsp;</a>
+            
+            
+        </div>
+    </div>
+</nav>
+
+        
+<article class="post">
+    <div class="meta">
+        <div class="post-meta">
+            <span class="post-date">2019-04-10</span>
+            
+            <span class="dot">·</span>
+            <span class="post-updated">更新于 2025-11-16</span>
+            
+            <span class="dot">·</span>
+            <span class="post-reading">3 分钟阅读</span>
+        </div>
+
+        <h1 class="title">如何使用 Android Studio / IDEA 合并 GitHub 的 pull request</h1>
+
+        
+        <div class="post-taxonomy">
+            
+            <a class="chip chip-category" href="../../../../categories/%E5%B7%A5%E5%85%B7/">工具</a>
+            
+            
+            <a class="chip" href="../../../../tags/Android-Studio/"># Android Studio</a>
+            
+            <a class="chip" href="../../../../tags/Git/"># Git</a>
+            
+            <a class="chip" href="../../../../tags/GitHub/"># GitHub</a>
+            
+        </div>
+        
+    </div>
+
+    <div class="divider"></div>
+
+    
+    <details class="toc-card">
+        <summary>目录</summary>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#new-pull-request"><span class="toc-text">new pull request</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%94%A8%E9%80%94"><span class="toc-text">用途</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%93%8D%E4%BD%9C"><span class="toc-text">操作</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%90%88%E5%B9%B6%E5%86%B2%E7%AA%81"><span class="toc-text">合并冲突</span></a></li></ol>
+    </details>
+    
+
+    <div class="content">
+        <p>有时候我们使用gitHub上面的一些开源库,需要对库的代码进行一些修改,以符合我们自己的要求,但是如果原作者后续有了更新,我们如何让我们fork的仓库也获得这些更新呢?这个时候就需要我们new pull request,合并更新的代码.</p>
+<h2 id="new-pull-request"><a href="#new-pull-request" class="headerlink" title="new pull request"></a>new pull request</h2><h3 id="用途"><a href="#用途" class="headerlink" title="用途"></a>用途</h3><ol>
+<li>我们fork原作者的仓库,修改后想把这些修改推送给原作者,合并到他的仓库中,让大家都来使用你的代码,成为原作者仓库的贡献者.</li>
+<li>原作者的仓库进行了更新,让我们fork的仓库跟进这些更新.</li>
+</ol>
+<h3 id="操作"><a href="#操作" class="headerlink" title="操作"></a>操作</h3><p><img src="1.png" alt="new request"></p>
+<p><img src="2.png" alt="2png"></p>
+<p>这里要注意左边的仓库是要合并到的仓库,原作者的再左边就是实现上面的功能1,向原仓库提交代码.如果要获取原仓库的更新的话,左边选择我们自己的仓库.</p>
+<p><img src="3.png" alt="3png"></p>
+<p><em>选了之后你会发现不能再选择仓库了,这时候点击右边的<code>compare across forks</code>展开</em>.</p>
+<p><img src="4.png" alt="4png"></p>
+<p>现在右边选择原作者的仓库,创建的pull request,就是提交给你自己.</p>
+<p>如果这次pull request没有冲突,恭喜你,自动就合并了,但是如果有冲突的话,就要自己手动操作了,官方的方法是在gitHub 桌面客户端或者git命令行里面进行合并的指导,但是命令行的话不太会用,我自己最理想的合并是使用as的冲突合并对比工具.清晰方便的就可以合并冲突的代码.今天进行了一下尝试,revert了几次,总算是搞明白了,现在记录下流程.</p>
+<h2 id="合并冲突"><a href="#合并冲突" class="headerlink" title="合并冲突"></a>合并冲突</h2><ol>
+<li><p>checkout 自己的仓库到本地,用as打开.</p>
+</li>
+<li><p>新建并切换到一个分支,我這里就叫temp了.<code>git checkout -b temp master</code>,可以用命令行操作也可以在as里面用界面操作.</p>
+</li>
+<li><p>pull 原仓库分支,<code>git pull https://github.com/Bigkoo/Android-PickerView.git master</code>,这一步我没有发现怎么在as里面操作.添加原仓库为remote好像是不行的.</p>
+<p><img src="5.png" alt="5png"></p>
+</li>
+<li><p>pull了之后就会提示冲突了,这个时候到as中点击:</p>
+<p><img src="6.png" alt="6p"></p>
+<p><img src="7.png" alt="7p"></p>
+<p>解决冲突就好了.</p>
+</li>
+<li><p>冲突解决后.按照官方操作就好了.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Step 2: Merge the changes and update on GitHub.</span><br><span class="line"></span><br><span class="line">git checkout master</span><br><span class="line">git merge --no-ff temp</span><br><span class="line">git push origin master</span><br></pre></td></tr></table></figure>
+
+<p>可以在命令行操作,也可以在as中操作.</p>
+</li>
+</ol>
+<p>这样我们的仓库就能更新到原仓库的最新版本了.还能保留我们的修改.</p>
+
+    </div>
+
+    <div class="about">
+        <h2>关于本文</h2>
+        <p>本文作者 longforus，采用 <a href="https://creativecommons.org/licenses/by-nc/4.0" target="_blank" rel="noopener">CC BY-NC 4.0</a> 许可协议。转载请注明出处。</p>
+    </div>
+
+    
+        
+    
+</article>
+
+        <footer>
+    <div class="inner">
+        <div class="links">
+            
+            <div class="group">
+                <h4 class="title">站点</h4>
+                
+                
+                <a href="../../../../index.html" class="item">首页</a>
+                
+                
+                <a href="../../../../archives" class="item">归档</a>
+                
+                
+                <a href="../../../../tags" class="item">标签</a>
+                
+                
+                <a href="../../../../categories" class="item">分类</a>
+                
+                
+                <a href="../../../../about" class="item">关于</a>
+                
+            </div>
+            
+            <div class="group">
+                <h4 class="title">项目</h4>
+                
+                
+                <a href="https://github.com/longforus/MvpAutoCodePlus" class="item" target="_blank" rel="noopener">MvpAutoCodePlus</a>
+                
+                
+                <a href="https://github.com/longforus/pgyerUpload4AndroidStudio" class="item" target="_blank" rel="noopener">pgyerUpload4AndroidStudio</a>
+                
+                
+                <a href="https://github.com/longforus/Android-drawable-preview-plugin" class="item" target="_blank" rel="noopener">Android-drawable-preview-plugin</a>
+                
+            </div>
+            
+            <div class="group">
+                <h4 class="title">联系</h4>
+                
+                
+                <a href="https://github.com/longforus" class="item" target="_blank" rel="noopener">GitHub</a>
+                
+                
+                <a href="mailto:longforus@outlook.com" class="item" target="_blank" rel="noopener">Email</a>
+                
+            </div>
+            
+        </div>
+        &copy; 2026 longforus<br />
+        驱动自 <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+</footer>
+
+        
+<script src="../js/main.js"></script>
+
+        
+<script src="../js/custom.js"></script>
+
+        
+    </body>
+</html>

@@ -1,19 +1,28 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-    <!DOCTYPE html>
-<html>
-
-<head>
+    <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
   
+
   <title>longforus</title>
+
   
-    <link rel="shortcut icon" href="/favicon.png">
+    <link rel="shortcut icon" href="/favicon.svg">
   
+
+  <meta name="description" content="记录代码与折腾">
   
-    <link rel='manifest' href='/manifest.json'>
+  <meta name="keywords" content="Android,Java,Kotlin,逆向,Linux,Hexo">
   
+  <meta name="author" content="longforus">
+  <meta name="theme-color" content="#0a84ff">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="longforus">
+  <meta property="og:description" content="记录代码与折腾">
+  <meta property="og:site_name" content="longforus">
 
   
 <link rel="stylesheet" href="css/var.css">
@@ -51,165 +60,415 @@
 
   
   
+  
+<link rel="stylesheet" href="css/custom.css">
+
 
   
 <meta name="generator" content="Hexo 6.0.0"></head>
+
     <body>
         <nav id="theme-nav">
     <div class="inner">
-        <a class="title" href="/">Blog</a>
+        <a class="title" href="index.html">longforus</a>
         <div class="nav-arrow"></div>
         <div class="nav-items">
-            <a class="nav-item nav-item-home" href="/">Home</a>
-            
-            
-            <a class="nav-item" href="/archives">Archives</a>
+            <a class="nav-item nav-item-home" href="index.html">主页</a>
             
             
             
-            <a class="nav-item" href="/friends">Friends</a>
+            <a class="nav-item" href="/archives">归档</a>
             
             
             
-            <a class="nav-item" href="/projects">Projects</a>
+            
+            <a class="nav-item" href="/tags">标签</a>
             
             
             
-            <a class="nav-item" href="/about">About</a>
+            
+            <a class="nav-item" href="/categories">分类</a>
             
             
             
-            <a class="nav-item nav-item-github nav-item-icon" href="https://github.com/longforus" target="_blank">&nbsp;</a>
+            
+            <a class="nav-item" href="/about">关于</a>
+            
+            
+            
+            
+            <a class="nav-item nav-item-github nav-item-icon" href="https://github.com/longforus" target="_blank" rel="noopener" aria-label="GitHub">&nbsp;</a>
             
             
         </div>
     </div>
 </nav>
+
         <div class="container">
     
-    <div class="hero">
+    <section class="hero">
         <div class="group">
-            <h2 class="sub">An android code farmer blog</h2>
-            <h2 class="large">long for us</h2>
+            <p class="sub">Android · Java/Kotlin · 逆向 · 系统折腾</p>
+            <h1 class="large">记录代码与折腾</h1>
+            <div class="hero-stats">
+                <span><strong>44</strong> 篇笔记</span>
+                <span><strong>11</strong> 个分类</span>
+                <span><strong>74</strong> 个标签</span>
+            </div>
         </div>
-    </div>
+    </section>
 
-    <h2 class="section-title">Latest Posts</h2>
+    <h2 class="section-title">最新笔记</h2>
     
 
     <div class="post-list">
-        
-        <article class="post-list-item">
-            <a href="2022/12/15/%E5%87%BA%E7%8E%B0Default_Activity_not_found%E7%9A%84%E4%B8%80%E7%A7%8D%E6%83%85%E5%86%B5%E7%9A%84%E8%A7%A3%E5%86%B3/">
-                
-                <div class="content">
-                    <div class="title">
-                        出现Default Activity not found的一种情况的解决
-                    </div>
-                    
-                    <div class="time">
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        <span>December</span>
-                        
-                        <span>&nbsp;15,&nbsp;</span>
-                        <span>2022</span>
-                    </div>
+    
+    <article class="post-list-item">
+        <a href="2026/10/22/kali-transparent-bridge-mitm/" class="post-list-link">
+            
+            <div class="content">
+                <div class="title">
+                    Kali 二层透明桥 HTTP MITM 实验复现记录
                 </div>
-            </a>
-        </article>
-        
-        <article class="post-list-item">
-            <a href="2022/12/15/%E5%BC%80%E5%90%AFMultiDex%E4%BB%8D%E7%84%B6%E6%8A%A565535%E6%96%B9%E6%B3%95%E6%95%B0%E7%9A%84%E4%B8%80%E7%A7%8D%E6%83%85%E5%86%B5%E7%9A%84%E8%A7%A3%E5%86%B3/">
                 
-                <div class="content">
-                    <div class="title">
-                        开启MultiDex仍然报65535方法数的一种情况的解决
-                    </div>
-                    
-                    <div class="time">
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        <span>December</span>
-                        
-                        <span>&nbsp;15,&nbsp;</span>
-                        <span>2022</span>
-                    </div>
+                <div class="excerpt">
+                    在 Kali 上搭建二层透明桥，配合 DNAT 与 Python 实现 HTTP MITM 的实验复现记录。
                 </div>
-            </a>
-        </article>
-        
-    </div>
-
+                
+                <div class="time">
+                    <span>2026-10-22</span>
+                    
+                    <span class="dot">·</span>
+                    <span class="category">网络安全</span>
+                    
+                </div>
+            </div>
+        </a>
+    </article>
+    
+    <article class="post-list-item">
+        <a href="2026/09/25/cachyos-ddcutil-udev-fix/" class="post-list-link">
+            
+            <div class="content">
+                <div class="title">
+                    CachyOS 升级后 Udev 触发 ddcutil 失效排查与修复指南
+                </div>
+                
+                <div class="excerpt">
+                    在 CachyOS (基于 Arch Linux) 等滚动发行版中，系统升级（特别是 systemd 升级）后，原本通过 udev 规则直接执行硬件控制脚本（如 ddcutil）可能会失效。
+                </div>
+                
+                <div class="time">
+                    <span>2026-09-25</span>
+                    
+                    <span class="dot">·</span>
+                    <span class="category">Linux</span>
+                    
+                </div>
+            </div>
+        </a>
+    </article>
+    
+    <article class="post-list-item">
+        <a href="2026/06/13/linux-music-player/" class="post-list-link">
+            
+            <div class="content">
+                <div class="title">
+                    Linux 上播放音乐的终极解决方案
+                </div>
+                
+                <div class="excerpt">
+                    最近主要日常使用改为了kubuntu26.04,但是在这个系统上听歌经过了一翻摸索才达到但在对我来说基本完美的解决方案,记录一下.
+                </div>
+                
+                <div class="time">
+                    <span>2026-06-13</span>
+                    
+                    <span class="dot">·</span>
+                    <span class="category">Linux</span>
+                    
+                </div>
+            </div>
+        </a>
+    </article>
+    
+    <article class="post-list-item">
+        <a href="2025/12/21/dual-nic-all-in-one/" class="post-list-link">
+            
+            <div class="content">
+                <div class="title">
+                    双网口小主机 All in one 除 PVE 外的另一种选择
+                </div>
+                
+                <div class="excerpt">
+                    关于双网口小主机All in one,网上的主流方案大多是用PVE作为底层,在作为软路由,NAS为主或者需要虚拟windwos的情况下,这可能是合理的选择,PVE作为专业的虚拟机平台,在这管理虚拟机方面,肯定有它的优势,…
+                </div>
+                
+                <div class="time">
+                    <span>2025-12-21</span>
+                    
+                    <span class="dot">·</span>
+                    <span class="category">系统运维</span>
+                    
+                </div>
+            </div>
+        </a>
+    </article>
+    
+    <article class="post-list-item">
+        <a href="2025/06/24/frp-clash-fixed-proxy/" class="post-list-link">
+            
+            <div class="content">
+                <div class="title">
+                    frp + Clash 实现固定代理
+                </div>
+                
+                <div class="excerpt">
+                    使用 frp 与 Clash 将异地网络请求转发到固定区域出口的配置记录。
+                </div>
+                
+                <div class="time">
+                    <span>2025-06-24</span>
+                    
+                    <span class="dot">·</span>
+                    <span class="category">网络运维</span>
+                    
+                </div>
+            </div>
+        </a>
+    </article>
+    
+    <article class="post-list-item">
+        <a href="2024/11/08/directory-opus-take-ownership/" class="post-list-link">
+            
+            <div class="content">
+                <div class="title">
+                    Directory Opus 添加管理员获得所有权右键菜单
+                </div>
+                
+                <div class="excerpt">
+                    在windows的资源管理器中添加管理员获得所有权的右键菜单很容易,通过注册表就可以了.
+                </div>
+                
+                <div class="time">
+                    <span>2024-11-08</span>
+                    
+                    <span class="dot">·</span>
+                    <span class="category">工具</span>
+                    
+                </div>
+            </div>
+        </a>
+    </article>
+    
+    <article class="post-list-item">
+        <a href="2024/11/08/frida-classfactory-loader/" class="post-list-link">
+            
+            <div class="content">
+                <div class="title">
+                    Frida Java.classFactory.loader: Cannot assign to &#39;loader&#39; because it is a read-only property
+                </div>
+                
+                <div class="excerpt">
+                    使用 Frida hook 非默认 ClassLoader 加载的类时遇到的只读属性错误处理。
+                </div>
+                
+                <div class="time">
+                    <span>2024-11-08</span>
+                    
+                    <span class="dot">·</span>
+                    <span class="category">Android</span>
+                    
+                </div>
+            </div>
+        </a>
+    </article>
+    
+    <article class="post-list-item">
+        <a href="2024/11/08/legacy-gpu-vbios-uefi/" class="post-list-link">
+            
+            <div class="content">
+                <div class="title">
+                    不支持 UEFI 的老显卡修改 vBIOS 进行支持
+                </div>
+                
+                <div class="excerpt">
+                    为不支持 UEFI 的老显卡修改 vBIOS，使其支持 UEFI 启动的记录。
+                </div>
+                
+                <div class="time">
+                    <span>2024-11-08</span>
+                    
+                    <span class="dot">·</span>
+                    <span class="category">硬件</span>
+                    
+                </div>
+            </div>
+        </a>
+    </article>
+    
+    <article class="post-list-item">
+        <a href="2024/11/08/willpopscope-to-popscope/" class="post-list-link">
+            
+            <div class="content">
+                <div class="title">
+                    怎么从 WillPopScope 迁移到 PopScope
+                </div>
+                
+                <div class="excerpt">
+                    Flutter 中从 WillPopScope 迁移到 PopScope 的异步返回拦截方案。
+                </div>
+                
+                <div class="time">
+                    <span>2024-11-08</span>
+                    
+                    <span class="dot">·</span>
+                    <span class="category">Flutter</span>
+                    
+                </div>
+            </div>
+        </a>
+    </article>
+    
+    <article class="post-list-item">
+        <a href="2024/07/21/irremote-esp8266-android/" class="post-list-link">
+            
+            <div class="content">
+                <div class="title">
+                    IRremoteESP8266 红外信号转安卓
+                </div>
+                
+                <div class="excerpt">
+                    最近换了Redmi Note12T,又带红外了,还是比较方便的,但是一些冷门的遥控在MIUI的遥控器里面是找不到的,比如我的DAC(SMSL SU-9),之前我是通过手机发送指令通过阿里云到esp8266来模拟控制实现手…
+                </div>
+                
+                <div class="time">
+                    <span>2024-07-21</span>
+                    
+                    <span class="dot">·</span>
+                    <span class="category">IoT</span>
+                    
+                </div>
+            </div>
+        </a>
+    </article>
+    
+    <article class="post-list-item">
+        <a href="2024/07/21/rtx20-dsr/" class="post-list-link">
+            
+            <div class="content">
+                <div class="title">
+                    RTX 20 系开启超分辨率
+                </div>
+                
+                <div class="excerpt">
+                    我的显卡是2070s现在也支持了超分辨率,根据网上的教程一通折腾后发现了不少的坑,记一下.希望有缘人可以少走点弯路.
+                </div>
+                
+                <div class="time">
+                    <span>2024-07-21</span>
+                    
+                    <span class="dot">·</span>
+                    <span class="category">硬件</span>
+                    
+                </div>
+            </div>
+        </a>
+    </article>
+    
+    <article class="post-list-item">
+        <a href="2021/11/23/apk-install-script/" class="post-list-link">
+            
+            <div class="content">
+                <div class="title">
+                    双击安装Apk,可选目标设备的小脚本
+                </div>
+                
+                <div class="excerpt">
+                    在逆向或者开发的时候经常需要安装Apk到设备,一般都用adb install z:/xxx.apk进行安装,如果adb只连了一个设备还好,要是多连了几个就麻烦了,需要adb -s 设备号 install z:/xxx.a…
+                </div>
+                
+                <div class="time">
+                    <span>2021-11-23</span>
+                    
+                    <span class="dot">·</span>
+                    <span class="category">Android</span>
+                    
+                </div>
+            </div>
+        </a>
+    </article>
     
 </div>
+
+
+    
+<div class="paginator">
+    <span class="page-number current">1</span><a class="page-number" href="page/2/">2</a><a class="page-number" href="page/3/">3</a><a class="page-number" href="page/4/">4</a><a class="extend next" rel="next" href="page/2/">下一页</a>
+</div>
+
+</div>
+
         <footer>
     <div class="inner">
         <div class="links">
             
             <div class="group">
-                <h4 class="title">Blog</h4>
+                <h4 class="title">站点</h4>
                 
-                <a href="/" class="item" target="_blank">Blog</a>
                 
-                <a href="/archives" class="item" target="_blank">Archives</a>
+                <a href="index.html" class="item">首页</a>
                 
-                <a href="/friends" class="item" target="_blank">Friends</a>
                 
-                <a href="/projects" class="item" target="_blank">Projects</a>
+                <a href="/archives" class="item">归档</a>
                 
-                <a href="/resume" class="item" target="_blank">Resume</a>
                 
-                <a href="/about" class="item" target="_blank">About</a>
+                <a href="/tags" class="item">标签</a>
                 
-                <a href="/atom.xml" class="item" target="_blank">RSS</a>
                 
-            </div>
-            
-            <div class="group">
-                <h4 class="title">Projects</h4>
+                <a href="/categories" class="item">分类</a>
                 
-                <a href="https://github.com/longforus/MvpAutoCodePlus" class="item" target="_blank">MvpAutoCodePlus</a>
+                
+                <a href="/about" class="item">关于</a>
                 
             </div>
             
             <div class="group">
-                <h4 class="title">Me</h4>
+                <h4 class="title">项目</h4>
                 
-                <a href="https://github.com/longforus" class="item" target="_blank">GitHub</a>
                 
-                <a href="mailto:longforus@outlook.com" class="item" target="_blank">Email</a>
+                <a href="https://github.com/longforus/MvpAutoCodePlus" class="item" target="_blank" rel="noopener">MvpAutoCodePlus</a>
+                
+                
+                <a href="https://github.com/longforus/pgyerUpload4AndroidStudio" class="item" target="_blank" rel="noopener">pgyerUpload4AndroidStudio</a>
+                
+                
+                <a href="https://github.com/longforus/Android-drawable-preview-plugin" class="item" target="_blank" rel="noopener">Android-drawable-preview-plugin</a>
+                
+            </div>
+            
+            <div class="group">
+                <h4 class="title">联系</h4>
+                
+                
+                <a href="https://github.com/longforus" class="item" target="_blank" rel="noopener">GitHub</a>
+                
+                
+                <a href="mailto:longforus@outlook.com" class="item" target="_blank" rel="noopener">Email</a>
                 
             </div>
             
         </div>
-        &copy; 2022 longforus<br />
-        Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+        &copy; 2026 longforus<br />
+        驱动自 <a href="http://hexo.io/" target="_blank">Hexo</a>
     </div>
 </footer>
 
         
-<script src="../../../../js/main.js"></script>
+<script src="../js/main.js"></script>
+
+        
+<script src="../js/custom.js"></script>
 
         
     </body>

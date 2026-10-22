@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+
+  <title>编辑 jar 包中 class 文件的几种方式 - longforus</title>
+
+  
+    <link rel="shortcut icon" href="../../../../favicon.svg">
+  
+
+  <meta name="description" content="在日常的开发中经常使用到第三方一些库,这些库可能提供gradle仓库的依赖,也可能提供jar包,有时候为了我们的一些自定义操作,需要修改这些jar包中的代码.这个时候该怎么做呢?">
+  
+  <meta name="keywords" content="Android,Java,Kotlin,逆向,Linux,Hexo">
+  
+  <meta name="author" content="longforus">
+  <meta name="theme-color" content="#0a84ff">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="编辑 jar 包中 class 文件的几种方式">
+  <meta property="og:description" content="在日常的开发中经常使用到第三方一些库,这些库可能提供gradle仓库的依赖,也可能提供jar包,有时候为了我们的一些自定义操作,需要修改这些jar包中的代码.这个时候该怎么做呢?">
+  <meta property="og:site_name" content="longforus">
+
+  
+<link rel="stylesheet" href="../../../../css/var.css">
+
+  
+<link rel="stylesheet" href="../../../../css/main.css">
+
+  
+<link rel="stylesheet" href="../../../../css/typography.css">
+
+  
+<link rel="stylesheet" href="../../../../css/code-highlighting.css">
+
+  
+<link rel="stylesheet" href="../../../../css/components.css">
+
+  
+<link rel="stylesheet" href="../../../../css/nav.css">
+
+  
+<link rel="stylesheet" href="../../../../css/paginator.css">
+
+  
+<link rel="stylesheet" href="../../../../css/footer.css">
+
+  
+<link rel="stylesheet" href="../../../../css/post-list.css">
+
+  
+<link rel="stylesheet" href="../../../../css/waline.css">
+
+  
+  
+  
+<link rel="stylesheet" href="../../../../css/post.css">
+
+  
+  
+<link rel="stylesheet" href="../../../../css/custom.css">
+
+
+  
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+    <body>
+        <nav id="theme-nav">
+    <div class="inner">
+        <a class="title" href="../../../../index.html">longforus</a>
+        <div class="nav-arrow"></div>
+        <div class="nav-items">
+            <a class="nav-item nav-item-home" href="../../../../index.html">主页</a>
+            
+            
+            
+            <a class="nav-item" href="../../../../archives">归档</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../tags">标签</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../categories">分类</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../about">关于</a>
+            
+            
+            
+            
+            <a class="nav-item nav-item-github nav-item-icon" href="https://github.com/longforus" target="_blank" rel="noopener" aria-label="GitHub">&nbsp;</a>
+            
+            
+        </div>
+    </div>
+</nav>
+
+        
+<article class="post">
+    <div class="meta">
+        <div class="post-meta">
+            <span class="post-date">2019-04-10</span>
+            
+            <span class="dot">·</span>
+            <span class="post-updated">更新于 2025-11-16</span>
+            
+            <span class="dot">·</span>
+            <span class="post-reading">4 分钟阅读</span>
+        </div>
+
+        <h1 class="title">编辑 jar 包中 class 文件的几种方式</h1>
+
+        
+        <div class="post-taxonomy">
+            
+            <a class="chip chip-category" href="../../../../categories/Java/">Java</a>
+            
+            
+            <a class="chip" href="../../../../tags/%E5%B7%A5%E5%85%B7/"># 工具</a>
+            
+            <a class="chip" href="../../../../tags/%E5%AD%97%E8%8A%82%E7%A0%81/"># 字节码</a>
+            
+            <a class="chip" href="../../../../tags/jar/"># jar</a>
+            
+        </div>
+        
+    </div>
+
+    <div class="divider"></div>
+
+    
+    <details class="toc-card">
+        <summary>目录</summary>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%88%91%E6%89%80%E4%BA%86%E8%A7%A3%E7%9A%84%E5%8F%AF%E4%BB%A5%E4%BF%AE%E6%94%B9jar%E4%B8%ADclass%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E5%BC%8F"><span class="toc-text">我所了解的可以修改jar中class的几种方式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%8A%E5%A4%A9%E4%BD%BF%E7%94%A8%E7%9A%84%E6%96%B9%E6%B3%95%E7%9A%84%E5%A4%A7%E6%A6%82%E6%B5%81%E7%A8%8B"><span class="toc-text">今天使用的方法的大概流程</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%A6%E5%AD%98%E4%B8%BA-java%E6%96%87%E4%BB%B6"><span class="toc-text">另存为.java文件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8B%B7%E8%B4%9D%E5%88%B0%E9%A1%B9%E7%9B%AE%E4%B8%AD%E4%BF%AE%E6%94%B9"><span class="toc-text">拷贝到项目中修改</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%90%88%E5%B9%B6%E5%A4%84%E7%90%86"><span class="toc-text">合并处理</span></a></li></ol></li></ol>
+    </details>
+    
+
+    <div class="content">
+        <p>在日常的开发中经常使用到第三方一些库,这些库可能提供gradle仓库的依赖,也可能提供jar包,有时候为了我们的一些自定义操作,需要修改这些jar包中的代码.这个时候该怎么做呢?</p>
+<h2 id="我所了解的可以修改jar中class的几种方式"><a href="#我所了解的可以修改jar中class的几种方式" class="headerlink" title="我所了解的可以修改jar中class的几种方式"></a>我所了解的可以修改jar中class的几种方式</h2><ol>
+<li><p>aop编程,使用aop框架hook想要修改的class的方法,自己实现这个方法或者额外的执行一些代码,但既然是aop,aop的目的也不是這样的,aop适合于面向切面的,多点修改的情况.虽然也能达到目的,但并不适合今天的场景.</p>
+</li>
+<li><p>自定义gradle插件,继承<code>Transform</code>在里面找到要修改的class用<code>javassist</code>等工具修改对应的代码,这个也是aop实现的一种方式.也不适合今天的情况.</p>
+</li>
+<li><p>使用<a target="_blank" rel="noopener" href="http://java-decompiler.github.io/">JD-GUI</a>这样的decompile工具,打开jar包中的class文件,另存为.java文件修改相应的代码后,重新编译替换原来jar包中的class文件.今天开始也采用這样的方法,但是发现了一些需要注意的点:</p>
+<ol>
+<li>如果类中有匿名内部类,反编译出来的代码进行编辑的时候需要修改一些引用上的错误.这个问题应该是避免不了的.</li>
+<li>重新编译需要对应的环境,原类在什么包中,编辑的类也需要在对应的包中,编辑的环境还需要依赖对应的jar包.不然是不能正常编译出class的.</li>
+<li>编辑后编译生成的class文件,应该连生成的内部类全部替换,防止有一些没注意到的修改没有替换到.造成非预期情况的发生.</li>
+</ol>
+</li>
+<li><p>这个方法和3类似,也是今天使用的方法.还是使用JD-GUI,decompile另存为.java文件,然后在as中创建对应的包,copy .java文件到其中进行编辑,這样的好处是修改方便,和正常的修改代码一样.修改完成后不再拷贝生成的class文件到jar包中,因为最后这些class文件都会合并到一处,最近打包成dex,拷不拷贝都一样.</p>
+</li>
+</ol>
+<h2 id="今天使用的方法的大概流程"><a href="#今天使用的方法的大概流程" class="headerlink" title="今天使用的方法的大概流程"></a>今天使用的方法的大概流程</h2><h3 id="另存为-java文件"><a href="#另存为-java文件" class="headerlink" title="另存为.java文件"></a>另存为.java文件</h3><p>下载安装<a target="_blank" rel="noopener" href="http://java-decompiler.github.io/">JD-GUI</a>,打开需要修改的jar包,找到想要修改的class文件, <code>Ctrl+s</code>保存为.java文件.</p>
+<p><img src="%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7-2019-04-09-10.25.35-PM-4820214.png" alt="jdgui"></p>
+<h3 id="拷贝到项目中修改"><a href="#拷贝到项目中修改" class="headerlink" title="拷贝到项目中修改"></a>拷贝到项目中修改</h3><p>建立对应的包,拷贝到包中修改,这个module需要依赖这个jar包.</p>
+<p><img src="%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7-2019-04-09-10.31.15-PM.png" alt="edit.javafile"></p>
+<h3 id="合并处理"><a href="#合并处理" class="headerlink" title="合并处理"></a>合并处理</h3><p>修改完成后直接assemble的话是会报错的,因为jar包中有和这个.java文件编译生成的同名class文件.有几种处理方式:</p>
+<ol>
+<li><p>删除jar包中这个类的class,包括内部类的class哦,这个最简单粗暴.</p>
+</li>
+<li><p>实现gradle插件在<code>Transform</code>中过滤掉对应的类不拷贝,没有进行尝试,感觉是可以实现的.但是有点舍近求远的意思.</p>
+</li>
+<li><p>另外开始想不依赖这个jar包,直接把jar中的class解压到class目录下,解压的过程中,过滤掉不要的class,debug模式下已经实现,但是release的时候报找不到要依赖的类,这个方法目前有2个点还需要明确.</p>
+<ol>
+<li>如何在JavaCompile的时候获取这次编译的buildType.如果可以获取到,在release的时候就把jar解压到对应的目录下,這样还会报找不到类么?</li>
+<li>怎么让model依赖一个目录中的class?</li>
+</ol>
+<p>如果可以解决这2个问题之一应该可以让这个方案得以实现,假如在不允许修改jar的情况下,这种方法就有作用了.</p>
+</li>
+</ol>
+<p>现在还是使用的方法1来实现,其他的方法待测试.</p>
+
+    </div>
+
+    <div class="about">
+        <h2>关于本文</h2>
+        <p>本文作者 longforus，采用 <a href="https://creativecommons.org/licenses/by-nc/4.0" target="_blank" rel="noopener">CC BY-NC 4.0</a> 许可协议。转载请注明出处。</p>
+    </div>
+
+    
+        
+    
+</article>
+
+        <footer>
+    <div class="inner">
+        <div class="links">
+            
+            <div class="group">
+                <h4 class="title">站点</h4>
+                
+                
+                <a href="../../../../index.html" class="item">首页</a>
+                
+                
+                <a href="../../../../archives" class="item">归档</a>
+                
+                
+                <a href="../../../../tags" class="item">标签</a>
+                
+                
+                <a href="../../../../categories" class="item">分类</a>
+                
+                
+                <a href="../../../../about" class="item">关于</a>
+                
+            </div>
+            
+            <div class="group">
+                <h4 class="title">项目</h4>
+                
+                
+                <a href="https://github.com/longforus/MvpAutoCodePlus" class="item" target="_blank" rel="noopener">MvpAutoCodePlus</a>
+                
+                
+                <a href="https://github.com/longforus/pgyerUpload4AndroidStudio" class="item" target="_blank" rel="noopener">pgyerUpload4AndroidStudio</a>
+                
+                
+                <a href="https://github.com/longforus/Android-drawable-preview-plugin" class="item" target="_blank" rel="noopener">Android-drawable-preview-plugin</a>
+                
+            </div>
+            
+            <div class="group">
+                <h4 class="title">联系</h4>
+                
+                
+                <a href="https://github.com/longforus" class="item" target="_blank" rel="noopener">GitHub</a>
+                
+                
+                <a href="mailto:longforus@outlook.com" class="item" target="_blank" rel="noopener">Email</a>
+                
+            </div>
+            
+        </div>
+        &copy; 2026 longforus<br />
+        驱动自 <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+</footer>
+
+        
+<script src="../js/main.js"></script>
+
+        
+<script src="../js/custom.js"></script>
+
+        
+    </body>
+</html>

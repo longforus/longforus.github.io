@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+
+  <title>APT Note - 手动实现简易版 ButterKnife - longforus</title>
+
+  
+    <link rel="shortcut icon" href="../../../../favicon.svg">
+  
+
+  <meta name="description" content="早就发现了apt的强大,但是一直没有进行尝试,今天尝试使用apt和javapoet,实现一个简易版的Butterknife.">
+  
+  <meta name="keywords" content="Android,Java,Kotlin,逆向,Linux,Hexo">
+  
+  <meta name="author" content="longforus">
+  <meta name="theme-color" content="#0a84ff">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="APT Note - 手动实现简易版 ButterKnife">
+  <meta property="og:description" content="早就发现了apt的强大,但是一直没有进行尝试,今天尝试使用apt和javapoet,实现一个简易版的Butterknife.">
+  <meta property="og:site_name" content="longforus">
+
+  
+<link rel="stylesheet" href="../../../../css/var.css">
+
+  
+<link rel="stylesheet" href="../../../../css/main.css">
+
+  
+<link rel="stylesheet" href="../../../../css/typography.css">
+
+  
+<link rel="stylesheet" href="../../../../css/code-highlighting.css">
+
+  
+<link rel="stylesheet" href="../../../../css/components.css">
+
+  
+<link rel="stylesheet" href="../../../../css/nav.css">
+
+  
+<link rel="stylesheet" href="../../../../css/paginator.css">
+
+  
+<link rel="stylesheet" href="../../../../css/footer.css">
+
+  
+<link rel="stylesheet" href="../../../../css/post-list.css">
+
+  
+<link rel="stylesheet" href="../../../../css/waline.css">
+
+  
+  
+  
+<link rel="stylesheet" href="../../../../css/post.css">
+
+  
+  
+<link rel="stylesheet" href="../../../../css/custom.css">
+
+
+  
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+    <body>
+        <nav id="theme-nav">
+    <div class="inner">
+        <a class="title" href="../../../../index.html">longforus</a>
+        <div class="nav-arrow"></div>
+        <div class="nav-items">
+            <a class="nav-item nav-item-home" href="../../../../index.html">主页</a>
+            
+            
+            
+            <a class="nav-item" href="../../../../archives">归档</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../tags">标签</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../categories">分类</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../about">关于</a>
+            
+            
+            
+            
+            <a class="nav-item nav-item-github nav-item-icon" href="https://github.com/longforus" target="_blank" rel="noopener" aria-label="GitHub">&nbsp;</a>
+            
+            
+        </div>
+    </div>
+</nav>
+
+        
+<article class="post">
+    <div class="meta">
+        <div class="post-meta">
+            <span class="post-date">2018-05-29</span>
+            
+            <span class="dot">·</span>
+            <span class="post-updated">更新于 2025-11-16</span>
+            
+            <span class="dot">·</span>
+            <span class="post-reading">17 分钟阅读</span>
+        </div>
+
+        <h1 class="title">APT Note - 手动实现简易版 ButterKnife</h1>
+
+        
+        <div class="post-taxonomy">
+            
+            <a class="chip chip-category" href="../../../../categories/Android/">Android</a>
+            
+            
+            <a class="chip" href="../../../../tags/APT/"># APT</a>
+            
+            <a class="chip" href="../../../../tags/%E6%B3%A8%E8%A7%A3%E5%A4%84%E7%90%86%E5%99%A8/"># 注解处理器</a>
+            
+        </div>
+        
+    </div>
+
+    <div class="divider"></div>
+
+    
+    <details class="toc-card">
+        <summary>目录</summary>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BB%93%E6%9E%84"><span class="toc-text">结构</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Anno"><span class="toc-text">Anno</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Api"><span class="toc-text">Api</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Compiler"><span class="toc-text">Compiler</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#VoidBindCompiler"><span class="toc-text">VoidBindCompiler</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#gradle"><span class="toc-text">gradle</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8"><span class="toc-text">使用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B7%BB%E5%8A%A0%E4%BE%9D%E8%B5%96"><span class="toc-text">添加依赖</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%9B%E8%A1%8C%E6%B3%A8%E8%A7%A3"><span class="toc-text">进行注解</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%94%9F%E6%88%90%E7%9A%84%E4%BB%A3%E7%A0%81"><span class="toc-text">生成的代码</span></a></li></ol>
+    </details>
+    
+
+    <div class="content">
+        <p>早就发现了apt的强大,但是一直没有进行尝试,今天尝试使用apt和javapoet,实现一个简易版的Butterknife.</p>
+<h2 id="结构"><a href="#结构" class="headerlink" title="结构"></a>结构</h2><ol>
+<li><p>anno  这个里面放的annotiation,写到单独的library中.依赖时使用compileOnly ,可以不包含到最终的app中,减少不必要的空间浪费.</p>
+</li>
+<li><p>api  这个里面放的是生成类的接口和bind需要用到的类.</p>
+</li>
+<li><p>compiler 这个是注解处理器.注解的获取和代码的生成都在这里完成.</p>
+<p>三个库都使用 java Library.java的Library不能依赖Android的Library.</p>
+</li>
+</ol>
+<h2 id="Anno"><a href="#Anno" class="headerlink" title="Anno"></a>Anno</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Target(ElementType.FIELD)</span></span><br><span class="line"><span class="meta">@Retention(RetentionPolicy.SOURCE)</span></span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> BindView &#123;</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">value</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="Api"><a href="#Api" class="headerlink" title="Api"></a>Api</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">IBind</span>&lt;<span class="title">T</span>&gt; </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">bind</span><span class="params">(T target)</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">------</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">VoidBind</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">bind</span><span class="params">(Object activity)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">//反射对应的类,生成实例调用</span></span><br><span class="line">            Class clazz = Class.forName(activity.getClass().getCanonicalName() + <span class="string">&quot;$VoidBind&quot;</span>);</span><br><span class="line">            IBind instance = (IBind)clazz.newInstance();</span><br><span class="line">             <span class="comment">//调用接口方法,为bind的view赋值</span></span><br><span class="line">            instance.bind(activity);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="Compiler"><a href="#Compiler" class="headerlink" title="Compiler"></a>Compiler</h2><h3 id="VoidBindCompiler"><a href="#VoidBindCompiler" class="headerlink" title="VoidBindCompiler"></a>VoidBindCompiler</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@AutoService(Processor.class)</span></span><br><span class="line"><span class="comment">//要处理的annotiation集合</span></span><br><span class="line"><span class="meta">@SupportedAnnotationTypes( &#123; &quot;com.longforus.voidbindanno.BindView&quot; &#125;)</span></span><br><span class="line"><span class="meta">@SupportedSourceVersion(SourceVersion.RELEASE_8)</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">VoidBindCompiler</span> <span class="keyword">extends</span> <span class="title">AbstractProcessor</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> ProcessingEnvironment mProcessingEnv;</span><br><span class="line">    <span class="keyword">private</span> SimpleDateFormat mDateFormat;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">(ProcessingEnvironment processingEnv)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.init(processingEnv);</span><br><span class="line">        <span class="comment">//后续要用到</span></span><br><span class="line">        mProcessingEnv = processingEnv;</span><br><span class="line">        mDateFormat = <span class="keyword">new</span> SimpleDateFormat(<span class="string">&quot;yyyy-MM-dd HH:mm:ss&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">process</span><span class="params">(Set&lt;? extends TypeElement&gt; annotations,RoundEnvironment roundEnv)</span> </span>&#123;</span><br><span class="line">        <span class="comment">//key为全类名 value为要处理的元素集合</span></span><br><span class="line">        Map&lt;String,List&lt;VariableElement&gt;&gt; map = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line"></span><br><span class="line">        Set&lt;? extends Element&gt; annotatedWith = roundEnv.getElementsAnnotatedWith(BindView.class);</span><br><span class="line">        <span class="keyword">for</span> (Element element : annotatedWith) &#123;</span><br><span class="line">            VariableElement e = (VariableElement)element;</span><br><span class="line">            String fullClassName = getFullClassName(e);</span><br><span class="line">            <span class="comment">//如果map中包含就返回,否则调用lambda,生成value并用K保存到map中</span></span><br><span class="line">            List&lt;VariableElement&gt; elements = map.computeIfAbsent(fullClassName,k -&gt; <span class="keyword">new</span> ArrayList&lt;&gt;());</span><br><span class="line">            elements.add(e);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (Map.Entry&lt;String,List&lt;VariableElement&gt;&gt; entry : map.entrySet()) &#123;</span><br><span class="line">            <span class="keyword">if</span> (entry.getValue() == <span class="keyword">null</span> || entry.getValue().isEmpty()) &#123;</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            String fullName = entry.getKey();</span><br><span class="line">            <span class="keyword">int</span> i = fullName.lastIndexOf(<span class="string">&quot;.&quot;</span>);</span><br><span class="line">            <span class="comment">//获取外围元素的类型,toString()其实就是全类名</span></span><br><span class="line">            TypeName enclosingTypeName = TypeName.get(entry.getValue().get(<span class="number">0</span>).getEnclosingElement().asType());</span><br><span class="line">            <span class="comment">//生成方法</span></span><br><span class="line">            MethodSpec.Builder methodBuild = MethodSpec.methodBuilder(<span class="string">&quot;bind&quot;</span>).addAnnotation(Override.class).addModifiers(Modifier.PUBLIC).returns(<span class="keyword">void</span>.class).addParameter(</span><br><span class="line">                enclosingTypeName,<span class="string">&quot;target&quot;</span>);</span><br><span class="line">            <span class="keyword">for</span> (VariableElement element : entry.getValue()) &#123;</span><br><span class="line">                methodBuild.addStatement(</span><br><span class="line">                    String.format(Locale.CHINA,<span class="string">&quot;target.%s=target.findViewById(%d)&quot;</span>,element.getSimpleName().toString(),element.getAnnotation(BindView.class).value()));</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            String enclosingClassName = fullName.substring(i + <span class="number">1</span>,fullName.length());</span><br><span class="line">            <span class="comment">//生成带泛型的接口类型名</span></span><br><span class="line">            ParameterizedTypeName superinterface = ParameterizedTypeName.get(ClassName.get(IBind.class),enclosingTypeName);</span><br><span class="line">            TypeSpec typeSpec = TypeSpec.classBuilder(enclosingClassName + <span class="string">&quot;$VoidBind&quot;</span>)</span><br><span class="line">                                        .addModifiers(Modifier.PUBLIC,Modifier.FINAL)</span><br><span class="line">                                        .addSuperinterface(superinterface)</span><br><span class="line">                                        .addMethod(methodBuild.build()).build();</span><br><span class="line"></span><br><span class="line">            String packageName = fullName.substring(<span class="number">0</span>,i);</span><br><span class="line">            JavaFile javaFile = JavaFile.builder(packageName,typeSpec).addFileComment(<span class="string">&quot;This class generate by VoidBind.Don&#x27;t modify it,   - &quot;</span>+mDateFormat.format(<span class="keyword">new</span> Date())).build();</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                <span class="comment">//写出到generated/source/kapt/debug/包名/目录下</span></span><br><span class="line">                javaFile.writeTo(mProcessingEnv.getFiler());</span><br><span class="line">            &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> String <span class="title">getFullClassName</span><span class="params">(VariableElement e)</span> </span>&#123;</span><br><span class="line">        <span class="comment">//获取到持有e的外围元素,这里是Activity等</span></span><br><span class="line">        TypeElement enclosingElement = (TypeElement)e.getEnclosingElement();</span><br><span class="line">        <span class="comment">//获取外围元素的包名</span></span><br><span class="line">        String packageName = mProcessingEnv.getElementUtils().getPackageOf(enclosingElement).getQualifiedName().toString();</span><br><span class="line">        <span class="keyword">return</span> packageName + <span class="string">&quot;.&quot;</span> + enclosingElement.getSimpleName().toString();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="gradle"><a href="#gradle" class="headerlink" title="gradle"></a>gradle</h3><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">apply <span class="attr">plugin:</span> <span class="string">&#x27;java-library&#x27;</span></span><br><span class="line"></span><br><span class="line">dependencies &#123;</span><br><span class="line">    implementation fileTree(<span class="attr">dir:</span> <span class="string">&#x27;libs&#x27;</span>, <span class="attr">include:</span> [<span class="string">&#x27;*.jar&#x27;</span>])</span><br><span class="line">    implementation project(<span class="string">&#x27;:VoidBindAnno&#x27;</span>)</span><br><span class="line">    <span class="comment">//不能依赖android library</span></span><br><span class="line">    implementation project(<span class="string">&#x27;:VoidBindApi&#x27;</span>)</span><br><span class="line">    implementation <span class="string">&#x27;com.google.auto.service:auto-service:1.0-rc4&#x27;</span></span><br><span class="line">    implementation <span class="string">&#x27;com.squareup:javapoet:1.11.0&#x27;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//指定编译的编码</span></span><br><span class="line">tasks.withType(JavaCompile)&#123;</span><br><span class="line">    options.encoding = <span class="string">&quot;UTF-8&quot;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">sourceCompatibility = <span class="string">&quot;1.8&quot;</span></span><br><span class="line">targetCompatibility = <span class="string">&quot;1.8&quot;</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><h3 id="添加依赖"><a href="#添加依赖" class="headerlink" title="添加依赖"></a>添加依赖</h3><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//注解</span></span><br><span class="line">compileOnly project(<span class="string">&#x27;:VoidBindAnno&#x27;</span>)</span><br><span class="line"><span class="comment">//工具</span></span><br><span class="line">implementation project(<span class="string">&#x27;:VoidBindApi&#x27;</span>)</span><br><span class="line"><span class="comment">//处理注解生成代码</span></span><br><span class="line">kapt project(<span class="string">&#x27;:VoidBindCompiler&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="进行注解"><a href="#进行注解" class="headerlink" title="进行注解"></a>进行注解</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SecondActivity</span> <span class="keyword">extends</span> <span class="title">AppCompatActivity</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@BindView(R.id.button)</span></span><br><span class="line">    Button mButton;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState);</span><br><span class="line">        setContentView(R.layout.activity_second);</span><br><span class="line">        VoidBind.bind(<span class="keyword">this</span>);</span><br><span class="line">        mButton.setOnClickListener(<span class="keyword">new</span> View.OnClickListener() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onClick</span><span class="params">(View v)</span> </span>&#123;</span><br><span class="line">                Toast.makeText(SecondActivity.<span class="keyword">this</span>,<span class="string">&quot;success&quot;</span>,Toast.LENGTH_SHORT).show();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>如果在kotlin中使用,生成的代码提示被注解的var是private的.暂时还没想到怎么解决</strong></p>
+<h2 id="生成的代码"><a href="#生成的代码" class="headerlink" title="生成的代码"></a>生成的代码</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// This class generate by VoidBind.Don&#x27;t modify it,   - 2018-05-09 14:57:29</span></span><br><span class="line"><span class="keyword">package</span> com.longforus.aptdemo;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.longforus.voidbindapi.IBind;</span><br><span class="line"><span class="keyword">import</span> java.lang.Override;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">SecondActivity</span>$<span class="title">VoidBind</span> <span class="keyword">implements</span> <span class="title">IBind</span>&lt;<span class="title">SecondActivity</span>&gt; </span>&#123;</span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">bind</span><span class="params">(SecondActivity target)</span> </span>&#123;</span><br><span class="line">    target.mButton=target.findViewById(<span class="number">2131165219</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<p>也算是打开了一种新的思路,工作中还没有发现适合实际应用的场景.笔记保存,方便查用.</p>
+
+    </div>
+
+    <div class="about">
+        <h2>关于本文</h2>
+        <p>本文作者 longforus，采用 <a href="https://creativecommons.org/licenses/by-nc/4.0" target="_blank" rel="noopener">CC BY-NC 4.0</a> 许可协议。转载请注明出处。</p>
+    </div>
+
+    
+        
+    
+</article>
+
+        <footer>
+    <div class="inner">
+        <div class="links">
+            
+            <div class="group">
+                <h4 class="title">站点</h4>
+                
+                
+                <a href="../../../../index.html" class="item">首页</a>
+                
+                
+                <a href="../../../../archives" class="item">归档</a>
+                
+                
+                <a href="../../../../tags" class="item">标签</a>
+                
+                
+                <a href="../../../../categories" class="item">分类</a>
+                
+                
+                <a href="../../../../about" class="item">关于</a>
+                
+            </div>
+            
+            <div class="group">
+                <h4 class="title">项目</h4>
+                
+                
+                <a href="https://github.com/longforus/MvpAutoCodePlus" class="item" target="_blank" rel="noopener">MvpAutoCodePlus</a>
+                
+                
+                <a href="https://github.com/longforus/pgyerUpload4AndroidStudio" class="item" target="_blank" rel="noopener">pgyerUpload4AndroidStudio</a>
+                
+                
+                <a href="https://github.com/longforus/Android-drawable-preview-plugin" class="item" target="_blank" rel="noopener">Android-drawable-preview-plugin</a>
+                
+            </div>
+            
+            <div class="group">
+                <h4 class="title">联系</h4>
+                
+                
+                <a href="https://github.com/longforus" class="item" target="_blank" rel="noopener">GitHub</a>
+                
+                
+                <a href="mailto:longforus@outlook.com" class="item" target="_blank" rel="noopener">Email</a>
+                
+            </div>
+            
+        </div>
+        &copy; 2026 longforus<br />
+        驱动自 <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+</footer>
+
+        
+<script src="../js/main.js"></script>
+
+        
+<script src="../js/custom.js"></script>
+
+        
+    </body>
+</html>

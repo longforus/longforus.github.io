@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+
+  <title>关于 zBar 部分手机扫描空白处识别出条码的问题 - longforus</title>
+
+  
+    <link rel="shortcut icon" href="../../../../favicon.svg">
+  
+
+  <meta name="description" content="最近的项目中使用到自己编译的zBar进行条码识别,在自己的手机上一直都没有问题,但是前面有一部小米MAX2s中出现了手机放着不动扫描空白处,尽然识别出了条码的bug.因为这个bug在别的手机上还没有遇到过,而且也比较诡异…">
+  
+  <meta name="keywords" content="Android,Java,Kotlin,逆向,Linux,Hexo">
+  
+  <meta name="author" content="longforus">
+  <meta name="theme-color" content="#0a84ff">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="关于 zBar 部分手机扫描空白处识别出条码的问题">
+  <meta property="og:description" content="最近的项目中使用到自己编译的zBar进行条码识别,在自己的手机上一直都没有问题,但是前面有一部小米MAX2s中出现了手机放着不动扫描空白处,尽然识别出了条码的bug.因为这个bug在别的手机上还没有遇到过,而且也比较诡异…">
+  <meta property="og:site_name" content="longforus">
+
+  
+<link rel="stylesheet" href="../../../../css/var.css">
+
+  
+<link rel="stylesheet" href="../../../../css/main.css">
+
+  
+<link rel="stylesheet" href="../../../../css/typography.css">
+
+  
+<link rel="stylesheet" href="../../../../css/code-highlighting.css">
+
+  
+<link rel="stylesheet" href="../../../../css/components.css">
+
+  
+<link rel="stylesheet" href="../../../../css/nav.css">
+
+  
+<link rel="stylesheet" href="../../../../css/paginator.css">
+
+  
+<link rel="stylesheet" href="../../../../css/footer.css">
+
+  
+<link rel="stylesheet" href="../../../../css/post-list.css">
+
+  
+<link rel="stylesheet" href="../../../../css/waline.css">
+
+  
+  
+  
+<link rel="stylesheet" href="../../../../css/post.css">
+
+  
+  
+<link rel="stylesheet" href="../../../../css/custom.css">
+
+
+  
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+    <body>
+        <nav id="theme-nav">
+    <div class="inner">
+        <a class="title" href="../../../../index.html">longforus</a>
+        <div class="nav-arrow"></div>
+        <div class="nav-items">
+            <a class="nav-item nav-item-home" href="../../../../index.html">主页</a>
+            
+            
+            
+            <a class="nav-item" href="../../../../archives">归档</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../tags">标签</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../categories">分类</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../about">关于</a>
+            
+            
+            
+            
+            <a class="nav-item nav-item-github nav-item-icon" href="https://github.com/longforus" target="_blank" rel="noopener" aria-label="GitHub">&nbsp;</a>
+            
+            
+        </div>
+    </div>
+</nav>
+
+        
+<article class="post">
+    <div class="meta">
+        <div class="post-meta">
+            <span class="post-date">2019-08-23</span>
+            
+            <span class="dot">·</span>
+            <span class="post-updated">更新于 2025-11-16</span>
+            
+            <span class="dot">·</span>
+            <span class="post-reading">5 分钟阅读</span>
+        </div>
+
+        <h1 class="title">关于 zBar 部分手机扫描空白处识别出条码的问题</h1>
+
+        
+        <div class="post-taxonomy">
+            
+            <a class="chip chip-category" href="../../../../categories/Android/">Android</a>
+            
+            
+            <a class="chip" href="../../../../tags/%E4%BA%8C%E7%BB%B4%E7%A0%81/"># 二维码</a>
+            
+            <a class="chip" href="../../../../tags/zBar/"># zBar</a>
+            
+        </div>
+        
+    </div>
+
+    <div class="divider"></div>
+
+    
+    <details class="toc-card">
+        <summary>目录</summary>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AF%86%E5%88%AB%E6%B5%81%E7%A8%8B"><span class="toc-text">识别流程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A7%A3%E5%86%B3%E8%BF%87%E7%A8%8B"><span class="toc-text">解决过程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B9%8B%E5%89%8D%E7%9A%84%E9%85%8D%E7%BD%AE"><span class="toc-text">之前的配置</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%8E%B0%E5%9C%A8%E7%9A%84%E9%85%8D%E7%BD%AE"><span class="toc-text">现在的配置</span></a></li></ol>
+    </details>
+    
+
+    <div class="content">
+        <p>  最近的项目中使用到自己编译的zBar进行条码识别,在自己的手机上一直都没有问题,但是前面有一部小米MAX2s中出现了手机放着不动扫描空白处,尽然识别出了条码的bug.因为这个bug在别的手机上还没有遇到过,而且也比较诡异,未做处理,但是最近反馈说這样的手机也有一些包括小米8.必须要进行处理了.</p>
+<h2 id="识别流程"><a href="#识别流程" class="headerlink" title="识别流程"></a>识别流程</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">graph TD</span><br><span class="line">   start[摄像头重复获取图像] --&gt; input[zBar识别]</span><br><span class="line">   input --&gt; conditionA&#123;识别出条码?&#125;</span><br><span class="line">   conditionA -- YES --&gt; print[处理插入数据库]</span><br><span class="line">   conditionA -- NO --&gt; start</span><br><span class="line">   print --&gt; start</span><br></pre></td></tr></table></figure>
+
+<p>在摄像头重复的回调中,把图像数据交给zBar去识别,zBar返回识别到的条码list,如果list不空,则触发我的处理逻辑,正常情况下扫描空白的桌面,摄像头的回调图像也是空白的,传入zBar也肯定不会识别出条码信息了,但是却偏偏识别出了条码,匪夷所思了,zBar的底层识别是用c++实现的,虽然是<a target="_blank" rel="noopener" href="https://download.csdn.net/download/longforus/11235111">自己编译的zBar</a>也有源码在手,问题是看不懂啊.搜索能找到少量的类似问题,但是都没有解决方法.</p>
+<h2 id="解决过程"><a href="#解决过程" class="headerlink" title="解决过程"></a>解决过程</h2><ol>
+<li>先在出现问题的手机上安装了,zBar的官方demo,没有做什么修改,我的项目就是依据这个demo来进行配置的.问题依旧.那可以明确问题是在zBar的内部了.这个就触及到我的盲区了.</li>
+<li>clone别的大神整合的扫描库<a target="_blank" rel="noopener" href="https://github.com/bertsir/zBarLibary">zBarLibary</a>,构建后安装到问题手机发现问题没有再出现了,查看这个大神的条码识别也是使用的zBar,为什么我的不可以呢?</li>
+<li>直接替换项目中的so库为<a target="_blank" rel="noopener" href="https://github.com/bertsir/zBarLibary">zBarLibary</a>的so库,因为源码不一致,启动报错.</li>
+<li>观察<a target="_blank" rel="noopener" href="https://github.com/bertsir/zBarLibary">zBarLibary</a>的识别配置,修改自己项目的配置和<a target="_blank" rel="noopener" href="https://github.com/bertsir/zBarLibary">zBarLibary</a>的相同,成功.</li>
+</ol>
+<h2 id="之前的配置"><a href="#之前的配置" class="headerlink" title="之前的配置"></a>之前的配置</h2><p>只是copy官方demo,没有做更多的配置</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">scanner.setConfig(<span class="number">0</span>, Config.X_DENSITY, <span class="number">3</span>)</span><br><span class="line">scanner.setConfig(<span class="number">0</span>, Config.Y_DENSITY, <span class="number">3</span>)</span><br></pre></td></tr></table></figure>
+
+<h2 id="现在的配置"><a href="#现在的配置" class="headerlink" title="现在的配置"></a>现在的配置</h2><p>加上了条码识别的一些配置</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">scanner.setConfig(<span class="number">0</span>, Config.X_DENSITY, <span class="number">3</span>)</span><br><span class="line">scanner.setConfig(<span class="number">0</span>, Config.Y_DENSITY, <span class="number">3</span>)</span><br><span class="line">scanner.setConfig(Symbol.NONE, Config.ENABLE, <span class="number">0</span>)</span><br><span class="line">scanner.setConfig(Symbol.CODE128, Config.ENABLE, <span class="number">1</span>)</span><br><span class="line">scanner.setConfig(Symbol.CODE39, Config.ENABLE, <span class="number">1</span>)</span><br><span class="line">scanner.setConfig(Symbol.EAN13, Config.ENABLE, <span class="number">1</span>)</span><br><span class="line">scanner.setConfig(Symbol.EAN8, Config.ENABLE, <span class="number">1</span>)</span><br><span class="line">scanner.setConfig(Symbol.UPCA, Config.ENABLE, <span class="number">1</span>)</span><br><span class="line">scanner.setConfig(Symbol.UPCE, Config.ENABLE, <span class="number">1</span>)</span><br><span class="line">scanner.setConfig(Symbol.UPCE, Config.ENABLE, <span class="number">1</span>)</span><br></pre></td></tr></table></figure>
+
+
+
+<p>感谢<a target="_blank" rel="noopener" href="https://github.com/bertsir/zBarLibary">zBarLibary</a>开源库,如果有扫描需求的话可以直接使用,因为我没有二维码需求,就保持现在的不变了.</p>
+
+    </div>
+
+    <div class="about">
+        <h2>关于本文</h2>
+        <p>本文作者 longforus，采用 <a href="https://creativecommons.org/licenses/by-nc/4.0" target="_blank" rel="noopener">CC BY-NC 4.0</a> 许可协议。转载请注明出处。</p>
+    </div>
+
+    
+        
+    
+</article>
+
+        <footer>
+    <div class="inner">
+        <div class="links">
+            
+            <div class="group">
+                <h4 class="title">站点</h4>
+                
+                
+                <a href="../../../../index.html" class="item">首页</a>
+                
+                
+                <a href="../../../../archives" class="item">归档</a>
+                
+                
+                <a href="../../../../tags" class="item">标签</a>
+                
+                
+                <a href="../../../../categories" class="item">分类</a>
+                
+                
+                <a href="../../../../about" class="item">关于</a>
+                
+            </div>
+            
+            <div class="group">
+                <h4 class="title">项目</h4>
+                
+                
+                <a href="https://github.com/longforus/MvpAutoCodePlus" class="item" target="_blank" rel="noopener">MvpAutoCodePlus</a>
+                
+                
+                <a href="https://github.com/longforus/pgyerUpload4AndroidStudio" class="item" target="_blank" rel="noopener">pgyerUpload4AndroidStudio</a>
+                
+                
+                <a href="https://github.com/longforus/Android-drawable-preview-plugin" class="item" target="_blank" rel="noopener">Android-drawable-preview-plugin</a>
+                
+            </div>
+            
+            <div class="group">
+                <h4 class="title">联系</h4>
+                
+                
+                <a href="https://github.com/longforus" class="item" target="_blank" rel="noopener">GitHub</a>
+                
+                
+                <a href="mailto:longforus@outlook.com" class="item" target="_blank" rel="noopener">Email</a>
+                
+            </div>
+            
+        </div>
+        &copy; 2026 longforus<br />
+        驱动自 <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+</footer>
+
+        
+<script src="../js/main.js"></script>
+
+        
+<script src="../js/custom.js"></script>
+
+        
+    </body>
+</html>

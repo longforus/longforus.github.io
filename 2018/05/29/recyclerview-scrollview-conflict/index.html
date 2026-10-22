@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+
+  <title>RecyclerView 的 item 中嵌套 ScrollView 的滑动冲突解决 - longforus</title>
+
+  
+    <link rel="shortcut icon" href="../../../../favicon.svg">
+  
+
+  <meta name="description" content="外层是一个RecyclerView rv ,每个Item中又有一个可以上下滑动的Scrollview sv,这种设计是比较少见和脑残的.内外层肯定会造成滑动冲突,刚刚编码完成的时候表现就是,内部的 sv 无法滑动. 但是…">
+  
+  <meta name="keywords" content="Android,Java,Kotlin,逆向,Linux,Hexo">
+  
+  <meta name="author" content="longforus">
+  <meta name="theme-color" content="#0a84ff">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="RecyclerView 的 item 中嵌套 ScrollView 的滑动冲突解决">
+  <meta property="og:description" content="外层是一个RecyclerView rv ,每个Item中又有一个可以上下滑动的Scrollview sv,这种设计是比较少见和脑残的.内外层肯定会造成滑动冲突,刚刚编码完成的时候表现就是,内部的 sv 无法滑动. 但是…">
+  <meta property="og:site_name" content="longforus">
+
+  
+<link rel="stylesheet" href="../../../../css/var.css">
+
+  
+<link rel="stylesheet" href="../../../../css/main.css">
+
+  
+<link rel="stylesheet" href="../../../../css/typography.css">
+
+  
+<link rel="stylesheet" href="../../../../css/code-highlighting.css">
+
+  
+<link rel="stylesheet" href="../../../../css/components.css">
+
+  
+<link rel="stylesheet" href="../../../../css/nav.css">
+
+  
+<link rel="stylesheet" href="../../../../css/paginator.css">
+
+  
+<link rel="stylesheet" href="../../../../css/footer.css">
+
+  
+<link rel="stylesheet" href="../../../../css/post-list.css">
+
+  
+<link rel="stylesheet" href="../../../../css/waline.css">
+
+  
+  
+  
+<link rel="stylesheet" href="../../../../css/post.css">
+
+  
+  
+<link rel="stylesheet" href="../../../../css/custom.css">
+
+
+  
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+    <body>
+        <nav id="theme-nav">
+    <div class="inner">
+        <a class="title" href="../../../../index.html">longforus</a>
+        <div class="nav-arrow"></div>
+        <div class="nav-items">
+            <a class="nav-item nav-item-home" href="../../../../index.html">主页</a>
+            
+            
+            
+            <a class="nav-item" href="../../../../archives">归档</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../tags">标签</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../categories">分类</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../about">关于</a>
+            
+            
+            
+            
+            <a class="nav-item nav-item-github nav-item-icon" href="https://github.com/longforus" target="_blank" rel="noopener" aria-label="GitHub">&nbsp;</a>
+            
+            
+        </div>
+    </div>
+</nav>
+
+        
+<article class="post">
+    <div class="meta">
+        <div class="post-meta">
+            <span class="post-date">2018-05-29</span>
+            
+            <span class="dot">·</span>
+            <span class="post-updated">更新于 2025-11-16</span>
+            
+            <span class="dot">·</span>
+            <span class="post-reading">5 分钟阅读</span>
+        </div>
+
+        <h1 class="title">RecyclerView 的 item 中嵌套 ScrollView 的滑动冲突解决</h1>
+
+        
+        <div class="post-taxonomy">
+            
+            <a class="chip chip-category" href="../../../../categories/Android/">Android</a>
+            
+            
+            <a class="chip" href="../../../../tags/RecyclerView/"># RecyclerView</a>
+            
+            <a class="chip" href="../../../../tags/UI/"># UI</a>
+            
+        </div>
+        
+    </div>
+
+    <div class="divider"></div>
+
+    
+    <details class="toc-card">
+        <summary>目录</summary>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9C%BA%E6%99%AF"><span class="toc-text">场景</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B0%9D%E8%AF%95"><span class="toc-text">尝试</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95"><span class="toc-text">解决方法</span></a></li></ol>
+    </details>
+    
+
+    <div class="content">
+        <h2 id="场景"><a href="#场景" class="headerlink" title="场景"></a>场景</h2><p><img src="RecyclerView%E7%9A%84item%E4%B8%AD%E5%B5%8C%E5%A5%97Scrollview%E7%9A%84%E6%BB%91%E5%8A%A8%E5%86%B2%E7%AA%81%E8%A7%A3%E5%86%B3_1.png" alt="应用场景"></p>
+<p>外层是一个RecyclerView <strong>rv</strong> ,每个Item中又有一个可以上下滑动的Scrollview <strong>sv</strong>,这种设计是比较少见和脑残的.内外层肯定会造成滑动冲突,刚刚编码完成的时候表现就是,内部的 sv 无法滑动. 但是因为H5已经实现,最近也不是很忙.而且对touchEvent的传递上不是非常的了解.就尝试着研究了一下.</p>
+<p>在网上没有找到合适的指导方案.百度出来几乎都是Scrollview内部嵌套RecyclerView的问题.尝试自己解决.</p>
+<h2 id="尝试"><a href="#尝试" class="headerlink" title="尝试"></a>尝试</h2><ol>
+<li>修改内部的Scrollview为NestedScrollView,当然是无效的.</li>
+<li>设置<code>sv.requestDisallowInterceptTouchEvent(true); </code> 意图请求父容器不拦截touchEvent,在这里sv的父容器是这个item的rootView,在不做处理的情况下,这个rootView也是接收不到touchEvent的.因为上层根本就没有传进来.</li>
+<li>还有很多尝试,很杂也不太记得了.</li>
+</ol>
+<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><ol>
+<li><p>rv addOnItemTouchListener 监听touchEvent获取event坐标点,给ViewHolder判断是否请求不拦截.</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">rv.addOnItemTouchListener(<span class="keyword">object</span> : RecyclerView.OnItemTouchListener &#123;</span><br><span class="line">           <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onTouchEvent</span><span class="params">(rv: <span class="type">RecyclerView</span>?, e: <span class="type">MotionEvent</span>?)</span></span> &#123;</span><br><span class="line"></span><br><span class="line">           &#125;</span><br><span class="line"></span><br><span class="line">           <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onInterceptTouchEvent</span><span class="params">(rv: <span class="type">RecyclerView</span>?, e: <span class="type">MotionEvent</span>?)</span></span>: <span class="built_in">Boolean</span> &#123;</span><br><span class="line">               <span class="keyword">if</span> (e != <span class="literal">null</span>) &#123;</span><br><span class="line">                   <span class="comment">//找到被点击位置的item的rootView</span></span><br><span class="line">                   <span class="keyword">val</span> view = rv?.findChildViewUnder(e.x, e.y)</span><br><span class="line">                   <span class="keyword">if</span> (view != <span class="literal">null</span>) &#123;</span><br><span class="line">                       <span class="comment">//通过rootView找到对应的ViewHolder</span></span><br><span class="line">                       <span class="keyword">val</span> holder = rv.getChildViewHolder(view) <span class="keyword">as</span> CombineAdapter.ViewHolder</span><br><span class="line">                       <span class="comment">//由ViewHolder决定要不要请求不拦截,如果不拦截的话event就回一路传到rootView中.否则被rv消费.</span></span><br><span class="line">                       rv.requestDisallowInterceptTouchEvent(holder.isTouchNsv(e.rawX, e.rawY))</span><br><span class="line">                   &#125;</span><br><span class="line">               &#125;</span><br><span class="line">               <span class="keyword">return</span> <span class="literal">false</span></span><br><span class="line">           &#125;</span><br><span class="line"></span><br><span class="line">           <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onRequestDisallowInterceptTouchEvent</span><span class="params">(disallowIntercept: <span class="type">Boolean</span>)</span></span> &#123;</span><br><span class="line"></span><br><span class="line">           &#125;</span><br><span class="line"></span><br><span class="line">       &#125;)</span><br></pre></td></tr></table></figure></li>
+</ol>
+<ol start="2">
+<li><p>判断event坐标点是否在sv范围内:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> x event的rowX</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> y event的rowY</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> 这个点在不在sv的范围内.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isTouchNsv</span><span class="params">(<span class="keyword">float</span> x,<span class="keyword">float</span> y)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span>[] pos = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">2</span>];</span><br><span class="line">        <span class="comment">//获取sv在屏幕上的位置</span></span><br><span class="line">        mall_nsv.getLocationOnScreen(pos);</span><br><span class="line">        <span class="keyword">int</span> width = mall_nsv.getMeasuredWidth();</span><br><span class="line">        <span class="keyword">int</span> height = mall_nsv.getMeasuredHeight();</span><br><span class="line">        <span class="keyword">return</span> x &gt;= pos[<span class="number">0</span>] &amp;&amp; x &lt;= pos[<span class="number">0</span>] + width &amp;&amp; y &gt;= pos[<span class="number">1</span>] &amp;&amp; y &lt;= pos[<span class="number">1</span>] + height;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<p>这样在滑动位置处于sv上的时候,event就被传到了sv中,触发sv的滑动.不在sv上的时候不做处理,触发rv的滑动,初步成功.</p>
+<p><img src="RecyclerView%E7%9A%84item%E4%B8%AD%E5%B5%8C%E5%A5%97Scrollview%E7%9A%84%E6%BB%91%E5%8A%A8%E5%86%B2%E7%AA%81%E8%A7%A3%E5%86%B3_2.gif" alt="效果"></p>
+<p>因水平有限,文中难免出现错误,欢迎交流,斧正.</p>
+
+    </div>
+
+    <div class="about">
+        <h2>关于本文</h2>
+        <p>本文作者 longforus，采用 <a href="https://creativecommons.org/licenses/by-nc/4.0" target="_blank" rel="noopener">CC BY-NC 4.0</a> 许可协议。转载请注明出处。</p>
+    </div>
+
+    
+        
+    
+</article>
+
+        <footer>
+    <div class="inner">
+        <div class="links">
+            
+            <div class="group">
+                <h4 class="title">站点</h4>
+                
+                
+                <a href="../../../../index.html" class="item">首页</a>
+                
+                
+                <a href="../../../../archives" class="item">归档</a>
+                
+                
+                <a href="../../../../tags" class="item">标签</a>
+                
+                
+                <a href="../../../../categories" class="item">分类</a>
+                
+                
+                <a href="../../../../about" class="item">关于</a>
+                
+            </div>
+            
+            <div class="group">
+                <h4 class="title">项目</h4>
+                
+                
+                <a href="https://github.com/longforus/MvpAutoCodePlus" class="item" target="_blank" rel="noopener">MvpAutoCodePlus</a>
+                
+                
+                <a href="https://github.com/longforus/pgyerUpload4AndroidStudio" class="item" target="_blank" rel="noopener">pgyerUpload4AndroidStudio</a>
+                
+                
+                <a href="https://github.com/longforus/Android-drawable-preview-plugin" class="item" target="_blank" rel="noopener">Android-drawable-preview-plugin</a>
+                
+            </div>
+            
+            <div class="group">
+                <h4 class="title">联系</h4>
+                
+                
+                <a href="https://github.com/longforus" class="item" target="_blank" rel="noopener">GitHub</a>
+                
+                
+                <a href="mailto:longforus@outlook.com" class="item" target="_blank" rel="noopener">Email</a>
+                
+            </div>
+            
+        </div>
+        &copy; 2026 longforus<br />
+        驱动自 <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+</footer>
+
+        
+<script src="../js/main.js"></script>
+
+        
+<script src="../js/custom.js"></script>
+
+        
+    </body>
+</html>

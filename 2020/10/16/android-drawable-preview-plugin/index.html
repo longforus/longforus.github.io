@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+
+  <title>Android Drawable Preview 插件适配 Android Studio 4.1 - longforus</title>
+
+  
+    <link rel="shortcut icon" href="../../../../favicon.svg">
+  
+
+  <meta name="description" content="Android Drawable Preview是一个在安卓开发中非常有用的AS/IDEA插件,可以将drawable资源文件的icon替换成内容的预览图,达到不需要打开资源文件,快速预览内容的功能,实在是非常的方便快捷…">
+  
+  <meta name="keywords" content="Android,Java,Kotlin,逆向,Linux,Hexo">
+  
+  <meta name="author" content="longforus">
+  <meta name="theme-color" content="#0a84ff">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Android Drawable Preview 插件适配 Android Studio 4.1">
+  <meta property="og:description" content="Android Drawable Preview是一个在安卓开发中非常有用的AS/IDEA插件,可以将drawable资源文件的icon替换成内容的预览图,达到不需要打开资源文件,快速预览内容的功能,实在是非常的方便快捷…">
+  <meta property="og:site_name" content="longforus">
+
+  
+<link rel="stylesheet" href="../../../../css/var.css">
+
+  
+<link rel="stylesheet" href="../../../../css/main.css">
+
+  
+<link rel="stylesheet" href="../../../../css/typography.css">
+
+  
+<link rel="stylesheet" href="../../../../css/code-highlighting.css">
+
+  
+<link rel="stylesheet" href="../../../../css/components.css">
+
+  
+<link rel="stylesheet" href="../../../../css/nav.css">
+
+  
+<link rel="stylesheet" href="../../../../css/paginator.css">
+
+  
+<link rel="stylesheet" href="../../../../css/footer.css">
+
+  
+<link rel="stylesheet" href="../../../../css/post-list.css">
+
+  
+<link rel="stylesheet" href="../../../../css/waline.css">
+
+  
+  
+  
+<link rel="stylesheet" href="../../../../css/post.css">
+
+  
+  
+<link rel="stylesheet" href="../../../../css/custom.css">
+
+
+  
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+    <body>
+        <nav id="theme-nav">
+    <div class="inner">
+        <a class="title" href="../../../../index.html">longforus</a>
+        <div class="nav-arrow"></div>
+        <div class="nav-items">
+            <a class="nav-item nav-item-home" href="../../../../index.html">主页</a>
+            
+            
+            
+            <a class="nav-item" href="../../../../archives">归档</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../tags">标签</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../categories">分类</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../about">关于</a>
+            
+            
+            
+            
+            <a class="nav-item nav-item-github nav-item-icon" href="https://github.com/longforus" target="_blank" rel="noopener" aria-label="GitHub">&nbsp;</a>
+            
+            
+        </div>
+    </div>
+</nav>
+
+        
+<article class="post">
+    <div class="meta">
+        <div class="post-meta">
+            <span class="post-date">2020-10-16</span>
+            
+            <span class="dot">·</span>
+            <span class="post-updated">更新于 2025-11-16</span>
+            
+            <span class="dot">·</span>
+            <span class="post-reading">7 分钟阅读</span>
+        </div>
+
+        <h1 class="title">Android Drawable Preview 插件适配 Android Studio 4.1</h1>
+
+        
+        <div class="post-taxonomy">
+            
+            <a class="chip chip-category" href="../../../../categories/Android/">Android</a>
+            
+            
+            <a class="chip" href="../../../../tags/Android-Studio/"># Android Studio</a>
+            
+            <a class="chip" href="../../../../tags/%E6%8F%92%E4%BB%B6/"># 插件</a>
+            
+        </div>
+        
+    </div>
+
+    <div class="divider"></div>
+
+    
+
+    <div class="content">
+        <p><a target="_blank" rel="noopener" href="https://plugins.jetbrains.com/plugin/10730-android-drawable-preview">Android Drawable Preview</a>是一个在安卓开发中非常有用的AS/IDEA插件,可以将drawable资源文件的icon替换成内容的预览图,达到不需要打开资源文件,快速预览内容的功能,实在是非常的方便快捷,让开发工作更加的愉悦.</p>
+<p>使用之前:</p>
+<p><img src="4.png"></p>
+<p><img src="3.png"></p>
+<p>使用之后:</p>
+<p><img src="1.png"></p>
+<p><img src="2-1602811767972.png"></p>
+<p>便利程度自然不用多说,是我一直使用的重要插件之一.</p>
+<p>可是好景不长,前几天AS4.1正式版发布了,虽然新功能我不一定都用到,但是就算为了intellij平台的更新,所以我向来都是用最新版AS的,升级后一些插件报错了:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Plugin &quot;Kotlin Code Sorter&quot; is incompatible (supported only in IntelliJ IDEA).</span><br><span class="line">Plugin &quot;Android Drawable Preview&quot; is incompatible (supported only in IntelliJ IDEA).</span><br></pre></td></tr></table></figure>
+
+<p>这是因为intellij平台更新了,对插件的配置有了一些要求,没有及时跟进升级的插件都会得到这个错误提示且不再兼容.查看<a target="_blank" rel="noopener" href="https://github.com/mistamek/Android-drawable-preview-plugin">Android Drawable Preview插件作者的GitHub</a>上次更新已经是2年前,作者也不是很活跃,不知道什么时候才能更新,可是离开这个这个插件势必会影响到开发效率,又舍不得回退AS到4.0,恰好我也有一点点插件开发经验,于是fork仓库,对AS4.1版本进行了小小的适配.目前已经提交pull request到源仓库,如果原作者采纳的话,才会打包发布到jetbrains的插件仓库,AS上的老版本才能得到更新提示,如果现在就想用新版的话,可以在<a target="_blank" rel="noopener" href="https://github.com/longforus/Android-drawable-preview-plugin/releases">我fork的仓库</a>进行下载后手动安装:</p>
+<ul>
+<li><strong>手动安装:</strong><ul>
+<li>下载<a target="_blank" rel="noopener" href="https://github.com/longforus/Android-drawable-preview-plugin/releases"><code>最新发布的插件包</code></a> &gt; <kbd>File</kbd> &gt;<kbd>Preferences(Settings)</kbd> &gt; <kbd>Plugins</kbd> &gt; <kbd>Install plugin from disk...</kbd></li>
+</ul>
+</li>
+</ul>
+<h4 id="其他相同问题的插件"><a href="#其他相同问题的插件" class="headerlink" title="其他相同问题的插件"></a>其他相同问题的插件</h4><p>如果有其他插件也出现同样的问题,而作者还没有更新的话,可以尝试强行修改:</p>
+<ol>
+<li><p>到<code>C:\Users\longforus\AppData\Roaming\Google\AndroidStudio4.1\plugins</code>目录下找到对应插件的jar包.</p>
+</li>
+<li><p>比如<code>C:\Users\longforus\AppData\Roaming\Google\AndroidStudio4.1\plugins\kotlincodesort\lib\kotlincodesort-1.2.2.jar</code>(这个是比如哈,我的插件已经更新了的)用压缩软件打开.</p>
+</li>
+<li><p>打开jar包内的<code>kotlincodesort-1.2.2.jar\META-INF\plugin.xml</code>:</p>
+ <figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">idea-plugin</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.2.2<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">change-notes</span>&gt;</span></span><br><span class="line">      Adapter Android Studio 4.1</span><br><span class="line">      <span class="tag">&lt;/<span class="name">change-notes</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">id</span>&gt;</span>com.longforus.kotlincodesorter<span class="tag">&lt;/<span class="name">id</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">name</span>&gt;</span>Kotlin Code Sorter<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">vendor</span> <span class="attr">email</span>=<span class="string">&quot;yxq.longforus@gmail.com&quot;</span> <span class="attr">url</span>=<span class="string">&quot;https://github.com/longforus&quot;</span>&gt;</span>longforus<span class="tag">&lt;/<span class="name">vendor</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">description</span>&gt;</span></span><br><span class="line">   	......</span><br><span class="line">    <span class="tag">&lt;/<span class="name">description</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">idea-version</span> <span class="attr">since-build</span>=<span class="string">&quot;192&quot;</span>/&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">depends</span>&gt;</span>org.jetbrains.kotlin<span class="tag">&lt;/<span class="name">depends</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">depends</span>&gt;</span>com.intellij.modules.platform<span class="tag">&lt;/<span class="name">depends</span>&gt;</span>//添加这一行</span><br><span class="line">  <span class="tag">&lt;<span class="name">extensions</span> <span class="attr">defaultExtensionNs</span>=<span class="string">&quot;com.intellij&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">applicationConfigurable</span> <span class="attr">instance</span>=<span class="string">&quot;com.longforus.kotlincodesorter.config.ConfigComponent&quot;</span>/&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">extensions</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">actions</span>&gt;</span></span><br><span class="line">	......</span><br><span class="line">  <span class="tag">&lt;/<span class="name">actions</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">idea-plugin</span>&gt;</span></span><br><span class="line"></span><br></pre></td></tr></table></figure></li>
+<li><p>保存,重启AS看是否能使用.<strong>这种方法只适用于不涉及API改变的情况,如果插件有使用已经删除的API等情况的话,用起来也会报错的,不能保证后续功能的正常使用</strong>,还是建议通知原作者更新.</p>
+</li>
+</ol>
+<h4 id="我其他的小插件"><a href="#我其他的小插件" class="headerlink" title="我其他的小插件:"></a>我其他的小插件:</h4><ul>
+<li>MvpAutoCodePlus   mvp模板代码生成 <a target="_blank" rel="noopener" href="https://github.com/longforus/MvpAutoCodePlus">https://github.com/longforus/MvpAutoCodePlus</a></li>
+<li>Kotlin Code Sorter   kotlin代码排序  <a target="_blank" rel="noopener" href="https://github.com/longforus/KotlinCodeSorter">https://github.com/longforus/KotlinCodeSorter</a></li>
+<li>adb-idea插件升级版  ADB IDEA插件增强版  <a target="_blank" rel="noopener" href="https://blog.csdn.net/longforus/article/details/83046562">https://blog.csdn.net/longforus/article/details/83046562</a></li>
+</ul>
+<p>如果对你有用,欢迎star.</p>
+
+    </div>
+
+    <div class="about">
+        <h2>关于本文</h2>
+        <p>本文作者 longforus，采用 <a href="https://creativecommons.org/licenses/by-nc/4.0" target="_blank" rel="noopener">CC BY-NC 4.0</a> 许可协议。转载请注明出处。</p>
+    </div>
+
+    
+        
+    
+</article>
+
+        <footer>
+    <div class="inner">
+        <div class="links">
+            
+            <div class="group">
+                <h4 class="title">站点</h4>
+                
+                
+                <a href="../../../../index.html" class="item">首页</a>
+                
+                
+                <a href="../../../../archives" class="item">归档</a>
+                
+                
+                <a href="../../../../tags" class="item">标签</a>
+                
+                
+                <a href="../../../../categories" class="item">分类</a>
+                
+                
+                <a href="../../../../about" class="item">关于</a>
+                
+            </div>
+            
+            <div class="group">
+                <h4 class="title">项目</h4>
+                
+                
+                <a href="https://github.com/longforus/MvpAutoCodePlus" class="item" target="_blank" rel="noopener">MvpAutoCodePlus</a>
+                
+                
+                <a href="https://github.com/longforus/pgyerUpload4AndroidStudio" class="item" target="_blank" rel="noopener">pgyerUpload4AndroidStudio</a>
+                
+                
+                <a href="https://github.com/longforus/Android-drawable-preview-plugin" class="item" target="_blank" rel="noopener">Android-drawable-preview-plugin</a>
+                
+            </div>
+            
+            <div class="group">
+                <h4 class="title">联系</h4>
+                
+                
+                <a href="https://github.com/longforus" class="item" target="_blank" rel="noopener">GitHub</a>
+                
+                
+                <a href="mailto:longforus@outlook.com" class="item" target="_blank" rel="noopener">Email</a>
+                
+            </div>
+            
+        </div>
+        &copy; 2026 longforus<br />
+        驱动自 <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+</footer>
+
+        
+<script src="../js/main.js"></script>
+
+        
+<script src="../js/custom.js"></script>
+
+        
+    </body>
+</html>

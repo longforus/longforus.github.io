@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+
+  <title>Kotlin 中 groupBy 和 groupingBy 使用对比 - longforus</title>
+
+  
+    <link rel="shortcut icon" href="../../../../favicon.svg">
+  
+
+  <meta name="description" content="Kotlin 中 groupBy 与 groupingBy 的使用方式和适用场景对比。">
+  
+  <meta name="keywords" content="Android,Java,Kotlin,逆向,Linux,Hexo">
+  
+  <meta name="author" content="longforus">
+  <meta name="theme-color" content="#0a84ff">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Kotlin 中 groupBy 和 groupingBy 使用对比">
+  <meta property="og:description" content="Kotlin 中 groupBy 与 groupingBy 的使用方式和适用场景对比。">
+  <meta property="og:site_name" content="longforus">
+
+  
+<link rel="stylesheet" href="../../../../css/var.css">
+
+  
+<link rel="stylesheet" href="../../../../css/main.css">
+
+  
+<link rel="stylesheet" href="../../../../css/typography.css">
+
+  
+<link rel="stylesheet" href="../../../../css/code-highlighting.css">
+
+  
+<link rel="stylesheet" href="../../../../css/components.css">
+
+  
+<link rel="stylesheet" href="../../../../css/nav.css">
+
+  
+<link rel="stylesheet" href="../../../../css/paginator.css">
+
+  
+<link rel="stylesheet" href="../../../../css/footer.css">
+
+  
+<link rel="stylesheet" href="../../../../css/post-list.css">
+
+  
+<link rel="stylesheet" href="../../../../css/waline.css">
+
+  
+  
+  
+<link rel="stylesheet" href="../../../../css/post.css">
+
+  
+  
+<link rel="stylesheet" href="../../../../css/custom.css">
+
+
+  
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+    <body>
+        <nav id="theme-nav">
+    <div class="inner">
+        <a class="title" href="../../../../index.html">longforus</a>
+        <div class="nav-arrow"></div>
+        <div class="nav-items">
+            <a class="nav-item nav-item-home" href="../../../../index.html">主页</a>
+            
+            
+            
+            <a class="nav-item" href="../../../../archives">归档</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../tags">标签</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../categories">分类</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../about">关于</a>
+            
+            
+            
+            
+            <a class="nav-item nav-item-github nav-item-icon" href="https://github.com/longforus" target="_blank" rel="noopener" aria-label="GitHub">&nbsp;</a>
+            
+            
+        </div>
+    </div>
+</nav>
+
+        
+<article class="post">
+    <div class="meta">
+        <div class="post-meta">
+            <span class="post-date">2021-03-30</span>
+            
+            <span class="dot">·</span>
+            <span class="post-reading">9 分钟阅读</span>
+        </div>
+
+        <h1 class="title">Kotlin 中 groupBy 和 groupingBy 使用对比</h1>
+
+        
+        <div class="post-taxonomy">
+            
+            <a class="chip chip-category" href="../../../../categories/Kotlin/">Kotlin</a>
+            
+            
+            <a class="chip" href="../../../../tags/Kotlin/"># Kotlin</a>
+            
+            <a class="chip" href="../../../../tags/%E9%9B%86%E5%90%88/"># 集合</a>
+            
+        </div>
+        
+    </div>
+
+    <div class="divider"></div>
+
+    
+
+    <div class="content">
+        <p>今天在看Kotlin的Coroutines官方文档练英文的时候,它有个<a target="_blank" rel="noopener" href="https://play.kotlinlang.org/hands-on/Introduction%20to%20Coroutines%20and%20Channels/02_BlockingRequest">Hands-on</a>,在里面要实现一个aggregate的功能,先来看看我的初版实现:</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> List<span class="type">&lt;User&gt;</span>.<span class="title">aggregate</span><span class="params">()</span></span>: List&lt;User&gt; &#123;</span><br><span class="line">    <span class="keyword">val</span> map = <span class="keyword">this</span>.groupBy &#123; it.login &#125;</span><br><span class="line">    <span class="keyword">val</span> result = ArrayList&lt;User&gt;(map.keys.size)</span><br><span class="line">    <span class="keyword">for</span> (login <span class="keyword">in</span> map.keys) &#123;</span><br><span class="line">        result.add(User(login, map[login]?.sumOf &#123; it.contributions &#125; ?: <span class="number">0</span>))</span><br><span class="line">    &#125;</span><br><span class="line">    result.sortByDescending &#123; it.contributions &#125;</span><br><span class="line">    <span class="keyword">return</span> result</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>再来看看官方的实现:</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> List<span class="type">&lt;User&gt;</span>.<span class="title">aggregate</span><span class="params">()</span></span>: List&lt;User&gt;  = groupBy &#123; it.login &#125;</span><br><span class="line">    .map &#123; (k,v)-&gt; User(k, v.sumOf &#123; it.contributions &#125;)&#125;</span><br><span class="line">    .sortedByDescending &#123; it.contributions &#125;</span><br></pre></td></tr></table></figure>
+
+<p>我自己的实现和官方的解决方案都用了<code>groupBy</code>,这个函数的功能就是根据给定的key遍历list进行分组:</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Groups elements of the original collection by the key returned by the given [keySelector] function</span></span><br><span class="line"><span class="comment"> * applied to each element and returns a map where each group key is associated with a list of corresponding elements.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * The returned map preserves the entry iteration order of the keys produced from the original collection.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@sample</span> samples.collections.Collections.Transformations.groupBy</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">inline</span> <span class="function"><span class="keyword">fun</span> <span class="type">&lt;T, K&gt;</span> Iterable<span class="type">&lt;T&gt;</span>.<span class="title">groupBy</span><span class="params">(keySelector: (<span class="type">T</span>) -&gt; <span class="type">K</span>)</span></span>: Map&lt;K, List&lt;T&gt;&gt; &#123;</span><br><span class="line">    <span class="keyword">return</span> groupByTo(LinkedHashMap&lt;K, MutableList&lt;T&gt;&gt;(), keySelector)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>相比官方我没有用map而是用了一个局部变量来接收<code>groupBy</code>的结果供后续处理,排序也没有注意到有一个<code>sortByDescending</code>还有一个<code>sortedByDescending</code>,明显不如官方的简练.</p>
+<p>但是在文章中后面又说:<code>An alternative is to use the function </code>groupingBy<code>instead of</code>groupBy<code>.😳😳😳还有一个</code>groupingBy`吗?之前都没有注意到有这个东西,让我来康康:</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Creates a [Grouping] source from a collection to be used later with one of group-and-fold operations</span></span><br><span class="line"><span class="comment"> * using the specified [keySelector] function to extract a key from each element.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@sample</span> samples.collections.Grouping.groupingByEachCount</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@SinceKotlin(<span class="meta-string">&quot;1.1&quot;</span>)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">inline</span> <span class="function"><span class="keyword">fun</span> <span class="type">&lt;T, K&gt;</span> Iterable<span class="type">&lt;T&gt;</span>.<span class="title">groupingBy</span><span class="params">(<span class="keyword">crossinline</span> keySelector: (<span class="type">T</span>) -&gt; <span class="type">K</span>)</span></span>: Grouping&lt;T, K&gt; &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">object</span> : Grouping&lt;T, K&gt; &#123;</span><br><span class="line">        <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">sourceIterator</span><span class="params">()</span></span>: Iterator&lt;T&gt; = <span class="keyword">this</span><span class="symbol">@groupingBy</span>.iterator()</span><br><span class="line">        <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">keyOf</span><span class="params">(element: <span class="type">T</span>)</span></span>: K = keySelector(element)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>看代码这里并没有进行遍历操作而是直接返回了一个<code>Grouping</code>类型的源数据的<em>界面</em>.不处理数据直接交给后续的操作处理.在这个例子中相对于<code>groupBy</code>可以减少一次遍历.那用<code>groupingBy</code>如何实现呢?</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> List<span class="type">&lt;User&gt;</span>.<span class="title">aggregateFromGrouping</span><span class="params">()</span></span>: List&lt;User&gt; = groupingBy &#123; it.login &#125;</span><br><span class="line">    .aggregate&lt;User, String, <span class="built_in">Int</span>&gt; &#123; _, accumulator, element, _ -&gt;</span><br><span class="line">        element.contributions + (accumulator ?: <span class="number">0</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    .map &#123; (k, v) -&gt; User(k, v) &#125;</span><br><span class="line">    .sortedByDescending &#123; it.contributions &#125;</span><br></pre></td></tr></table></figure>
+
+<p>看起来比<code>groupBy</code>复杂一点点,在<code>aggregate</code>这真正的遍历操作数据的这一步这里需要要繁杂一点点,但是因为少了一次遍历,在我的电脑上重复一千万次会比使用<code>groupBy</code>快一些:</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"> println(<span class="string">&quot;start groupingBy&quot;</span>)</span><br><span class="line"> <span class="keyword">val</span> s2 = System.currentTimeMillis()</span><br><span class="line"> repeat(<span class="number">10000000</span>)&#123;</span><br><span class="line">     <span class="keyword">actual</span> = list.aggregateFromGrouping()</span><br><span class="line"> &#125;</span><br><span class="line"> println(<span class="string">&quot;end groupingBy <span class="subst">$&#123;System.currentTimeMillis()-s2&#125;</span>ms&quot;</span>)</span><br><span class="line"></span><br><span class="line"> println(<span class="string">&quot;start groupBy&quot;</span>)</span><br><span class="line"> <span class="keyword">val</span> s1 = System.currentTimeMillis()</span><br><span class="line"> repeat(<span class="number">10000000</span>)&#123;</span><br><span class="line">     <span class="keyword">actual</span> = list.aggregate()</span><br><span class="line"> &#125;</span><br><span class="line"> println(<span class="string">&quot;end groupBy <span class="subst">$&#123;System.currentTimeMillis()-s1&#125;</span>ms&quot;</span>)</span><br><span class="line"></span><br><span class="line">-------------------------------result-------------------------</span><br><span class="line">start groupingBy</span><br><span class="line">end groupingBy 2064ms</span><br><span class="line">start groupBy</span><br><span class="line">end groupBy 2439ms</span><br></pre></td></tr></table></figure>
+
+<p>综上在性能要求严格的情况下推荐使用<code>groupingBy</code>.</p>
+<p>水完,下班.🚍</p>
+
+    </div>
+
+    <div class="about">
+        <h2>关于本文</h2>
+        <p>本文作者 longforus，采用 <a href="https://creativecommons.org/licenses/by-nc/4.0" target="_blank" rel="noopener">CC BY-NC 4.0</a> 许可协议。转载请注明出处。</p>
+    </div>
+
+    
+        
+    
+</article>
+
+        <footer>
+    <div class="inner">
+        <div class="links">
+            
+            <div class="group">
+                <h4 class="title">站点</h4>
+                
+                
+                <a href="../../../../index.html" class="item">首页</a>
+                
+                
+                <a href="../../../../archives" class="item">归档</a>
+                
+                
+                <a href="../../../../tags" class="item">标签</a>
+                
+                
+                <a href="../../../../categories" class="item">分类</a>
+                
+                
+                <a href="../../../../about" class="item">关于</a>
+                
+            </div>
+            
+            <div class="group">
+                <h4 class="title">项目</h4>
+                
+                
+                <a href="https://github.com/longforus/MvpAutoCodePlus" class="item" target="_blank" rel="noopener">MvpAutoCodePlus</a>
+                
+                
+                <a href="https://github.com/longforus/pgyerUpload4AndroidStudio" class="item" target="_blank" rel="noopener">pgyerUpload4AndroidStudio</a>
+                
+                
+                <a href="https://github.com/longforus/Android-drawable-preview-plugin" class="item" target="_blank" rel="noopener">Android-drawable-preview-plugin</a>
+                
+            </div>
+            
+            <div class="group">
+                <h4 class="title">联系</h4>
+                
+                
+                <a href="https://github.com/longforus" class="item" target="_blank" rel="noopener">GitHub</a>
+                
+                
+                <a href="mailto:longforus@outlook.com" class="item" target="_blank" rel="noopener">Email</a>
+                
+            </div>
+            
+        </div>
+        &copy; 2026 longforus<br />
+        驱动自 <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+</footer>
+
+        
+<script src="../js/main.js"></script>
+
+        
+<script src="../js/custom.js"></script>
+
+        
+    </body>
+</html>

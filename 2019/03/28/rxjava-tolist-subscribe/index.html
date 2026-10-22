@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+
+  <title>RxJava 在 toList() 后 subscribe() 不执行的问题 - longforus</title>
+
+  
+    <link rel="shortcut icon" href="../../../../favicon.svg">
+  
+
+  <meta name="description" content="今天在项目中遇到一个问题:需要遍历一个list在经过2次异步调用修改list中的一些值之后,刷新adapter,通知数据修改.略显复杂,一般的同步修改倒是没有什么了,但是需要进行2次异步调用修改,而且要跳过一些item,…">
+  
+  <meta name="keywords" content="Android,Java,Kotlin,逆向,Linux,Hexo">
+  
+  <meta name="author" content="longforus">
+  <meta name="theme-color" content="#0a84ff">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="RxJava 在 toList() 后 subscribe() 不执行的问题">
+  <meta property="og:description" content="今天在项目中遇到一个问题:需要遍历一个list在经过2次异步调用修改list中的一些值之后,刷新adapter,通知数据修改.略显复杂,一般的同步修改倒是没有什么了,但是需要进行2次异步调用修改,而且要跳过一些item,…">
+  <meta property="og:site_name" content="longforus">
+
+  
+<link rel="stylesheet" href="../../../../css/var.css">
+
+  
+<link rel="stylesheet" href="../../../../css/main.css">
+
+  
+<link rel="stylesheet" href="../../../../css/typography.css">
+
+  
+<link rel="stylesheet" href="../../../../css/code-highlighting.css">
+
+  
+<link rel="stylesheet" href="../../../../css/components.css">
+
+  
+<link rel="stylesheet" href="../../../../css/nav.css">
+
+  
+<link rel="stylesheet" href="../../../../css/paginator.css">
+
+  
+<link rel="stylesheet" href="../../../../css/footer.css">
+
+  
+<link rel="stylesheet" href="../../../../css/post-list.css">
+
+  
+<link rel="stylesheet" href="../../../../css/waline.css">
+
+  
+  
+  
+<link rel="stylesheet" href="../../../../css/post.css">
+
+  
+  
+<link rel="stylesheet" href="../../../../css/custom.css">
+
+
+  
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+    <body>
+        <nav id="theme-nav">
+    <div class="inner">
+        <a class="title" href="../../../../index.html">longforus</a>
+        <div class="nav-arrow"></div>
+        <div class="nav-items">
+            <a class="nav-item nav-item-home" href="../../../../index.html">主页</a>
+            
+            
+            
+            <a class="nav-item" href="../../../../archives">归档</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../tags">标签</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../categories">分类</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../about">关于</a>
+            
+            
+            
+            
+            <a class="nav-item nav-item-github nav-item-icon" href="https://github.com/longforus" target="_blank" rel="noopener" aria-label="GitHub">&nbsp;</a>
+            
+            
+        </div>
+    </div>
+</nav>
+
+        
+<article class="post">
+    <div class="meta">
+        <div class="post-meta">
+            <span class="post-date">2019-03-28</span>
+            
+            <span class="dot">·</span>
+            <span class="post-updated">更新于 2025-11-16</span>
+            
+            <span class="dot">·</span>
+            <span class="post-reading">14 分钟阅读</span>
+        </div>
+
+        <h1 class="title">RxJava 在 toList() 后 subscribe() 不执行的问题</h1>
+
+        
+        <div class="post-taxonomy">
+            
+            <a class="chip chip-category" href="../../../../categories/Android/">Android</a>
+            
+            
+            <a class="chip" href="../../../../tags/RxJava/"># RxJava</a>
+            
+        </div>
+        
+    </div>
+
+    <div class="divider"></div>
+
+    
+    <details class="toc-card">
+        <summary>目录</summary>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%81%8D%E5%8E%86"><span class="toc-text">遍历</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%B7%B3%E8%BF%87%E5%92%8C%E8%BD%AC%E5%9E%8B"><span class="toc-text">跳过和转型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A2%AB%E8%A7%82%E5%AF%9F%E8%80%85%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2"><span class="toc-text">被观察者类型转换</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%90%88%E5%B9%B62%E4%B8%AAObservable"><span class="toc-text">合并2个Observable</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BB%84%E5%90%88%E4%B8%8A%E6%B8%B8item%E4%B8%BAlist"><span class="toc-text">组合上游item为list</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%94%B9%E8%BF%9B%E5%92%8C%E8%B8%A9%E5%9D%91"><span class="toc-text">改进和踩坑</span></a></li></ol>
+    </details>
+    
+
+    <div class="content">
+        <p>今天在项目中遇到一个问题:需要遍历一个list在经过2次异步调用修改list中的一些值之后,刷新adapter,通知数据修改.略显复杂,一般的同步修改倒是没有什么了,但是需要进行2次异步调用修改,而且要跳过一些item,还要进行类型转换.最后还要根据异步调用返回的值进行排序,这个就略显复杂了.项目中引入了RxJava2,近几年的项目也一直都在用,今天面临的这种数据流的操作,最合适的也就是它了.</p>
+<h2 id="遍历"><a href="#遍历" class="headerlink" title="遍历"></a>遍历</h2><p>数据源就是一个list,很简单用<code>fromIterable</code>操作符就好了,这个操作符接收一个<code>Iterable&lt;? extends T&gt; source</code>,会依次发送里面的每一个item,发送完成后会调用<code>onComplete()</code>发送结束事件.</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Observable.fromIterable(adatper!!.<span class="keyword">data</span>)</span><br></pre></td></tr></table></figure>
+
+<h2 id="跳过和转型"><a href="#跳过和转型" class="headerlink" title="跳过和转型"></a>跳过和转型</h2><p>跳过的话可以调用<code>skip(long count)</code>操作符,它会跳过<code>0..count</code>个item,不像下游发送.转型的话直接使用<code>map(Function&lt;? super T, ? extends R&gt; mapper)</code>在里面把上游发送的被观察数据类型转为想要的类型就好了,会以新的类型继续向下游发送.</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Observable.fromIterable(adatper!!.<span class="keyword">data</span>).skip(<span class="number">3</span>).map &#123; it <span class="keyword">as</span> Ques &#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="被观察者类型转换"><a href="#被观察者类型转换" class="headerlink" title="被观察者类型转换"></a>被观察者类型转换</h2><p>今天的例子中,在开始的时候我接收到上游发送的数据后,需要进行异步调用,根据上游数据查询一个值,然后发送到下游,继续背观察.要实现这种功能的话要使用<code>Observable&lt;R&gt; flatMap(Function&lt;? super T, ? extends ObservableSource&lt;? extends R&gt;&gt; mapper) </code>操作符,接收到上游数据后新建一个Observable返回给下游,异步回调后,调用这个Observable的<code>emitter.onNext()</code>把数据发送给下游.</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">Observable.create&lt;<span class="built_in">Int</span>&gt; &#123;</span><br><span class="line">               RongIMClient.getInstance().getUnreadCount(Conversation.ConversationType.GROUP, bean.askCode, <span class="keyword">object</span> : RongIMClient.ResultCallback&lt;<span class="built_in">Int</span>&gt;() &#123;</span><br><span class="line">                    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onSuccess</span><span class="params">(p0: <span class="type">Int</span>?)</span></span> &#123;</span><br><span class="line">                        <span class="keyword">val</span> old = bean.msgCount</span><br><span class="line">                        <span class="keyword">if</span> (old == p0 ?: <span class="number">0</span>) <span class="keyword">return</span></span><br><span class="line">                        it.onNext(p0 ?: <span class="number">0</span>)</span><br><span class="line">                        it.onComplete()</span><br><span class="line">                    &#125;</span><br><span class="line"></span><br><span class="line">                    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onError</span><span class="params">(p0: <span class="type">RongIMClient</span>.<span class="type">ErrorCode</span>?)</span></span> &#123;</span><br><span class="line">                        <span class="keyword">val</span> old = bean.msgCount</span><br><span class="line">                        <span class="keyword">if</span> (old == <span class="number">0</span>) <span class="keyword">return</span></span><br><span class="line">                        it.onNext(<span class="number">0</span>)</span><br><span class="line">                        it.onComplete()</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;)</span><br><span class="line">            &#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="合并2个Observable"><a href="#合并2个Observable" class="headerlink" title="合并2个Observable"></a>合并2个Observable</h2><p>上面的异步调用我进行了2次,获取到不同的值后,需要合并并发送到下游,下游接收到已经统一处理,notify adapter更新.实现这个功能可以使用<code>zip()</code>操作符,合并2个Observable并发送到下游,使用<code>.zipWith()</code>效果也是一样的.</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">Observable.zip(countOb, msgOb, <span class="keyword">object</span> : BiFunction&lt;<span class="built_in">Int</span>, Triple&lt;String, String,String&gt;, Ques&gt; &#123;</span><br><span class="line">                <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">apply</span><span class="params">(t1: <span class="type">Int</span>, t2: <span class="type">Triple</span>&lt;<span class="type">String</span>, String,String&gt;)</span></span>: Ques &#123;</span><br><span class="line">                    bean.msgCount = t1</span><br><span class="line">                    <span class="keyword">if</span> (t2.first.isNotEmpty()) &#123;</span><br><span class="line">                        bean.content = t2.first</span><br><span class="line">                    &#125;</span><br><span class="line">                    bean.questionTime = t2.second</span><br><span class="line">                    bean.sortTime = t2.third</span><br><span class="line">                    <span class="keyword">return</span> bean</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">            &#125;)</span><br></pre></td></tr></table></figure>
+
+<h2 id="组合上游item为list"><a href="#组合上游item为list" class="headerlink" title="组合上游item为list"></a>组合上游item为list</h2><p>每个item都经过处理后会依次被下游的Observer接收到,但是我每次只接收一个插入到adapter然后notify,总是感觉不够优雅,在全部接收完之后再统一notify会不会更好了?这个时候就可以使用<code>toList()</code>操作符了,它会收集上游发送的所有item放到一个list中,直到上游调用<code>onComplete()</code>后将整个list发送到下游.而且还提供了一个<code>toSortedList()</code>的操作符可以对这个list进行排序,可以传入<code>Comparator</code>进行自定义排序,可谓非常的方便.</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">.toSortedList &#123; o1, o2 -&gt;</span><br><span class="line">                o2.sortTime.compareTo(o1.sortTime)</span><br><span class="line">            &#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="改进和踩坑"><a href="#改进和踩坑" class="headerlink" title="改进和踩坑"></a>改进和踩坑</h2><p>代码写到后面,发现不用把异步调用的结果单独进行发射,因为结果最后也要赋值给被观察item的成员变量,这种情况下使用别的操作符来代替flatMap行不行呢?或许是可以的,改天有应该试试,总之zip操作符在我的处理流中就暂时舍去了.把异步调用的结果直接赋值给上游发送的item再把这个item发射出去,(那用<code>doOnNext()</code>行不行呢?<code>doOnNext()</code>接收上游发送的item但是并不返回或者发送这个item,待测试),</p>
+<p>我在写完上述代码后添加了<code>toSortedList()</code>操作符,这个时候意想不到的情况出现了,这个也是今天要说的重点:</p>
+<p><strong>后续的<code>subscribe()</code>没有被调用,<code>toSortedList()</code>自身也没有被调用</strong>,开始以为是线程切换的问题,删除线程切换后问题依旧,搜索后说是上游没有调用<code>onComplete()</code>,但是我的源头是使用的<code>fromIterable()</code>啊肯定是会调用<code>onComplete()</code>的,查看源码也证实了这一点,到这里就卡住了.</p>
+<p>我没有想到的是源头虽然调用了<code>onComplete()</code>,但是中游的<code>flatMap()</code>并没有调用啊,开始我一厢情愿的以为<code>fromIterable()</code>的<code>onComplete()</code>事件会跟着流一直传递,事实证明我想得太天真,对源码也没有深耕.想到这一点后<strong>在中游的<code>flatMap()</code>加入<code>onComplete()</code>的调用</strong>,问题就解决了.</p>
+<p>最后的代码如下:</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line">Observable.fromIterable(adatper!!.<span class="keyword">data</span>)</span><br><span class="line">						.skip(<span class="number">3</span>)<span class="comment">//跳过不需要的数据</span></span><br><span class="line">            .map &#123; it <span class="keyword">as</span> Ques &#125;<span class="comment">//转型</span></span><br><span class="line">            .flatMap &#123; ques -&gt;<span class="comment">//进行异步调用</span></span><br><span class="line">                Observable.create&lt;Ques&gt; &#123;RongIMClient.getInstance().getUnreadCount(Conversation.ConversationType.GROUP, ques.askCode, <span class="keyword">object</span> : RongIMClient.ResultCallback&lt;<span class="built_in">Int</span>&gt;() &#123;</span><br><span class="line">                        <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onSuccess</span><span class="params">(p0: <span class="type">Int</span>?)</span></span> &#123;</span><br><span class="line">                            ques.msgCount = p0 ?: <span class="number">0</span></span><br><span class="line">                            it.onNext(ques)<span class="comment">//发射异步调用结果</span></span><br><span class="line">                            it.onComplete()<span class="comment">//别忘了这个哦</span></span><br><span class="line">                        &#125;</span><br><span class="line"></span><br><span class="line">                        <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onError</span><span class="params">(p0: <span class="type">RongIMClient</span>.<span class="type">ErrorCode</span>?)</span></span> &#123;</span><br><span class="line">                            ques.msgCount = <span class="number">0</span></span><br><span class="line">                            it.onNext(ques)</span><br><span class="line">                            it.onComplete()</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;)</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;.flatMap &#123; ques -&gt;</span><br><span class="line">                Observable.create&lt;Ques&gt; &#123;RongIMClient.getInstance().getLatestMessages(Conversation.ConversationType.GROUP, ques.askCode, <span class="number">1</span>, <span class="keyword">object</span> : RongIMClient.ResultCallback&lt;List&lt;Message&gt;&gt;() &#123;</span><br><span class="line">                        <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onSuccess</span><span class="params">(p0: <span class="type">List</span>&lt;<span class="type">Message</span>&gt;?)</span></span> &#123;</span><br><span class="line">                            <span class="keyword">if</span> (p0?.isNotEmpty() == <span class="literal">true</span>) &#123;</span><br><span class="line">                                <span class="keyword">val</span> message = p0[<span class="number">0</span>]</span><br><span class="line">                                <span class="keyword">val</span> content = message.content</span><br><span class="line">                                <span class="keyword">val</span> isToday = TimeUtils.getTimeSpanByNow(message.receivedTime, TimeConstants.DAY) == <span class="number">0L</span></span><br><span class="line">                                <span class="keyword">val</span> timeStr = <span class="keyword">if</span> (isToday) &#123;</span><br><span class="line">                                    TimeUtils.millis2String(message.receivedTime, TimeUtils.FORMAT_HH_mm)</span><br><span class="line">                                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                                    TimeUtils.millis2String(message.receivedTime, TimeUtils.FORMAT_yyyy_MM_dd)</span><br><span class="line">                                &#125;</span><br><span class="line">                                ques.questionTime = timeStr</span><br><span class="line">                                ques.sortTime = TimeUtils.millis2String(message.receivedTime)</span><br><span class="line">                                <span class="keyword">if</span> (content <span class="keyword">is</span> TextMessage) &#123;</span><br><span class="line">                                    ques.content = content.content</span><br><span class="line">                                &#125;</span><br><span class="line">                                it.onNext(ques)</span><br><span class="line">                            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                                ques.sortTime = ques.questionTime</span><br><span class="line">                                it.onNext(ques)</span><br><span class="line">                            &#125;</span><br><span class="line">                            it.onComplete()</span><br><span class="line">                        &#125;</span><br><span class="line"></span><br><span class="line">                        <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onError</span><span class="params">(p0: <span class="type">RongIMClient</span>.<span class="type">ErrorCode</span>?)</span></span> &#123;</span><br><span class="line">                            it.onNext(ques)</span><br><span class="line">                            it.onComplete()</span><br><span class="line">                        &#125;</span><br><span class="line"></span><br><span class="line">                    &#125;)</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;.toSortedList &#123; o1, o2 -&gt;<span class="comment">//排序并组合成list</span></span><br><span class="line">                o2.sortTime.compareTo(o1.sortTime)</span><br><span class="line">            &#125;</span><br><span class="line">            .subscribeOn(Schedulers.io())</span><br><span class="line">            .observeOn(AndroidSchedulers.mainThread())</span><br><span class="line">            .subscribe &#123; t -&gt;</span><br><span class="line">                newList.addAll(t)</span><br><span class="line">                adatper?.setNewData(newList)</span><br><span class="line">            &#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>RxJava博大精深,上手简单,要玩6还差得远,暂记于此,多用多想,希望早点玩6.</p>
+
+    </div>
+
+    <div class="about">
+        <h2>关于本文</h2>
+        <p>本文作者 longforus，采用 <a href="https://creativecommons.org/licenses/by-nc/4.0" target="_blank" rel="noopener">CC BY-NC 4.0</a> 许可协议。转载请注明出处。</p>
+    </div>
+
+    
+        
+    
+</article>
+
+        <footer>
+    <div class="inner">
+        <div class="links">
+            
+            <div class="group">
+                <h4 class="title">站点</h4>
+                
+                
+                <a href="../../../../index.html" class="item">首页</a>
+                
+                
+                <a href="../../../../archives" class="item">归档</a>
+                
+                
+                <a href="../../../../tags" class="item">标签</a>
+                
+                
+                <a href="../../../../categories" class="item">分类</a>
+                
+                
+                <a href="../../../../about" class="item">关于</a>
+                
+            </div>
+            
+            <div class="group">
+                <h4 class="title">项目</h4>
+                
+                
+                <a href="https://github.com/longforus/MvpAutoCodePlus" class="item" target="_blank" rel="noopener">MvpAutoCodePlus</a>
+                
+                
+                <a href="https://github.com/longforus/pgyerUpload4AndroidStudio" class="item" target="_blank" rel="noopener">pgyerUpload4AndroidStudio</a>
+                
+                
+                <a href="https://github.com/longforus/Android-drawable-preview-plugin" class="item" target="_blank" rel="noopener">Android-drawable-preview-plugin</a>
+                
+            </div>
+            
+            <div class="group">
+                <h4 class="title">联系</h4>
+                
+                
+                <a href="https://github.com/longforus" class="item" target="_blank" rel="noopener">GitHub</a>
+                
+                
+                <a href="mailto:longforus@outlook.com" class="item" target="_blank" rel="noopener">Email</a>
+                
+            </div>
+            
+        </div>
+        &copy; 2026 longforus<br />
+        驱动自 <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+</footer>
+
+        
+<script src="../js/main.js"></script>
+
+        
+<script src="../js/custom.js"></script>
+
+        
+    </body>
+</html>

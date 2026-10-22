@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+
+  <title>CachyOS 升级后 Udev 触发 ddcutil 失效排查与修复指南 - longforus</title>
+
+  
+    <link rel="shortcut icon" href="../../../../favicon.svg">
+  
+
+  <meta name="description" content="在 CachyOS (基于 Arch Linux) 等滚动发行版中，系统升级（特别是 systemd 升级）后，原本通过 udev 规则直接执行硬件控制脚本（如 ddcutil）可能会失效。">
+  
+  <meta name="keywords" content="Android,Java,Kotlin,逆向,Linux,Hexo">
+  
+  <meta name="author" content="longforus">
+  <meta name="theme-color" content="#0a84ff">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="CachyOS 升级后 Udev 触发 ddcutil 失效排查与修复指南">
+  <meta property="og:description" content="在 CachyOS (基于 Arch Linux) 等滚动发行版中，系统升级（特别是 systemd 升级）后，原本通过 udev 规则直接执行硬件控制脚本（如 ddcutil）可能会失效。">
+  <meta property="og:site_name" content="longforus">
+
+  
+<link rel="stylesheet" href="../../../../css/var.css">
+
+  
+<link rel="stylesheet" href="../../../../css/main.css">
+
+  
+<link rel="stylesheet" href="../../../../css/typography.css">
+
+  
+<link rel="stylesheet" href="../../../../css/code-highlighting.css">
+
+  
+<link rel="stylesheet" href="../../../../css/components.css">
+
+  
+<link rel="stylesheet" href="../../../../css/nav.css">
+
+  
+<link rel="stylesheet" href="../../../../css/paginator.css">
+
+  
+<link rel="stylesheet" href="../../../../css/footer.css">
+
+  
+<link rel="stylesheet" href="../../../../css/post-list.css">
+
+  
+<link rel="stylesheet" href="../../../../css/waline.css">
+
+  
+  
+  
+<link rel="stylesheet" href="../../../../css/post.css">
+
+  
+  
+<link rel="stylesheet" href="../../../../css/custom.css">
+
+
+  
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+    <body>
+        <nav id="theme-nav">
+    <div class="inner">
+        <a class="title" href="../../../../index.html">longforus</a>
+        <div class="nav-arrow"></div>
+        <div class="nav-items">
+            <a class="nav-item nav-item-home" href="../../../../index.html">主页</a>
+            
+            
+            
+            <a class="nav-item" href="../../../../archives">归档</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../tags">标签</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../categories">分类</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../about">关于</a>
+            
+            
+            
+            
+            <a class="nav-item nav-item-github nav-item-icon" href="https://github.com/longforus" target="_blank" rel="noopener" aria-label="GitHub">&nbsp;</a>
+            
+            
+        </div>
+    </div>
+</nav>
+
+        
+<article class="post">
+    <div class="meta">
+        <div class="post-meta">
+            <span class="post-date">2026-09-25</span>
+            
+            <span class="dot">·</span>
+            <span class="post-reading">6 分钟阅读</span>
+        </div>
+
+        <h1 class="title">CachyOS 升级后 Udev 触发 ddcutil 失效排查与修复指南</h1>
+
+        
+        <div class="post-taxonomy">
+            
+            <a class="chip chip-category" href="../../../../categories/Linux/">Linux</a>
+            
+            
+            <a class="chip" href="../../../../tags/CachyOS/"># CachyOS</a>
+            
+            <a class="chip" href="../../../../tags/udev/"># udev</a>
+            
+            <a class="chip" href="../../../../tags/ddcutil/"># ddcutil</a>
+            
+        </div>
+        
+    </div>
+
+    <div class="divider"></div>
+
+    
+    <details class="toc-card">
+        <summary>目录</summary>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%93%9D-%E9%97%AE%E9%A2%98%E8%83%8C%E6%99%AF"><span class="toc-text">📝 问题背景</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%9B%A0%EF%B8%8F-%E6%A0%B8%E5%BF%83%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6"><span class="toc-text">🛠️ 核心配置文件</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E8%84%9A%E6%9C%AC%E6%96%87%E4%BB%B6%EF%BC%9A%E8%B4%9F%E8%B4%A3%E6%89%A7%E8%A1%8C%E5%88%87%E6%8D%A2%E5%91%BD%E4%BB%A4"><span class="toc-text">1. 脚本文件：负责执行切换命令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-Systemd-%E6%9C%8D%E5%8A%A1%EF%BC%9A%E7%AA%81%E7%A0%B4%E6%B2%99%E7%AE%B1%E9%99%90%E5%88%B6%E5%B9%B6%E6%8F%90%E4%BE%9B%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F"><span class="toc-text">2. Systemd 服务：突破沙箱限制并提供环境变量</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-Udev-%E8%A7%84%E5%88%99%EF%BC%9A%E7%9B%91%E5%90%AC%E7%A1%AC%E4%BB%B6%E4%BA%8B%E4%BB%B6%E5%B9%B6%E8%A7%A6%E5%8F%91%E6%9C%8D%E5%8A%A1"><span class="toc-text">3. Udev 规则：监听硬件事件并触发服务</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%9A%80-%E5%BA%94%E7%94%A8%E5%B9%B6%E7%94%9F%E6%95%88"><span class="toc-text">🚀 应用并生效</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%94%8D-%E6%9C%AA%E6%9D%A5%E6%8E%92%E6%9F%A5%E6%8C%87%E5%8D%97-Troubleshooting"><span class="toc-text">🔍 未来排查指南 (Troubleshooting)</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AC%AC%E4%B8%80%E6%AD%A5%EF%BC%9A%E6%B5%8B%E8%AF%95%E6%9C%80%E5%BA%95%E5%B1%82%E7%9A%84-ddcutil-%E5%92%8C%E8%84%9A%E6%9C%AC"><span class="toc-text">第一步：测试最底层的 ddcutil 和脚本</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AC%AC%E4%BA%8C%E6%AD%A5%EF%BC%9A%E6%B5%8B%E8%AF%95-Systemd-%E6%9C%8D%E5%8A%A1%E5%B1%82"><span class="toc-text">第二步：测试 Systemd 服务层</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AC%AC%E4%B8%89%E6%AD%A5%EF%BC%9A%E6%B5%8B%E8%AF%95-Udev-%E7%9B%91%E5%90%AC%E5%B1%82"><span class="toc-text">第三步：测试 Udev 监听层</span></a></li></ol></li></ol>
+    </details>
+    
+
+    <div class="content">
+        <h2 id="📝-问题背景"><a href="#📝-问题背景" class="headerlink" title="📝 问题背景"></a>📝 问题背景</h2><p>在 CachyOS (基于 Arch Linux) 等滚动发行版中，系统升级（特别是 <code>systemd</code> 升级）后，原本通过 <code>udev</code> 规则直接执行硬件控制脚本（如 <code>ddcutil</code>）可能会失效。</p>
+<p><strong>失效原因：</strong></p>
+<ol>
+<li><strong>沙箱限制加严</strong>：新版 <code>systemd-udevd</code> 引入了严格的后台沙箱，禁止直接在 Udev 的 <code>RUN</code> 指令中访问 <code>/dev/i2c-*</code> 等硬件接口，导致命令被静默拦截。</li>
+<li><strong>环境变量缺失</strong>：<code>ddcutil</code> 在无头 (Headless) 环境下执行时，找不到 <code>$HOME</code> 变量，无法定位并读取 <code>dynamic sleep cache</code> 缓存文件，从而报错退出或执行极慢。</li>
+</ol>
+<p><strong>标准架构（最佳实践）：</strong></p>
+<p><code>USB 拔插事件</code> ➜ <code>Udev 规则</code> ➜ <code>触发 Systemd Service</code> ➜ <code>执行 Bash 脚本</code> ➜ <code>ddcutil (指定 Bus)</code></p>
+<h2 id="🛠️-核心配置文件"><a href="#🛠️-核心配置文件" class="headerlink" title="🛠️ 核心配置文件"></a>🛠️ 核心配置文件</h2><h3 id="1-脚本文件：负责执行切换命令"><a href="#1-脚本文件：负责执行切换命令" class="headerlink" title="1. 脚本文件：负责执行切换命令"></a>1. 脚本文件：负责执行切换命令</h3><p><strong>路径：</strong> <code>/usr/local/bin/usb_dac_remove.sh</code></p>
+<p>Bash</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">#!/bin/bash</span><br><span class="line"># 注意：务必使用 --bus=9 直接指定 I2C 总线，跳过全局扫描，实现“秒切”</span><br><span class="line">/usr/bin/ddcutil --bus=9 setvcp 60 0x10</span><br></pre></td></tr></table></figure>
+
+<p><em>(注：如果更换了主板或显卡接口，总线号可能会变。运行 <code>sudo ddcutil detect</code> 查看显示器对应的 <code>I2C bus</code> 数字进行更新。)</em></p>
+<h3 id="2-Systemd-服务：突破沙箱限制并提供环境变量"><a href="#2-Systemd-服务：突破沙箱限制并提供环境变量" class="headerlink" title="2. Systemd 服务：突破沙箱限制并提供环境变量"></a>2. Systemd 服务：突破沙箱限制并提供环境变量</h3><p><strong>路径：</strong> <code>/etc/systemd/system/usb-dac-remove.service</code></p>
+<p>Ini, TOML</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[Unit]</span><br><span class="line">Description=Switch Monitor on USB DAC Remove</span><br><span class="line"></span><br><span class="line">[Service]</span><br><span class="line">Type=oneshot</span><br><span class="line"># 必须指定 HOME 变量，否则 ddcutil 会报 Unable to determine dynamic sleep cache 错误</span><br><span class="line">Environment=&quot;HOME=/root&quot;</span><br><span class="line">ExecStart=/usr/local/bin/usb_dac_remove.sh</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-Udev-规则：监听硬件事件并触发服务"><a href="#3-Udev-规则：监听硬件事件并触发服务" class="headerlink" title="3. Udev 规则：监听硬件事件并触发服务"></a>3. Udev 规则：监听硬件事件并触发服务</h3><p><strong>路径：</strong> <code>/etc/udev/rules.d/99-usb-dac.rules</code></p>
+<p>代码段</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 当匹配到 SMSL DAC 断开时，异步启动 Systemd 服务</span><br><span class="line">SUBSYSTEM==&quot;usb&quot;, ACTION==&quot;remove&quot;, ENV&#123;PRODUCT&#125;==&quot;152a/85dd/*&quot;, ENV&#123;DEVTYPE&#125;==&quot;usb_device&quot;, RUN+=&quot;/usr/bin/systemctl start --no-block usb-dac-remove.service&quot;</span><br></pre></td></tr></table></figure>
+
+<p><em>(注：<code>--no-block</code> 非常重要，它让 udev 触发服务后立刻释放进程，防止阻塞内核 USB 队列。)</em></p>
+<h2 id="🚀-应用并生效"><a href="#🚀-应用并生效" class="headerlink" title="🚀 应用并生效"></a>🚀 应用并生效</h2><p>修改完以上文件后，依次执行以下命令使其生效：</p>
+<p>Bash</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># 1. 预热 ddcutil 缓存 (重要！生成 /root/.cache/ddcutil 加快后续执行速度)</span><br><span class="line">sudo ddcutil detect</span><br><span class="line"></span><br><span class="line"># 2. 重载 Systemd 与 Udev 配置</span><br><span class="line">sudo systemctl daemon-reload</span><br><span class="line">sudo udevadm control --reload-rules</span><br></pre></td></tr></table></figure>
+
+<h2 id="🔍-未来排查指南-Troubleshooting"><a href="#🔍-未来排查指南-Troubleshooting" class="headerlink" title="🔍 未来排查指南 (Troubleshooting)"></a>🔍 未来排查指南 (Troubleshooting)</h2><p>如果日后再次失效，请严格按照以下 <strong>“从上到下”</strong> 的顺序进行二分排查：</p>
+<h3 id="第一步：测试最底层的-ddcutil-和脚本"><a href="#第一步：测试最底层的-ddcutil-和脚本" class="headerlink" title="第一步：测试最底层的 ddcutil 和脚本"></a>第一步：测试最底层的 ddcutil 和脚本</h3><p>手动执行脚本，看显示器是否切换：</p>
+<p>Bash</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo /usr/local/bin/usb_dac_remove.sh</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>如果不切</strong>：说明 <code>i2c-dev</code> 模块未加载，或 <code>I2C bus</code> 编号发生了变化（运行 <code>sudo ddcutil detect</code> 确认）。</li>
+<li><strong>如果正常切换</strong>：进入第二步。</li>
+</ul>
+<h3 id="第二步：测试-Systemd-服务层"><a href="#第二步：测试-Systemd-服务层" class="headerlink" title="第二步：测试 Systemd 服务层"></a>第二步：测试 Systemd 服务层</h3><p>手动触发 Systemd 服务：</p>
+<p>Bash</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo systemctl start usb-dac-remove.service</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p><strong>如果失败</strong>：查看报错日志：</p>
+<p>  Bash</p>
+  <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">journalctl -xeu usb-dac-remove.service</span><br></pre></td></tr></table></figure>
+
+<p>  <em>(常见报错是 HOME 环境变量丢失导致缓存写入失败，或权限不足)。</em></p>
+</li>
+<li><p><strong>如果正常切换</strong>：说明服务正常，问题出在最前端的 Udev，进入第三步。</p>
+</li>
+</ul>
+<h3 id="第三步：测试-Udev-监听层"><a href="#第三步：测试-Udev-监听层" class="headerlink" title="第三步：测试 Udev 监听层"></a>第三步：测试 Udev 监听层</h3><p>查看 USB 设备拔插时的真实 ID 和环境变量：</p>
+<p>Bash</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">udevadm monitor --property --subsystem-match=usb</span><br></pre></td></tr></table></figure>
+
+<p>拔插设备，观察弹出的日志，检查下面三个变量是否发生变化：</p>
+<ul>
+<li><p><code>ACTION</code>（是 remove 还是 unbind？）</p>
+</li>
+<li><p><code>PRODUCT</code>（设备 ID 是否还是 <code>152a/85dd/xxx</code> 格式？）</p>
+<p>  如果发生了变化，同步修改 <code>/etc/udev/rules.d/99-usb-dac.rules</code> 中的匹配条件即可。</p>
+</li>
+</ul>
+
+    </div>
+
+    <div class="about">
+        <h2>关于本文</h2>
+        <p>本文作者 longforus，采用 <a href="https://creativecommons.org/licenses/by-nc/4.0" target="_blank" rel="noopener">CC BY-NC 4.0</a> 许可协议。转载请注明出处。</p>
+    </div>
+
+    
+        
+    
+</article>
+
+        <footer>
+    <div class="inner">
+        <div class="links">
+            
+            <div class="group">
+                <h4 class="title">站点</h4>
+                
+                
+                <a href="../../../../index.html" class="item">首页</a>
+                
+                
+                <a href="../../../../archives" class="item">归档</a>
+                
+                
+                <a href="../../../../tags" class="item">标签</a>
+                
+                
+                <a href="../../../../categories" class="item">分类</a>
+                
+                
+                <a href="../../../../about" class="item">关于</a>
+                
+            </div>
+            
+            <div class="group">
+                <h4 class="title">项目</h4>
+                
+                
+                <a href="https://github.com/longforus/MvpAutoCodePlus" class="item" target="_blank" rel="noopener">MvpAutoCodePlus</a>
+                
+                
+                <a href="https://github.com/longforus/pgyerUpload4AndroidStudio" class="item" target="_blank" rel="noopener">pgyerUpload4AndroidStudio</a>
+                
+                
+                <a href="https://github.com/longforus/Android-drawable-preview-plugin" class="item" target="_blank" rel="noopener">Android-drawable-preview-plugin</a>
+                
+            </div>
+            
+            <div class="group">
+                <h4 class="title">联系</h4>
+                
+                
+                <a href="https://github.com/longforus" class="item" target="_blank" rel="noopener">GitHub</a>
+                
+                
+                <a href="mailto:longforus@outlook.com" class="item" target="_blank" rel="noopener">Email</a>
+                
+            </div>
+            
+        </div>
+        &copy; 2026 longforus<br />
+        驱动自 <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+</footer>
+
+        
+<script src="../js/main.js"></script>
+
+        
+<script src="../js/custom.js"></script>
+
+        
+    </body>
+</html>

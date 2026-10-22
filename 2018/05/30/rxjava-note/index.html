@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+
+  <title>RxJava Note - longforus</title>
+
+  
+    <link rel="shortcut icon" href="../../../../favicon.svg">
+  
+
+  <meta name="description" content="RxJava 常用操作符与实践经验笔记。">
+  
+  <meta name="keywords" content="Android,Java,Kotlin,逆向,Linux,Hexo">
+  
+  <meta name="author" content="longforus">
+  <meta name="theme-color" content="#0a84ff">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="RxJava Note">
+  <meta property="og:description" content="RxJava 常用操作符与实践经验笔记。">
+  <meta property="og:site_name" content="longforus">
+
+  
+<link rel="stylesheet" href="../../../../css/var.css">
+
+  
+<link rel="stylesheet" href="../../../../css/main.css">
+
+  
+<link rel="stylesheet" href="../../../../css/typography.css">
+
+  
+<link rel="stylesheet" href="../../../../css/code-highlighting.css">
+
+  
+<link rel="stylesheet" href="../../../../css/components.css">
+
+  
+<link rel="stylesheet" href="../../../../css/nav.css">
+
+  
+<link rel="stylesheet" href="../../../../css/paginator.css">
+
+  
+<link rel="stylesheet" href="../../../../css/footer.css">
+
+  
+<link rel="stylesheet" href="../../../../css/post-list.css">
+
+  
+<link rel="stylesheet" href="../../../../css/waline.css">
+
+  
+  
+  
+<link rel="stylesheet" href="../../../../css/post.css">
+
+  
+  
+<link rel="stylesheet" href="../../../../css/custom.css">
+
+
+  
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+    <body>
+        <nav id="theme-nav">
+    <div class="inner">
+        <a class="title" href="../../../../index.html">longforus</a>
+        <div class="nav-arrow"></div>
+        <div class="nav-items">
+            <a class="nav-item nav-item-home" href="../../../../index.html">主页</a>
+            
+            
+            
+            <a class="nav-item" href="../../../../archives">归档</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../tags">标签</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../categories">分类</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../about">关于</a>
+            
+            
+            
+            
+            <a class="nav-item nav-item-github nav-item-icon" href="https://github.com/longforus" target="_blank" rel="noopener" aria-label="GitHub">&nbsp;</a>
+            
+            
+        </div>
+    </div>
+</nav>
+
+        
+<article class="post">
+    <div class="meta">
+        <div class="post-meta">
+            <span class="post-date">2018-05-30</span>
+            
+            <span class="dot">·</span>
+            <span class="post-updated">更新于 2025-11-16</span>
+            
+            <span class="dot">·</span>
+            <span class="post-reading">23 分钟阅读</span>
+        </div>
+
+        <h1 class="title">RxJava Note</h1>
+
+        
+        <div class="post-taxonomy">
+            
+            <a class="chip chip-category" href="../../../../categories/Android/">Android</a>
+            
+            
+            <a class="chip" href="../../../../tags/RxJava/"># RxJava</a>
+            
+        </div>
+        
+    </div>
+
+    <div class="divider"></div>
+
+    
+    <details class="toc-card">
+        <summary>目录</summary>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#fromCallable"><span class="toc-text">fromCallable</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#map"><span class="toc-text">map</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#flatMap"><span class="toc-text">flatMap</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#zip"><span class="toc-text">zip</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#sample"><span class="toc-text">sample</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#buffer"><span class="toc-text">buffer</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#groupBy"><span class="toc-text">groupBy</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#concat"><span class="toc-text">concat</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#distinct"><span class="toc-text">distinct</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Flowable"><span class="toc-text">Flowable</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AE%80%E5%8C%96%E7%89%88%E7%9A%84Observable"><span class="toc-text">简化版的Observable</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#interval"><span class="toc-text">interval</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#other"><span class="toc-text">other</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#CompositeDisposable"><span class="toc-text">CompositeDisposable</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9C%A8%E6%A0%87%E5%87%86%E7%9A%84Java%E7%A8%8B%E5%BA%8F%E4%B8%AD%E6%80%8E%E4%B9%88%E8%AE%A9observeOn%E8%BF%90%E8%A1%8C%E5%9C%A8main-Thread"><span class="toc-text">在标准的Java程序中怎么让observeOn运行在main Thread</span></a></li></ol></li></ol>
+    </details>
+    
+
+    <div class="content">
+        <h2 id="fromCallable"><a href="#fromCallable" class="headerlink" title="fromCallable"></a>fromCallable</h2><p>返回执行结果的被观察者</p>
+<h2 id="map"><a href="#map" class="headerlink" title="map"></a>map</h2><p>把一种类型的被观察者转换为任意类型的被观察者</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">Observable.create(&#123; e: ObservableEmitter&lt;<span class="built_in">Int</span>&gt;? -&gt;<span class="comment">//发送的int</span></span><br><span class="line">		e?.onNext(<span class="number">1</span>)</span><br><span class="line">		e?.onNext(<span class="number">2</span>)</span><br><span class="line">		e?.onNext(<span class="number">3</span>)</span><br><span class="line">		println(Thread.currentThread().name)</span><br><span class="line">		e?.onComplete()</span><br><span class="line">	&#125;)</span><br><span class="line">    <span class="comment">//.map(object :Function&lt;Int,String&gt;&#123;</span></span><br><span class="line">    <span class="comment">//override fun apply(t : Int?) : String &#123;</span></span><br><span class="line">    <span class="comment">//	return &quot;this map result $t&quot;</span></span><br><span class="line">	    <span class="comment">//&#125;</span></span><br><span class="line">    <span class="comment">//&#125;)</span></span><br><span class="line">	.map &#123; t-&gt;(<span class="string">&quot;this map result <span class="variable">$t</span>&quot;</span>)&#125;<span class="comment">//转换为string ,  lambada 形式</span></span><br><span class="line">	.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())</span><br><span class="line">	.subscribe(&#123; t: String -&gt;  println(t) &#125;,Throwable::printStackTrace, &#123;</span><br><span class="line">		println(Thread.currentThread().name)</span><br><span class="line">		println(<span class="string">&quot;complete&quot;</span>)</span><br><span class="line">	&#125;)</span><br></pre></td></tr></table></figure>
+<h2 id="flatMap"><a href="#flatMap" class="headerlink" title="flatMap"></a>flatMap</h2><p>可以将一个发送事件的上游Observable变换为另外的Observables，这个转化的Observable的事件将被发送到下游.<br><strong>事件是无序的,需要严格有序的话使用 concatMap</strong></p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">    Observable.create(&#123; e: ObservableEmitter&lt;<span class="built_in">Int</span>&gt;? -&gt;<span class="comment">//发送一个int</span></span><br><span class="line">		e?.onNext(<span class="number">1</span>)</span><br><span class="line">		e?.onNext(<span class="number">2</span>)</span><br><span class="line">		e?.onNext(<span class="number">3</span>)</span><br><span class="line">		println(Thread.currentThread().name)</span><br><span class="line">		e?.onComplete()</span><br><span class="line">	&#125;)</span><br><span class="line"><span class="comment">//		.flatMap(object :Function&lt;Int,ObservableSource&lt;String&gt;&gt;&#123;</span></span><br><span class="line"><span class="comment">//			override fun apply(t : Int?) : ObservableSource&lt;String&gt; &#123;</span></span><br><span class="line"><span class="comment">//				var list = listOf&lt;String&gt;()</span></span><br><span class="line"><span class="comment">//				for (i in 0 .. 2) &#123;</span></span><br><span class="line"><span class="comment">//					list+=&quot;flatMap $i : $t&quot;</span></span><br><span class="line"><span class="comment">//				&#125;</span></span><br><span class="line"><span class="comment">//				return Observable.fromIterable(list).delay(10, TimeUnit.MILLISECONDS)</span></span><br><span class="line"><span class="comment">//			&#125;</span></span><br><span class="line"><span class="comment">//		&#125;)</span></span><br><span class="line">		.flatMap &#123; t -&gt;</span><br><span class="line">			<span class="keyword">var</span> list = listOf&lt;String&gt;()</span><br><span class="line">			<span class="keyword">for</span> (i <span class="keyword">in</span> <span class="number">0</span> .. <span class="number">2</span>) &#123;</span><br><span class="line">				list+=<span class="string">&quot;flatMap <span class="variable">$i</span> : <span class="variable">$t</span>&quot;</span></span><br><span class="line">			&#125;</span><br><span class="line">	    	Observable.fromIterable(list).delay(<span class="number">10</span>, TimeUnit.MILLISECONDS)<span class="comment">//转换为3个string发送  delay是为了看到无序的效果</span></span><br><span class="line">			&#125;</span><br><span class="line">			.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())</span><br><span class="line">			.subscribe(&#123; t: String -&gt;  println(t) &#125;,Throwable::printStackTrace, &#123;</span><br><span class="line">				println(Thread.currentThread().name)</span><br><span class="line">				println(<span class="string">&quot;complete&quot;</span>)</span><br><span class="line">			&#125;)</span><br></pre></td></tr></table></figure>
+<p>相对于map来说(设转化后的结果为T):</p>
+<ul>
+<li>  发送的结果不一样.map直接发送T,flatmap发送Observable<T>.</li>
+<li>  如果T是集合,flatmap使用just或者from发送,下游每次接收到的是T[i],而map接收到的是T[]还需要for遍历.</li>
+<li>map适用于一对一转换，当然也可以配合flatmap进行适用<br>  flatmap适用于一对多，多对多的场景</li>
+</ul>
+<h2 id="zip"><a href="#zip" class="headerlink" title="zip"></a>zip</h2><p>按照发送顺序把2个被观察者发送的数据组合成一个新的被观察者发送</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">    <span class="keyword">val</span> o1 = Observable.create(&#123; e: ObservableEmitter&lt;String&gt;? -&gt;</span><br><span class="line">        println(<span class="string">&quot;o1 a&quot;</span>)</span><br><span class="line">        e?.onNext(<span class="string">&quot;a&quot;</span>)</span><br><span class="line">        SystemClock.sleep(<span class="number">500</span>)</span><br><span class="line">        println(<span class="string">&quot;o1 b&quot;</span>)</span><br><span class="line">        e?.onNext(<span class="string">&quot;b&quot;</span>)</span><br><span class="line">        SystemClock.sleep(<span class="number">500</span>)</span><br><span class="line">        println(<span class="string">&quot;o1 c&quot;</span>)</span><br><span class="line">        e?.onNext(<span class="string">&quot;c&quot;</span>)</span><br><span class="line">        SystemClock.sleep(<span class="number">500</span>)</span><br><span class="line">        println(<span class="string">&quot;o1 d&quot;</span>)</span><br><span class="line">        e?.onNext(<span class="string">&quot;d&quot;</span>)</span><br><span class="line">        SystemClock.sleep(<span class="number">500</span>)</span><br><span class="line">        println(<span class="string">&quot;o1 com&quot;</span> + Thread.currentThread().name)</span><br><span class="line">        e?.onComplete()</span><br><span class="line">        &#125;).subscribeOn(Schedulers.newThread())</span><br><span class="line">    <span class="keyword">val</span> o2 = Observable.create(&#123; e: ObservableEmitter&lt;<span class="built_in">Int</span>&gt;? -&gt;</span><br><span class="line">        println(<span class="string">&quot;o2 1&quot;</span>)</span><br><span class="line">        e?.onNext(<span class="number">1</span>)</span><br><span class="line">        SystemClock.sleep(<span class="number">500</span>)</span><br><span class="line">        println(<span class="string">&quot;o2 2&quot;</span>)</span><br><span class="line">        e?.onNext(<span class="number">2</span>)</span><br><span class="line">        SystemClock.sleep(<span class="number">500</span>)</span><br><span class="line">        println(<span class="string">&quot;o2 3&quot;</span>)</span><br><span class="line">        e?.onNext(<span class="number">3</span>)</span><br><span class="line">        SystemClock.sleep(<span class="number">500</span>)</span><br><span class="line">        println(<span class="string">&quot;o2 com &quot;</span> + Thread.currentThread().name)</span><br><span class="line">        e?.onComplete()</span><br><span class="line">    &#125;).subscribeOn(Schedulers.newThread())</span><br><span class="line">    <span class="comment">//      Observable.zip(o1,o2,object :io.reactivex.functions.BiFunction&lt;String?,Int?,String?&gt;&#123;</span></span><br><span class="line">    <span class="comment">//          override fun apply(t1: String?, t2: Int?): String? &#123;</span></span><br><span class="line">    <span class="comment">//             return t1+ t2</span></span><br><span class="line">    <span class="comment">//          &#125;</span></span><br><span class="line">    <span class="comment">//      &#125;)</span></span><br><span class="line">    Observable.zip(o1, o2, BiFunction&lt;String?, <span class="built_in">Int</span>?, String?&gt; &#123; t1, t2 -&gt; t1 + t2 &#125;)<span class="comment">//按照发送顺序把o1和o2发送的数据组合起来组合完成就马上发送,只要接收到了一个源的onComplete 就发送这个zip的onComplete</span></span><br><span class="line"><span class="comment">//   .subscribeOn(Schedulers.io())</span></span><br><span class="line">    .observeOn(AndroidSchedulers.mainThread())</span><br><span class="line">    .subscribe(&#123; t: String? -&gt; println(t) &#125;, Throwable::printStackTrace, &#123;</span><br><span class="line">           println(Thread.currentThread().name)</span><br><span class="line">           println(<span class="string">&quot;complete&quot;</span>)</span><br><span class="line">     &#125;)</span><br></pre></td></tr></table></figure>
+<h2 id="sample"><a href="#sample" class="headerlink" title="sample"></a>sample</h2><p>每隔多少时间进行一次取样,取得的value将发送给下游的观察者</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.sample(<span class="number">2</span>,TimeUnit.SECONDS,Schedulers.io())<span class="comment">//取样 指定间隔时间和线程</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="buffer"><a href="#buffer" class="headerlink" title="buffer"></a>buffer</h2><p>缓存上游发射的数据达到缓存数量后组成list发射,类似的有window,window发射的是Observable,订阅这个Observable后连续发射n个数据.</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Observable.just(<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>).buffer(<span class="number">2</span>).subscribe &#123;</span><br><span class="line">        println(it)</span><br><span class="line">&#125;</span><br><span class="line">--------------------</span><br><span class="line">[<span class="number">1</span>, <span class="number">2</span>]</span><br><span class="line">[<span class="number">3</span>, <span class="number">4</span>]</span><br><span class="line">[<span class="number">5</span>]</span><br></pre></td></tr></table></figure>
+
+<h2 id="groupBy"><a href="#groupBy" class="headerlink" title="groupBy"></a>groupBy</h2><p>按照返回元素的equlas对上游发射的元素进行分组后,每组生成一个Observable发射组内的数据.</p>
+<h2 id="concat"><a href="#concat" class="headerlink" title="concat"></a>concat</h2><p>把参数接收的源Observable<T>所有发射的元素合并,一个接一个没有交叉的发射.类似的merge,但是数据可能交叉.</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> groupBy = Observable.just(<span class="string">&quot;A3&quot;</span>,<span class="string">&quot;B1&quot;</span>,<span class="string">&quot;C1&quot;</span>, <span class="string">&quot;B2&quot;</span>, <span class="string">&quot;A2&quot;</span>, <span class="string">&quot;C3&quot;</span>).groupBy &#123;</span><br><span class="line">    it[<span class="number">0</span>]</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//groupBy的类型为Observable&lt;GroupedObservable&lt;K, T&gt;&gt;,如果在后面直接.subscribe() 接收到是GroupedObservable&lt;K, T&gt;类型,用concat接收它发射的所有元素再发射,.subscribe()收到的就是K类型了</span></span><br><span class="line">Observable.concat(groupBy).subscribe &#123;</span><br><span class="line">    println(it)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="distinct"><a href="#distinct" class="headerlink" title="distinct"></a>distinct</h2><p>去除重复元素,整个序列发射过的全部丢弃掉,distinctUntilChanged则只丢弃和上一个发射的元素一样的元素.</p>
+<h1 id="Flowable"><a href="#Flowable" class="headerlink" title="Flowable"></a>Flowable</h1><p>类似Observable但是比Observable多了背压控制的功能,使用方式和Observable类似,但是在性能方面比Observable弱一些,在不需要控制背压的地方还是应该使用Observable</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">    Flowable.create(&#123;e: FlowableEmitter&lt;String&gt;? -&gt;</span><br><span class="line">       println(<span class="string">&quot;emitter 1&quot;</span>)</span><br><span class="line">       e?.onNext(<span class="string">&quot;1test&quot;</span>)</span><br><span class="line">       println(<span class="string">&quot;emitter 2&quot;</span>)</span><br><span class="line">       e?.onNext(<span class="string">&quot;2test&quot;</span>)</span><br><span class="line">       println(<span class="string">&quot;emitter 3&quot;</span>)</span><br><span class="line">       e?.onNext(<span class="string">&quot;3test&quot;</span>)</span><br><span class="line">       println(<span class="string">&quot;emitter 4&quot;</span>)</span><br><span class="line">       e?.onNext(<span class="string">&quot;4test&quot;</span>)</span><br><span class="line">       println(<span class="string">&quot;emitter o&quot;</span>)</span><br><span class="line">       e?.onComplete()</span><br><span class="line">   &#125;,BackpressureStrategy.ERROR)</span><br><span class="line">   <span class="comment">//BackpressureStrategy标识出现背压时的处理策略</span></span><br><span class="line">       <span class="comment">// 1.ERROR是在缓冲池满了以后抛出error</span></span><br><span class="line">       <span class="comment">// 2.BUFFER是使用无限大的缓冲池,会有OOM的危险</span></span><br><span class="line">       <span class="comment">// 3.DROP 是默认缓冲池可以装的时候就装进去 其他的扔掉  下游每request(n)个  默认缓冲池就装如上游正在发送的n个value</span></span><br><span class="line">       <span class="comment">//4.LATEST 和DROP的不同之处是 latest总是会保留最后发送的value到缓冲池中 ,而DROP则不会</span></span><br><span class="line"></span><br><span class="line">       <span class="comment">//  在不同线程的异步订阅中  在flowable和subscribe中间有一个容量128 的value池  在下游没有请求vlaue的时候  flowable发送的value缓冲在这个池中,  如果池满了 就会抛出异常</span></span><br><span class="line">       .subscribeOn(Schedulers.io())<span class="comment">//如果在同一线程中上游的发送的vlaue数量超过了 下游可以接收的数量就会抛出异常  在不同线程中则不会</span></span><br><span class="line">       .observeOn(AndroidSchedulers.mainThread())</span><br><span class="line">       .subscribe(&#123; t: String? -&gt; println(t) &#125;,Throwable::printStackTrace,&#123;</span><br><span class="line">       println(Thread.currentThread().name)</span><br><span class="line">       println(<span class="string">&quot;on Complete&quot;</span>)</span><br><span class="line">   &#125;,&#123;t: Subscription? -&gt;</span><br><span class="line"><span class="comment">// t?.request(Long.MAX_VALUE) //告诉上游的flowable 下游的订阅者可以接收的vlaue数量  这句代码每被调用一次,上游就收到参数  发送&lt;=参数个value下来</span></span><br><span class="line">  <span class="comment">//可以把t: Subscription保存起来需要n个vlaue的时候 调用一下t?.request(n) 上游的缓冲池便会发送n个value下来,但是缓冲池的默认大小只有128</span></span><br><span class="line">       println(<span class="string">&quot;onSub&quot;</span>)</span><br><span class="line">   &#125;)</span><br></pre></td></tr></table></figure>
+
+<p>按需供应的例子:</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">Flowable.create(&#123; e : FlowableEmitter&lt;<span class="built_in">Int</span>&gt;? -&gt;</span><br><span class="line">	println(<span class="string">&quot;on start &quot;</span> + e?.requested())</span><br><span class="line">	<span class="keyword">var</span> flag = <span class="literal">false</span></span><br><span class="line">	<span class="keyword">for</span> ( i <span class="keyword">in</span> <span class="number">0.</span>. <span class="built_in">Int</span>.MAX_VALUE) &#123;</span><br><span class="line">		flag = <span class="literal">false</span></span><br><span class="line">		<span class="keyword">while</span> (e?.requested() == <span class="number">0L</span>) &#123;<span class="comment">//如果下游已经没有处理能力 通过阻塞线程来暂停发送event</span></span><br><span class="line">		<span class="comment">//当下游调用mSubscription?.request(n)(n&gt;=96的时候会触发e?.requested()的结果被赋值.否则下游消费了&lt;96个event這里也不会被赋值)</span></span><br><span class="line">		<span class="comment">// 的时候這里的值就不为0了,继续发送event到中间的缓冲池中</span></span><br><span class="line">			<span class="keyword">if</span> (!flag) &#123;</span><br><span class="line">				println(<span class="string">&quot;can&#x27;t emit value&quot;</span>)</span><br><span class="line">				flag = <span class="literal">true</span></span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		e?.onNext(i)</span><br><span class="line">		println(<span class="string">&quot;emit  <span class="variable">$i</span>   request = &quot;</span>+e?.requested())</span><br><span class="line">	&#125;</span><br><span class="line">&#125;, BackpressureStrategy.ERROR)</span><br><span class="line">	.subscribeOn(Schedulers.io())</span><br><span class="line">	.observeOn(AndroidSchedulers.mainThread())</span><br><span class="line">	.subscribe(&#123; t -&gt; println(t) &#125;, Throwable::printStackTrace, &#123; println(<span class="string">&quot;on complete&quot;</span>) &#125;, &#123; t     : Subscription -&gt;</span><br><span class="line">		<span class="keyword">this</span>.mSubscription = t</span><br><span class="line">           <span class="comment">//mSubscription?.request(n) 向中间的缓冲池请求可以消费n个事件  缓冲池内事件容量&gt;=96的时候会触发上游的e?.requested()的重新赋值  上游可以继续发送event到中间缓冲池 直到装满128个</span></span><br><span class="line">			println(<span class="string">&quot;on sub&quot;</span>)</span><br><span class="line">		&#125;)</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="简化版的Observable"><a href="#简化版的Observable" class="headerlink" title="简化版的Observable"></a>简化版的Observable</h2><h4 id="Single"><a href="#Single" class="headerlink" title="Single"></a>Single</h4><p>只发射一条单一的数据，或者一条异常通知，不能发射完成通知，其中数据与通知只能发射一个。</p>
+<h4 id="Completable"><a href="#Completable" class="headerlink" title="Completable"></a>Completable</h4><p>只发射一条完成通知，或者一条异常通知，不能发射数据，其中完成通知与异常通知只能发射一个</p>
+<h4 id="Maybe"><a href="#Maybe" class="headerlink" title="Maybe"></a>Maybe</h4><p>可发射一条单一的数据，以及发射一条完成通知，或者一条异常通知，其中完成通知和异常通知只能发射一个，发射数据只能在发射完成通知或者异常通知之前，否则发射数据无效.</p>
+<h2 id="interval"><a href="#interval" class="headerlink" title="interval"></a>interval</h2><p>interval操作符发送Long型的事件, 从0开始, 每隔指定的时间就把数字加1并发送出来</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Flowable.interval(<span class="number">1</span>, TimeUnit.MILLISECONDS)<span class="comment">//interval发送Long型的事件, 从0开始, 每隔指定的时间就把数字加1并发送出来,在这里每隔1毫秒发送1个</span></span><br><span class="line">     .onBackpressureDrop()<span class="comment">//对于interval这种非自己创建的Flowable要控制背压可以使用这样的方法连点  效果和对应的参数相同</span></span><br><span class="line">     .subscribeOn(Schedulers.io())</span><br><span class="line">     .observeOn(AndroidSchedulers.mainThread())</span><br><span class="line">     .subscribe(&#123; t -&gt;</span><br><span class="line">         println(t)</span><br><span class="line">     &#125;, Throwable::printStackTrace, &#123; println(<span class="string">&quot;on complete&quot;</span>) &#125;, &#123; t: Subscription? -&gt;</span><br><span class="line">         <span class="keyword">this</span>.subscription = t   <span class="comment">//subscription保存起来点击触发</span></span><br><span class="line">     &#125;)</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="other"><a href="#other" class="headerlink" title="other"></a>other</h2><h3 id="CompositeDisposable"><a href="#CompositeDisposable" class="headerlink" title="CompositeDisposable"></a>CompositeDisposable</h3><p>disposeable的容易可以装多个,在不需要再发生的时候执行clean方法,释放资源</p>
+<h3 id="在标准的Java程序中怎么让observeOn运行在main-Thread"><a href="#在标准的Java程序中怎么让observeOn运行在main-Thread" class="headerlink" title="在标准的Java程序中怎么让observeOn运行在main Thread"></a>在标准的Java程序中怎么让observeOn运行在main Thread</h3><p>在安卓中可以使用RxAndroid回调到main thread中,但是标准的Java程序呢?<code>.observeOn(Schedulers.trampoline())</code>不会起作用,Observer的代码还是运行在Observable执行的线程中,要回调到main thread的方法是:</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">Observable.create&lt;Response&gt; &#123;</span><br><span class="line">    println(<span class="string">&quot;before next &quot;</span>+Thread.currentThread())</span><br><span class="line">    it.onNext(onExecute(wrap))</span><br><span class="line">    it.onComplete()<span class="comment">//必须调用onComplete()或者onError()后 阻塞处 之后的代码才会继续执行.</span></span><br><span class="line">&#125;.subscribeOn(Schedulers.io()).blockingSubscribe(<span class="comment">//main thread在这里被阻塞了</span></span><br><span class="line">    &#123; resp -&gt;</span><br><span class="line">        wrap._success(resp.body()!!.string())</span><br><span class="line">    &#125;,</span><br><span class="line">    &#123; e -&gt;</span><br><span class="line">        e.printStackTrace()</span><br><span class="line">        wrap._fail(e)</span><br><span class="line">    &#125;)</span><br><span class="line"><span class="comment">//阻塞处</span></span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    <div class="about">
+        <h2>关于本文</h2>
+        <p>本文作者 longforus，采用 <a href="https://creativecommons.org/licenses/by-nc/4.0" target="_blank" rel="noopener">CC BY-NC 4.0</a> 许可协议。转载请注明出处。</p>
+    </div>
+
+    
+        
+    
+</article>
+
+        <footer>
+    <div class="inner">
+        <div class="links">
+            
+            <div class="group">
+                <h4 class="title">站点</h4>
+                
+                
+                <a href="../../../../index.html" class="item">首页</a>
+                
+                
+                <a href="../../../../archives" class="item">归档</a>
+                
+                
+                <a href="../../../../tags" class="item">标签</a>
+                
+                
+                <a href="../../../../categories" class="item">分类</a>
+                
+                
+                <a href="../../../../about" class="item">关于</a>
+                
+            </div>
+            
+            <div class="group">
+                <h4 class="title">项目</h4>
+                
+                
+                <a href="https://github.com/longforus/MvpAutoCodePlus" class="item" target="_blank" rel="noopener">MvpAutoCodePlus</a>
+                
+                
+                <a href="https://github.com/longforus/pgyerUpload4AndroidStudio" class="item" target="_blank" rel="noopener">pgyerUpload4AndroidStudio</a>
+                
+                
+                <a href="https://github.com/longforus/Android-drawable-preview-plugin" class="item" target="_blank" rel="noopener">Android-drawable-preview-plugin</a>
+                
+            </div>
+            
+            <div class="group">
+                <h4 class="title">联系</h4>
+                
+                
+                <a href="https://github.com/longforus" class="item" target="_blank" rel="noopener">GitHub</a>
+                
+                
+                <a href="mailto:longforus@outlook.com" class="item" target="_blank" rel="noopener">Email</a>
+                
+            </div>
+            
+        </div>
+        &copy; 2026 longforus<br />
+        驱动自 <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+</footer>
+
+        
+<script src="../js/main.js"></script>
+
+        
+<script src="../js/custom.js"></script>
+
+        
+    </body>
+</html>

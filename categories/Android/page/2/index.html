@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+
+  <title>分类: Android - longforus</title>
+
+  
+    <link rel="shortcut icon" href="../../../../favicon.svg">
+  
+
+  <meta name="description" content="记录代码与折腾">
+  
+  <meta name="keywords" content="Android,Java,Kotlin,逆向,Linux,Hexo">
+  
+  <meta name="author" content="longforus">
+  <meta name="theme-color" content="#0a84ff">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="分类: Android">
+  <meta property="og:description" content="记录代码与折腾">
+  <meta property="og:site_name" content="longforus">
+
+  
+<link rel="stylesheet" href="../../../../css/var.css">
+
+  
+<link rel="stylesheet" href="../../../../css/main.css">
+
+  
+<link rel="stylesheet" href="../../../../css/typography.css">
+
+  
+<link rel="stylesheet" href="../../../../css/code-highlighting.css">
+
+  
+<link rel="stylesheet" href="../../../../css/components.css">
+
+  
+<link rel="stylesheet" href="../../../../css/nav.css">
+
+  
+<link rel="stylesheet" href="../../../../css/paginator.css">
+
+  
+<link rel="stylesheet" href="../../../../css/footer.css">
+
+  
+<link rel="stylesheet" href="../../../../css/post-list.css">
+
+  
+<link rel="stylesheet" href="../../../../css/waline.css">
+
+  
+  
+  
+<link rel="stylesheet" href="../../../../css/post.css">
+
+  
+  
+<link rel="stylesheet" href="../../../../css/custom.css">
+
+
+  
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+    <body>
+        <nav id="theme-nav">
+    <div class="inner">
+        <a class="title" href="../../../../index.html">longforus</a>
+        <div class="nav-arrow"></div>
+        <div class="nav-items">
+            <a class="nav-item nav-item-home" href="../../../../index.html">主页</a>
+            
+            
+            
+            <a class="nav-item" href="../../../../archives">归档</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../tags">标签</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../categories">分类</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../about">关于</a>
+            
+            
+            
+            
+            <a class="nav-item nav-item-github nav-item-icon" href="https://github.com/longforus" target="_blank" rel="noopener" aria-label="GitHub">&nbsp;</a>
+            
+            
+        </div>
+    </div>
+</nav>
+
+        <div class="container">
+    <header class="page-header">
+        <h1 class="page-title">Android</h1>
+        <p class="page-subtitle">本页 12 篇笔记</p>
+    </header>
+
+    <div class="post-list">
+    
+    <article class="post-list-item">
+        <a href="../../../../2019/03/28/tinker-hotfix-thoughts/" class="post-list-link">
+            
+            <div class="content">
+                <div class="title">
+                    Tinker 热修复原理学习后的几点思考
+                </div>
+                
+                <div class="excerpt">
+                    最近几天断断续续的学了一下Tinker的热修复原理,按我的一句话说就是把已经修复的class放在有bug的class前面,让系统的classLoader能够先找到,找到了之后就不会再向下找了,那么bug也就避免了,具体的…
+                </div>
+                
+                <div class="time">
+                    <span>2019-03-28</span>
+                    
+                    <span class="dot">·</span>
+                    <span class="category">Android</span>
+                    
+                </div>
+            </div>
+        </a>
+    </article>
+    
+    <article class="post-list-item">
+        <a href="../../../../2019/03/01/network-request-optimization/" class="post-list-link">
+            
+            <div class="content">
+                <div class="title">
+                    记一次网络请求优化过程
+                </div>
+                
+                <div class="excerpt">
+                    最近接手的项目中,同事反映获取服务器数据有点慢,不如iOS版的流畅,观察OKHttp日志发现,某页面的数据请求耗时700ms左右,但是页面从空白到完成数据展示,感觉耗时在2.3秒左右,在代码中插入耗时计算代码发现,从Pr…
+                </div>
+                
+                <div class="time">
+                    <span>2019-03-01</span>
+                    
+                    <span class="dot">·</span>
+                    <span class="category">Android</span>
+                    
+                </div>
+            </div>
+        </a>
+    </article>
+    
+    <article class="post-list-item">
+        <a href="../../../../2018/11/12/android-modular-ci/" class="post-list-link">
+            
+            <div class="content">
+                <div class="title">
+                    Android模块化项目模块版本控制及持续集成方案
+                </div>
+                
+                <div class="excerpt">
+                    使用 Jenkins 与 Git 子模块管理 Android 模块化项目的版本控制与持续集成方案。
+                </div>
+                
+                <div class="time">
+                    <span>2018-11-12</span>
+                    
+                    <span class="dot">·</span>
+                    <span class="category">Android</span>
+                    
+                </div>
+            </div>
+        </a>
+    </article>
+    
+    <article class="post-list-item">
+        <a href="../../../../2018/07/18/gradle-pgyer-upload-task/" class="post-list-link">
+            
+            <div class="content">
+                <div class="title">
+                    基于 Gradle 的蒲公英自动上传 task
+                </div>
+                
+                <div class="excerpt">
+                    最近的项目中在使用蒲公英作为面向客户的App预览平台,虽然没有Jenkins这么强大,但是面向客户的话还是很方便的.但是在使用的过程中,需要到网页手动上传不是很方便,蒲公英都相应的Api接口,可以进行上传操作,我就想是需…
+                </div>
+                
+                <div class="time">
+                    <span>2018-07-18</span>
+                    
+                    <span class="dot">·</span>
+                    <span class="category">Android</span>
+                    
+                </div>
+            </div>
+        </a>
+    </article>
+    
+    <article class="post-list-item">
+        <a href="../../../../2018/07/05/android-studio-plugins/" class="post-list-link">
+            
+            <div class="content">
+                <div class="title">
+                    安卓开发常用插件推荐
+                </div>
+                
+                <div class="excerpt">
+                    现在的安卓码农们，基本上都已经把锄头换成Android Studio了吧，Android Studio是基于Jetbrains 的IntelliJ IDEA开发的。 继承了Jetbrains全家桶系列的优良风格:智能，强…
+                </div>
+                
+                <div class="time">
+                    <span>2018-07-05</span>
+                    
+                    <span class="dot">·</span>
+                    <span class="category">Android</span>
+                    
+                </div>
+            </div>
+        </a>
+    </article>
+    
+    <article class="post-list-item">
+        <a href="../../../../2018/06/27/adb-note/" class="post-list-link">
+            
+            <div class="content">
+                <div class="title">
+                    ADB Note
+                </div>
+                
+                <div class="excerpt">
+                    记录 ADB 常用命令与调试技巧。
+                </div>
+                
+                <div class="time">
+                    <span>2018-06-27</span>
+                    
+                    <span class="dot">·</span>
+                    <span class="category">Android</span>
+                    
+                </div>
+            </div>
+        </a>
+    </article>
+    
+    <article class="post-list-item">
+        <a href="../../../../2018/05/30/android-bytecode-instrumentation/" class="post-list-link">
+            
+            <div class="content">
+                <div class="title">
+                    Android Studio 项目编译期字节码插入实践
+                </div>
+                
+                <div class="excerpt">
+                    在 Android 编译期通过 Gradle Transform 与字节码框架插入代码的实践记录。
+                </div>
+                
+                <div class="time">
+                    <span>2018-05-30</span>
+                    
+                    <span class="dot">·</span>
+                    <span class="category">Android</span>
+                    
+                </div>
+            </div>
+        </a>
+    </article>
+    
+    <article class="post-list-item">
+        <a href="../../../../2018/05/30/gradle-note/" class="post-list-link">
+            
+            <div class="content">
+                <div class="title">
+                    Gradle Note
+                </div>
+                
+                <div class="excerpt">
+                    Gradle 构建脚本、任务与插件开发的常用知识笔记。
+                </div>
+                
+                <div class="time">
+                    <span>2018-05-30</span>
+                    
+                    <span class="dot">·</span>
+                    <span class="category">Android</span>
+                    
+                </div>
+            </div>
+        </a>
+    </article>
+    
+    <article class="post-list-item">
+        <a href="../../../../2018/05/30/recyclerview-nested-reuse/" class="post-list-link">
+            
+            <div class="content">
+                <div class="title">
+                    RecyclerView 列表嵌套下单列表实现子 View 复用
+                </div>
+                
+                <div class="excerpt">
+                    RecyclerView 多列表嵌套场景下复用子 View 的实现思路。
+                </div>
+                
+                <div class="time">
+                    <span>2018-05-30</span>
+                    
+                    <span class="dot">·</span>
+                    <span class="category">Android</span>
+                    
+                </div>
+            </div>
+        </a>
+    </article>
+    
+    <article class="post-list-item">
+        <a href="../../../../2018/05/30/rxjava-note/" class="post-list-link">
+            
+            <div class="content">
+                <div class="title">
+                    RxJava Note
+                </div>
+                
+                <div class="excerpt">
+                    RxJava 常用操作符与实践经验笔记。
+                </div>
+                
+                <div class="time">
+                    <span>2018-05-30</span>
+                    
+                    <span class="dot">·</span>
+                    <span class="category">Android</span>
+                    
+                </div>
+            </div>
+        </a>
+    </article>
+    
+    <article class="post-list-item">
+        <a href="../../../../2018/05/29/arouter-fragment-error/" class="post-list-link">
+            
+            <div class="content">
+                <div class="title">
+                    ARouter 配合 Fragment：Fetch fragment instance error 异常的处理
+                </div>
+                
+                <div class="excerpt">
+                    ARouter 配合 Fragment 使用时出现 Fetch fragment instance error 的排查与处理。
+                </div>
+                
+                <div class="time">
+                    <span>2018-05-29</span>
+                    
+                    <span class="dot">·</span>
+                    <span class="category">Android</span>
+                    
+                </div>
+            </div>
+        </a>
+    </article>
+    
+    <article class="post-list-item">
+        <a href="../../../../2018/05/29/apt-butterknife/" class="post-list-link">
+            
+            <div class="content">
+                <div class="title">
+                    APT Note - 手动实现简易版 ButterKnife
+                </div>
+                
+                <div class="excerpt">
+                    早就发现了apt的强大,但是一直没有进行尝试,今天尝试使用apt和javapoet,实现一个简易版的Butterknife.
+                </div>
+                
+                <div class="time">
+                    <span>2018-05-29</span>
+                    
+                    <span class="dot">·</span>
+                    <span class="category">Android</span>
+                    
+                </div>
+            </div>
+        </a>
+    </article>
+    
+</div>
+
+
+    
+<div class="paginator">
+    <a class="extend prev" rel="prev" href="../../">上一页</a><a class="page-number" href="../../">1</a><span class="page-number current">2</span><a class="page-number" href="../3/">3</a><a class="extend next" rel="next" href="../3/">下一页</a>
+</div>
+
+</div>
+
+        <footer>
+    <div class="inner">
+        <div class="links">
+            
+            <div class="group">
+                <h4 class="title">站点</h4>
+                
+                
+                <a href="../../../../index.html" class="item">首页</a>
+                
+                
+                <a href="../../../../archives" class="item">归档</a>
+                
+                
+                <a href="../../../../tags" class="item">标签</a>
+                
+                
+                <a href="../../../../categories" class="item">分类</a>
+                
+                
+                <a href="../../../../about" class="item">关于</a>
+                
+            </div>
+            
+            <div class="group">
+                <h4 class="title">项目</h4>
+                
+                
+                <a href="https://github.com/longforus/MvpAutoCodePlus" class="item" target="_blank" rel="noopener">MvpAutoCodePlus</a>
+                
+                
+                <a href="https://github.com/longforus/pgyerUpload4AndroidStudio" class="item" target="_blank" rel="noopener">pgyerUpload4AndroidStudio</a>
+                
+                
+                <a href="https://github.com/longforus/Android-drawable-preview-plugin" class="item" target="_blank" rel="noopener">Android-drawable-preview-plugin</a>
+                
+            </div>
+            
+            <div class="group">
+                <h4 class="title">联系</h4>
+                
+                
+                <a href="https://github.com/longforus" class="item" target="_blank" rel="noopener">GitHub</a>
+                
+                
+                <a href="mailto:longforus@outlook.com" class="item" target="_blank" rel="noopener">Email</a>
+                
+            </div>
+            
+        </div>
+        &copy; 2026 longforus<br />
+        驱动自 <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+</footer>
+
+        
+<script src="../js/main.js"></script>
+
+        
+<script src="../js/custom.js"></script>
+
+        
+    </body>
+</html>

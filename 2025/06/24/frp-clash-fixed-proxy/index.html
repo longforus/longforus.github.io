@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+
+  <title>frp + Clash 实现固定代理 - longforus</title>
+
+  
+    <link rel="shortcut icon" href="../../../../favicon.svg">
+  
+
+  <meta name="description" content="使用 frp 与 Clash 将异地网络请求转发到固定区域出口的配置记录。">
+  
+  <meta name="keywords" content="Android,Java,Kotlin,逆向,Linux,Hexo">
+  
+  <meta name="author" content="longforus">
+  <meta name="theme-color" content="#0a84ff">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="frp + Clash 实现固定代理">
+  <meta property="og:description" content="使用 frp 与 Clash 将异地网络请求转发到固定区域出口的配置记录。">
+  <meta property="og:site_name" content="longforus">
+
+  
+<link rel="stylesheet" href="../../../../css/var.css">
+
+  
+<link rel="stylesheet" href="../../../../css/main.css">
+
+  
+<link rel="stylesheet" href="../../../../css/typography.css">
+
+  
+<link rel="stylesheet" href="../../../../css/code-highlighting.css">
+
+  
+<link rel="stylesheet" href="../../../../css/components.css">
+
+  
+<link rel="stylesheet" href="../../../../css/nav.css">
+
+  
+<link rel="stylesheet" href="../../../../css/paginator.css">
+
+  
+<link rel="stylesheet" href="../../../../css/footer.css">
+
+  
+<link rel="stylesheet" href="../../../../css/post-list.css">
+
+  
+<link rel="stylesheet" href="../../../../css/waline.css">
+
+  
+  
+  
+<link rel="stylesheet" href="../../../../css/post.css">
+
+  
+  
+<link rel="stylesheet" href="../../../../css/custom.css">
+
+
+  
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+    <body>
+        <nav id="theme-nav">
+    <div class="inner">
+        <a class="title" href="../../../../index.html">longforus</a>
+        <div class="nav-arrow"></div>
+        <div class="nav-items">
+            <a class="nav-item nav-item-home" href="../../../../index.html">主页</a>
+            
+            
+            
+            <a class="nav-item" href="../../../../archives">归档</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../tags">标签</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../categories">分类</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../about">关于</a>
+            
+            
+            
+            
+            <a class="nav-item nav-item-github nav-item-icon" href="https://github.com/longforus" target="_blank" rel="noopener" aria-label="GitHub">&nbsp;</a>
+            
+            
+        </div>
+    </div>
+</nav>
+
+        
+<article class="post">
+    <div class="meta">
+        <div class="post-meta">
+            <span class="post-date">2025-06-24</span>
+            
+            <span class="dot">·</span>
+            <span class="post-updated">更新于 2025-11-19</span>
+            
+            <span class="dot">·</span>
+            <span class="post-reading">8 分钟阅读</span>
+        </div>
+
+        <h1 class="title">frp + Clash 实现固定代理</h1>
+
+        
+        <div class="post-taxonomy">
+            
+            <a class="chip chip-category" href="../../../../categories/%E7%BD%91%E7%BB%9C%E8%BF%90%E7%BB%B4/">网络运维</a>
+            
+            
+            <a class="chip" href="../../../../tags/frp/"># frp</a>
+            
+            <a class="chip" href="../../../../tags/Clash/"># Clash</a>
+            
+            <a class="chip" href="../../../../tags/%E4%BB%A3%E7%90%86/"># 代理</a>
+            
+        </div>
+        
+    </div>
+
+    <div class="divider"></div>
+
+    
+    <details class="toc-card">
+        <summary>目录</summary>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#C%E6%9C%BA%E6%9C%8D%E5%8A%A1%E7%AB%AF%E5%87%BA%E5%8F%A3-ubuntu20-04"><span class="toc-text">C机服务端出口 ubuntu20.04</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%89%E8%A3%85mihomo"><span class="toc-text">安装mihomo</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%89%E8%A3%85frpc"><span class="toc-text">安装frpc</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#B%E6%9C%BA%E4%BA%91%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%BD%AC%E5%8F%91"><span class="toc-text">B机云服务器转发</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#A%E6%9C%BA%E5%AE%A2%E6%88%B7%E7%AB%AF%E7%94%A8%E6%88%B7"><span class="toc-text">A机客户端用户</span></a></li></ol>
+    </details>
+    
+
+    <div class="content">
+        <p>最近需要将外地的网络请求转发到某个固定的区域,现在用frp服务器+clash的方式来实现,</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[远程设备A机]</span><br><span class="line">     ↓  (连接 VPS:8334)</span><br><span class="line">[云服务器B机:8334] --frp转发--&gt; [你家里的 Clash Verge:7890]</span><br><span class="line">     ↓</span><br><span class="line">Clash Verge 全局代理 C机 → 访问外网</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="C机服务端出口-ubuntu20-04"><a href="#C机服务端出口-ubuntu20-04" class="headerlink" title="C机服务端出口 ubuntu20.04"></a>C机服务端出口 ubuntu20.04</h2><h3 id="安装mihomo"><a href="#安装mihomo" class="headerlink" title="安装mihomo"></a>安装mihomo</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"> mkdir -p ~/clash-meta &amp;&amp; cd ~/clash-meta</span><br><span class="line"> wget https://github.com/MetaCubeX/mihomo/releases/download/Prerelease-Alpha/mihomo-linux-amd64-alpha-5344e86.deb</span><br><span class="line"> sudo dpkg -i mihomo-linux-amd64-alpha-5344e86.deb</span><br><span class="line"></span><br><span class="line"> wget https://github.com/haishanh/yacd/archive/refs/heads/gh-pages.zip -O yacd.zip</span><br><span class="line"> unzip yacd.zip</span><br><span class="line"> mkdir -p ~/.config/mihomo/ui</span><br><span class="line"> mv ~/clash-meta/yacd-gh-pages/* ~/.config/mihomo/ui/</span><br><span class="line"></span><br><span class="line"> cd ~/.config/mihomo</span><br><span class="line"> nano config.yaml</span><br><span class="line"></span><br><span class="line">------------------------------------------------</span><br><span class="line">mode: global</span><br><span class="line">mixed-port: 7890</span><br><span class="line">allow-lan: true</span><br><span class="line">log-level: info</span><br><span class="line">secret: &#x27;&#x27;</span><br><span class="line">external-controller: 0.0.0.0:9090</span><br><span class="line">external-ui: ../mihomo/ui</span><br><span class="line"></span><br><span class="line">-----------------------------------------------</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">sudo nano /etc/systemd/system/mihomo.service</span><br><span class="line">------------------------------------------------</span><br><span class="line">[Unit]</span><br><span class="line">Description=Mihomo (Clash.Meta) Service</span><br><span class="line">After=network.target</span><br><span class="line"></span><br><span class="line">[Service]</span><br><span class="line">Type=simple</span><br><span class="line">User=void</span><br><span class="line">ExecStart=/usr/bin/mihomo -d /home/void/.config/mihomo</span><br><span class="line">Restart=on-failure</span><br><span class="line">LimitNOFILE=1048576</span><br><span class="line"></span><br><span class="line">[Install]</span><br><span class="line">WantedBy=multi-user.target</span><br><span class="line">---------------------------------------------------</span><br><span class="line">sudo systemctl daemon-reexec  # 或 sudo systemctl daemon-reload</span><br><span class="line">sudo systemctl enable mihomo</span><br><span class="line">sudo systemctl start mihomo</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>启动后<a target="_blank" rel="noopener" href="http://192.168.0.227:9090/ui/#/">yacd</a>可以访问ui</p>
+<p><code>journalctl -u mihomo -f</code>可以持续查看输出日志</p>
+<h3 id="安装frpc"><a href="#安装frpc" class="headerlink" title="安装frpc"></a>安装frpc</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"> cd ~</span><br><span class="line"> wget https://github.com/fatedier/frp/releases/download/v0.62.1/frp_0.62.1_linux_amd64.tar.gz</span><br><span class="line"> tar -zxf frp_0.62.1_linux_amd64.tar.gz</span><br><span class="line"> cd frp_0.62.1_linux_amd64</span><br><span class="line"> sudo mv frpc /usr/bin/</span><br><span class="line"> sudo mkdir -p /etc/frp</span><br><span class="line"> cp frpc.toml /etc/frp/</span><br><span class="line"> sudo nano /etc/frp/frpc.toml</span><br><span class="line"></span><br><span class="line"> -----------------------------------------------</span><br><span class="line"> [common]</span><br><span class="line">server_addr = &quot;1.2.3.4&quot;</span><br><span class="line">server_port = 7000</span><br><span class="line">token = Mddkbasyssdhbowei</span><br><span class="line"></span><br><span class="line">[clash-verge-proxy-ubuntu] #這个不同的C机需要不同</span><br><span class="line">type = &quot;tcp&quot;</span><br><span class="line">local_ip = &quot;127.0.0.1&quot;</span><br><span class="line">local_port = 7890   #mihomo的本地代理端口</span><br><span class="line">remote_port = 8334  #這个就是A机代理需要填的端口,不同的C机需要不同的端口</span><br><span class="line"> --------------------------------------------------------</span><br><span class="line"></span><br><span class="line"> sudo nano /etc/systemd/system/frpc.service</span><br><span class="line"></span><br><span class="line"> -----------------------------------------------------------</span><br><span class="line"> [Unit]</span><br><span class="line">Description=FRP Client Service</span><br><span class="line">After=network.target</span><br><span class="line"></span><br><span class="line">[Service]</span><br><span class="line">Type=simple</span><br><span class="line">ExecStart=/usr/bin/frpc -c /etc/frp/frpc.toml</span><br><span class="line">Restart=on-failure</span><br><span class="line"></span><br><span class="line">[Install]</span><br><span class="line">WantedBy=multi-user.target</span><br><span class="line"></span><br><span class="line"> ---------------------------------------</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">sudo systemctl daemon-reexec  # 或 daemon-reload</span><br><span class="line">sudo systemctl enable frpc</span><br><span class="line">sudo systemctl start frpc</span><br><span class="line">systemctl status frpc  #查看状态</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="B机云服务器转发"><a href="#B机云服务器转发" class="headerlink" title="B机云服务器转发"></a>B机云服务器转发</h2><p>暂略</p>
+<h2 id="A机客户端用户"><a href="#A机客户端用户" class="headerlink" title="A机客户端用户"></a>A机客户端用户</h2><p>安装Clash Verge,填写B机IP和8334,即可访问</p>
+
+    </div>
+
+    <div class="about">
+        <h2>关于本文</h2>
+        <p>本文作者 longforus，采用 <a href="https://creativecommons.org/licenses/by-nc/4.0" target="_blank" rel="noopener">CC BY-NC 4.0</a> 许可协议。转载请注明出处。</p>
+    </div>
+
+    
+        
+    
+</article>
+
+        <footer>
+    <div class="inner">
+        <div class="links">
+            
+            <div class="group">
+                <h4 class="title">站点</h4>
+                
+                
+                <a href="../../../../index.html" class="item">首页</a>
+                
+                
+                <a href="../../../../archives" class="item">归档</a>
+                
+                
+                <a href="../../../../tags" class="item">标签</a>
+                
+                
+                <a href="../../../../categories" class="item">分类</a>
+                
+                
+                <a href="../../../../about" class="item">关于</a>
+                
+            </div>
+            
+            <div class="group">
+                <h4 class="title">项目</h4>
+                
+                
+                <a href="https://github.com/longforus/MvpAutoCodePlus" class="item" target="_blank" rel="noopener">MvpAutoCodePlus</a>
+                
+                
+                <a href="https://github.com/longforus/pgyerUpload4AndroidStudio" class="item" target="_blank" rel="noopener">pgyerUpload4AndroidStudio</a>
+                
+                
+                <a href="https://github.com/longforus/Android-drawable-preview-plugin" class="item" target="_blank" rel="noopener">Android-drawable-preview-plugin</a>
+                
+            </div>
+            
+            <div class="group">
+                <h4 class="title">联系</h4>
+                
+                
+                <a href="https://github.com/longforus" class="item" target="_blank" rel="noopener">GitHub</a>
+                
+                
+                <a href="mailto:longforus@outlook.com" class="item" target="_blank" rel="noopener">Email</a>
+                
+            </div>
+            
+        </div>
+        &copy; 2026 longforus<br />
+        驱动自 <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+</footer>
+
+        
+<script src="../js/main.js"></script>
+
+        
+<script src="../js/custom.js"></script>
+
+        
+    </body>
+</html>

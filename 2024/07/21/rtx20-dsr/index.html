@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+
+  <title>RTX 20 系开启超分辨率 - longforus</title>
+
+  
+    <link rel="shortcut icon" href="../../../../favicon.svg">
+  
+
+  <meta name="description" content="我的显卡是2070s现在也支持了超分辨率,根据网上的教程一通折腾后发现了不少的坑,记一下.希望有缘人可以少走点弯路.">
+  
+  <meta name="keywords" content="Android,Java,Kotlin,逆向,Linux,Hexo">
+  
+  <meta name="author" content="longforus">
+  <meta name="theme-color" content="#0a84ff">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="RTX 20 系开启超分辨率">
+  <meta property="og:description" content="我的显卡是2070s现在也支持了超分辨率,根据网上的教程一通折腾后发现了不少的坑,记一下.希望有缘人可以少走点弯路.">
+  <meta property="og:site_name" content="longforus">
+
+  
+<link rel="stylesheet" href="../../../../css/var.css">
+
+  
+<link rel="stylesheet" href="../../../../css/main.css">
+
+  
+<link rel="stylesheet" href="../../../../css/typography.css">
+
+  
+<link rel="stylesheet" href="../../../../css/code-highlighting.css">
+
+  
+<link rel="stylesheet" href="../../../../css/components.css">
+
+  
+<link rel="stylesheet" href="../../../../css/nav.css">
+
+  
+<link rel="stylesheet" href="../../../../css/paginator.css">
+
+  
+<link rel="stylesheet" href="../../../../css/footer.css">
+
+  
+<link rel="stylesheet" href="../../../../css/post-list.css">
+
+  
+<link rel="stylesheet" href="../../../../css/waline.css">
+
+  
+  
+  
+<link rel="stylesheet" href="../../../../css/post.css">
+
+  
+  
+<link rel="stylesheet" href="../../../../css/custom.css">
+
+
+  
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+    <body>
+        <nav id="theme-nav">
+    <div class="inner">
+        <a class="title" href="../../../../index.html">longforus</a>
+        <div class="nav-arrow"></div>
+        <div class="nav-items">
+            <a class="nav-item nav-item-home" href="../../../../index.html">主页</a>
+            
+            
+            
+            <a class="nav-item" href="../../../../archives">归档</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../tags">标签</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../categories">分类</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../about">关于</a>
+            
+            
+            
+            
+            <a class="nav-item nav-item-github nav-item-icon" href="https://github.com/longforus" target="_blank" rel="noopener" aria-label="GitHub">&nbsp;</a>
+            
+            
+        </div>
+    </div>
+</nav>
+
+        
+<article class="post">
+    <div class="meta">
+        <div class="post-meta">
+            <span class="post-date">2024-07-21</span>
+            
+            <span class="dot">·</span>
+            <span class="post-reading">4 分钟阅读</span>
+        </div>
+
+        <h1 class="title">RTX 20 系开启超分辨率</h1>
+
+        
+        <div class="post-taxonomy">
+            
+            <a class="chip chip-category" href="../../../../categories/%E7%A1%AC%E4%BB%B6/">硬件</a>
+            
+            
+            <a class="chip" href="../../../../tags/%E6%98%BE%E5%8D%A1/"># 显卡</a>
+            
+            <a class="chip" href="../../../../tags/NVIDIA/"># NVIDIA</a>
+            
+            <a class="chip" href="../../../../tags/%E8%B6%85%E5%88%86%E8%BE%A8%E7%8E%87/"># 超分辨率</a>
+            
+        </div>
+        
+    </div>
+
+    <div class="divider"></div>
+
+    
+    <details class="toc-card">
+        <summary>目录</summary>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%89%E8%A3%85"><span class="toc-text">安装</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%85%8D%E7%BD%AE"><span class="toc-text">配置</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B5%8F%E8%A7%88%E5%99%A8"><span class="toc-text">浏览器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%AC%E5%9C%B0%E8%A7%86%E9%A2%91%E6%92%AD%E6%94%BE%E5%99%A8"><span class="toc-text">本地视频播放器</span></a></li></ol></li></ol>
+    </details>
+    
+
+    <div class="content">
+        <p>  我的显卡是2070s现在也支持了超分辨率,根据网上的教程一通折腾后发现了不少的坑,记一下.希望有缘人可以少走点弯路.</p>
+<p>机器配置如下:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">[CPU]</span><br><span class="line">CPU #1: 3600MHz, AMD Ryzen 7 3700X 8-Core Processor             , AMD64 Family 23 Model 113 Stepping</span><br><span class="line">Instruction set: MMX MMXEXT MMX2 SSE SSE2 SSE3 SSSE3 SSE4 SSE42 AVX AVX2 FMA3 CMOV BMI1 BMI2</span><br><span class="line"></span><br><span class="line">[OS]</span><br><span class="line">Version: Windows 11 22H2(10.0.22621)</span><br><span class="line">Bits: Native 64</span><br><span class="line">DirectX: 9.0c(4.09.00.0904)</span><br><span class="line">Direct3D 9Ex: OK</span><br><span class="line"></span><br><span class="line">[VGA]</span><br><span class="line">VGA #0: NVIDIA GeForce RTX 2070 SUPER, Generic PnP Monitor, 2160×3840, \\.\DISPLAY1</span><br><span class="line">VGA #1: NVIDIA GeForce RTX 2070 SUPER, Generic PnP Monitor, 2560×1080, \\.\DISPLAY2</span><br><span class="line"></span><br><span class="line">[Memory]</span><br><span class="line">Used: 11.6GB(36%)</span><br><span class="line">Total Physical: 31.9GB</span><br><span class="line">Avail Physical: 20.3GB</span><br><span class="line">Total Page: 36.7GB</span><br><span class="line">Avail Page: 15.2GB</span><br><span class="line">Total Virtual: 128TB</span><br><span class="line">Avail Virtual: 128TB</span><br><span class="line">Avail Extended Virtual: 0Byte</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><ol>
+<li>先升级显卡驱动到新版本,我这里是546.33 升级后在nv控制面板-&gt;调整视频图像设置,里面就有超分辨率选项了,勾上保存,质量不用选很高,我开始选4,在运行成功后,播放一个视频GPU占用会达到70%,功耗过高了,没有必要,后来改为2.</li>
+<li>网上说要装<code>mpc-videorenderer-rtx1.1-4e2e160</code>来实现本地资源的超分辨率,实测后发现potPlayer不需要.</li>
+</ol>
+<h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><h3 id="浏览器"><a href="#浏览器" class="headerlink" title="浏览器"></a>浏览器</h3><ol>
+<li>chrome最新版直接就可以生效了.</li>
+<li>edge的话需要配置一下才可以生效:<ul>
+<li>在edge的设置中搜索找到<code>使用硬件加速(如可用)</code> 并勾选,重启edge生效.</li>
+<li>在地址栏输入<a href="edge://flags/">edge://flags/</a>,搜索找到<code>Microsoft Video Super Resolution</code>,选Enabled,保存重启生效.</li>
+</ul>
+</li>
+</ol>
+<h3 id="本地视频播放器"><a href="#本地视频播放器" class="headerlink" title="本地视频播放器"></a>本地视频播放器</h3><ol>
+<li><p>MPC-BE播放器选择<code>MPC视频渲染器</code>后就可以开启超分辨率,但是我觉得MPC-BE播放器不好用,而且在我电脑上放着放着会闪退.</p>
+</li>
+<li><p>potPlayer(版本:1.7.22077)经过实测后,发现不用像网上说的装<code>mpc-videorenderer-rtx1.1-4e2e160</code>,直接选内置D3D11适配渲染器,然后勾选下方的<code>D3D11 GPU超分辨率</code>即可开启.</p>
+<p> <img src="image-20240110210814194.png" alt="image-20240110210814194"></p>
+<p> 默认按键下,按TAB键potPlayer可以显示OSD信息:</p>
+<p> <img src="image-20240110211032972.jpg" alt="image-20240110211032972"></p>
+<p> 如果缩放这里显示GPU Super Resolution,那就开启成功了,GPU占用比未开启会有明显的提升,<strong>切记测试的时候,选择分辨率低些的视频,播放窗口要拉得超过视频原分辨率才会开启超分辨率</strong></p>
+</li>
+</ol>
+
+    </div>
+
+    <div class="about">
+        <h2>关于本文</h2>
+        <p>本文作者 longforus，采用 <a href="https://creativecommons.org/licenses/by-nc/4.0" target="_blank" rel="noopener">CC BY-NC 4.0</a> 许可协议。转载请注明出处。</p>
+    </div>
+
+    
+        
+    
+</article>
+
+        <footer>
+    <div class="inner">
+        <div class="links">
+            
+            <div class="group">
+                <h4 class="title">站点</h4>
+                
+                
+                <a href="../../../../index.html" class="item">首页</a>
+                
+                
+                <a href="../../../../archives" class="item">归档</a>
+                
+                
+                <a href="../../../../tags" class="item">标签</a>
+                
+                
+                <a href="../../../../categories" class="item">分类</a>
+                
+                
+                <a href="../../../../about" class="item">关于</a>
+                
+            </div>
+            
+            <div class="group">
+                <h4 class="title">项目</h4>
+                
+                
+                <a href="https://github.com/longforus/MvpAutoCodePlus" class="item" target="_blank" rel="noopener">MvpAutoCodePlus</a>
+                
+                
+                <a href="https://github.com/longforus/pgyerUpload4AndroidStudio" class="item" target="_blank" rel="noopener">pgyerUpload4AndroidStudio</a>
+                
+                
+                <a href="https://github.com/longforus/Android-drawable-preview-plugin" class="item" target="_blank" rel="noopener">Android-drawable-preview-plugin</a>
+                
+            </div>
+            
+            <div class="group">
+                <h4 class="title">联系</h4>
+                
+                
+                <a href="https://github.com/longforus" class="item" target="_blank" rel="noopener">GitHub</a>
+                
+                
+                <a href="mailto:longforus@outlook.com" class="item" target="_blank" rel="noopener">Email</a>
+                
+            </div>
+            
+        </div>
+        &copy; 2026 longforus<br />
+        驱动自 <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+</footer>
+
+        
+<script src="../js/main.js"></script>
+
+        
+<script src="../js/custom.js"></script>
+
+        
+    </body>
+</html>

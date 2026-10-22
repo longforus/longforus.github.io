@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+
+  <title>ARouter 配合 Fragment：Fetch fragment instance error 异常的处理 - longforus</title>
+
+  
+    <link rel="shortcut icon" href="../../../../favicon.svg">
+  
+
+  <meta name="description" content="ARouter 配合 Fragment 使用时出现 Fetch fragment instance error 的排查与处理。">
+  
+  <meta name="keywords" content="Android,Java,Kotlin,逆向,Linux,Hexo">
+  
+  <meta name="author" content="longforus">
+  <meta name="theme-color" content="#0a84ff">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="ARouter 配合 Fragment：Fetch fragment instance error 异常的处理">
+  <meta property="og:description" content="ARouter 配合 Fragment 使用时出现 Fetch fragment instance error 的排查与处理。">
+  <meta property="og:site_name" content="longforus">
+
+  
+<link rel="stylesheet" href="../../../../css/var.css">
+
+  
+<link rel="stylesheet" href="../../../../css/main.css">
+
+  
+<link rel="stylesheet" href="../../../../css/typography.css">
+
+  
+<link rel="stylesheet" href="../../../../css/code-highlighting.css">
+
+  
+<link rel="stylesheet" href="../../../../css/components.css">
+
+  
+<link rel="stylesheet" href="../../../../css/nav.css">
+
+  
+<link rel="stylesheet" href="../../../../css/paginator.css">
+
+  
+<link rel="stylesheet" href="../../../../css/footer.css">
+
+  
+<link rel="stylesheet" href="../../../../css/post-list.css">
+
+  
+<link rel="stylesheet" href="../../../../css/waline.css">
+
+  
+  
+  
+<link rel="stylesheet" href="../../../../css/post.css">
+
+  
+  
+<link rel="stylesheet" href="../../../../css/custom.css">
+
+
+  
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+    <body>
+        <nav id="theme-nav">
+    <div class="inner">
+        <a class="title" href="../../../../index.html">longforus</a>
+        <div class="nav-arrow"></div>
+        <div class="nav-items">
+            <a class="nav-item nav-item-home" href="../../../../index.html">主页</a>
+            
+            
+            
+            <a class="nav-item" href="../../../../archives">归档</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../tags">标签</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../categories">分类</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../about">关于</a>
+            
+            
+            
+            
+            <a class="nav-item nav-item-github nav-item-icon" href="https://github.com/longforus" target="_blank" rel="noopener" aria-label="GitHub">&nbsp;</a>
+            
+            
+        </div>
+    </div>
+</nav>
+
+        
+<article class="post">
+    <div class="meta">
+        <div class="post-meta">
+            <span class="post-date">2018-05-29</span>
+            
+            <span class="dot">·</span>
+            <span class="post-updated">更新于 2021-11-18</span>
+            
+            <span class="dot">·</span>
+            <span class="post-reading">23 分钟阅读</span>
+        </div>
+
+        <h1 class="title">ARouter 配合 Fragment：Fetch fragment instance error 异常的处理</h1>
+
+        
+        <div class="post-taxonomy">
+            
+            <a class="chip chip-category" href="../../../../categories/Android/">Android</a>
+            
+            
+            <a class="chip" href="../../../../tags/ARouter/"># ARouter</a>
+            
+            <a class="chip" href="../../../../tags/Fragment/"># Fragment</a>
+            
+        </div>
+        
+    </div>
+
+    <div class="divider"></div>
+
+    
+    <details class="toc-card">
+        <summary>目录</summary>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BC%82%E5%B8%B8%E4%BF%A1%E6%81%AF"><span class="toc-text">异常信息</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90"><span class="toc-text">问题分析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A4%84%E7%90%86%E8%BF%87%E7%A8%8B"><span class="toc-text">处理过程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%90%8E%E8%AE%B0"><span class="toc-text">后记</span></a></li></ol>
+    </details>
+    
+
+    <div class="content">
+        <p>现在的项目中使用ARouter来处理组件化开发中的跳转和部分数据传递的需求,使用一直很顺畅,今天遇到一个不太常见的异常.记录一下:</p>
+<h2 id="异常信息"><a href="#异常信息" class="headerlink" title="异常信息"></a>异常信息</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">E/ARouter::: Fetch fragment instance error,     at java.lang.reflect.Constructor.newInstance0(Native Method)</span><br><span class="line">at java.lang.reflect.Constructor.newInstance(Constructor.java:430)</span><br><span class="line">at com.alibaba.android.arouter.launcher._ARouter._navigation(_ARouter.java:380)</span><br><span class="line">at com.alibaba.android.arouter.launcher._ARouter.navigation(_ARouter.java:329)</span><br><span class="line">at com.alibaba.android.arouter.launcher.ARouter.navigation(ARouter.java:183)</span><br><span class="line">at com.alibaba.android.arouter.facade.Postcard.navigation(Postcard.java:149)</span><br><span class="line">at com.alibaba.android.arouter.facade.Postcard.navigation(Postcard.java:140)</span><br><span class="line">at com.fec.yunmall.MainActivity$MainAdapter.&lt;init&gt;(MainActivity.java:181)</span><br><span class="line">at com.fec.yunmall.MainActivity.initTab(MainActivity.java:274)</span><br><span class="line">at com.fec.yunmall.MainActivity.initView(MainActivity.java:91)</span><br><span class="line">at com.fec.fecCommon.ui.activity.FecBaseActivity.onCreate(FecBaseActivity.java:45)</span><br><span class="line">at android.app.Activity.performCreate(Activity.java:6679)</span><br><span class="line">at android.app.Instrumentation.callActivityOnCreate(Instrumentation.java:1118)</span><br><span class="line">at android.app.ActivityThread.performLaunchActivity(ActivityThread.java:2618)</span><br><span class="line">at android.app.ActivityThread.handleLaunchActivity(ActivityThread.java:2726)</span><br><span class="line">at android.app.ActivityThread.-wrap12(ActivityThread.java)</span><br><span class="line">at android.app.ActivityThread$H.handleMessage(ActivityThread.java:1477)</span><br><span class="line">at android.os.Handler.dispatchMessage(Handler.java:102)</span><br><span class="line">at android.os.Looper.loop(Looper.java:154)</span><br><span class="line">at android.app.ActivityThread.main(ActivityThread.java:6119)</span><br><span class="line">at java.lang.reflect.Method.invoke(Native Method)</span><br><span class="line">at com.android.internal.os.ZygoteInit$MethodAndArgsCaller.run(ZygoteInit.java:886)</span><br><span class="line">at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:776)</span><br></pre></td></tr></table></figure>
+
+
+
+<p>为了方便遇到类似问题的童鞋好找,把异常信息都贴出来了,有点长. 主要信息是获取Fragment错误.我在MainActivity中通过ARouter可以直接获取Fragment实例的功能,获取在业务组件中的Fragment.之前一直是没有问题的.忽然出现了这样的异常.页面获取失败,在MainActivity里面切换,造成App崩溃.</p>
+<h2 id="问题分析"><a href="#问题分析" class="headerlink" title="问题分析"></a>问题分析</h2><p>查看ARouter的异常处代码:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">case</span> FRAGMENT:</span><br><span class="line">                Class fragmentMeta = postcard.getDestination();</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    Object instance = fragmentMeta.getConstructor().newInstance();</span><br><span class="line">                    <span class="keyword">if</span> (instance <span class="keyword">instanceof</span> Fragment) &#123;</span><br><span class="line">                        ((Fragment) instance).setArguments(postcard.getExtras());</span><br><span class="line">                    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (instance <span class="keyword">instanceof</span> android.support.v4.app.Fragment) &#123;</span><br><span class="line">                        ((android.support.v4.app.Fragment) instance).setArguments(postcard.getExtras());</span><br><span class="line">                    &#125;</span><br><span class="line"></span><br><span class="line">                    <span class="keyword">return</span> instance;</span><br><span class="line">                &#125; <span class="keyword">catch</span> (Exception ex) &#123;</span><br><span class="line">                    logger.error(Consts.TAG, <span class="string">&quot;Fetch fragment instance error, &quot;</span> + TextUtils.formatStackTrace(ex.getStackTrace()));</span><br><span class="line">                &#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>可见这里的实现是通过反射实现的.通过断点观察MainActivity中的Fragment List,发现出现问题的是3号Fragment,这个Fragment是Kotlin实现的.以为是这里的问题,但是2号也是Kotlin实现的并没有出现问题.之前也没有出现过这样的问题,也没有更深层次的异常信息.因为之前才将App的compileSdkVersion和buildToolsVersion提升到27+,便略有怀疑是Sdk版本的问题,但是从感觉可能性不大,准备在其他方法无果的时候再降低SdkVersion测试.仔细观察出现问题的3号Fragment发现了可能的原因.测试后发现是这个原因.</p>
+<h2 id="处理过程"><a href="#处理过程" class="headerlink" title="处理过程"></a>处理过程</h2><p>在3号Fragment中起初有如下代码:</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Route(path = <span class="meta-string">&quot;/memberCenter/memberCenter&quot;</span>)</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MemberCenterFragment</span> : <span class="type">BaseMvcFragment</span></span>() &#123;</span><br><span class="line">    <span class="keyword">val</span> loginCallBack = <span class="keyword">object</span> : NavCallback() &#123;<span class="comment">//构建公用的callBack在未登录的状态页面跳转被拦截的情况下,跳转到登录页面,面对切面编程</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onInterrupt</span><span class="params">(postcard: <span class="type">Postcard</span>?)</span></span> &#123;</span><br><span class="line">            member_center_tv_name.post &#123;</span><br><span class="line">              initView2Start()</span><br><span class="line">            &#125;</span><br><span class="line">            ARouter.getInstance().build(<span class="string">&quot;/memberCenter/selectLoginActivity&quot;</span>).navigation(activity, FecBaseFragment.REQUEST_REFRESH_KEY)</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onArrival</span><span class="params">(postcard: <span class="type">Postcard</span>?)</span></span> &#123;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//Decompile java:</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">MemberCenterFragment</span> <span class="keyword">extends</span> <span class="title">BaseMvcFragment</span> </span>&#123;</span><br><span class="line">   <span class="meta">@NotNull</span></span><br><span class="line">   <span class="keyword">private</span> <span class="keyword">final</span> NavCallback loginCallBack = (NavCallback)(<span class="keyword">new</span> NavCallback() &#123;</span><br><span class="line">      <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onInterrupt</span><span class="params">(<span class="meta">@Nullable</span> Postcard postcard)</span> </span>&#123;</span><br><span class="line">         ((TextView)MemberCenterFragment.<span class="keyword">this</span>._$_findCachedViewById(id.member_center_tv_name)).post((Runnable)(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">               MemberCenterFragment.<span class="keyword">this</span>.initView2Start();</span><br><span class="line">            &#125;</span><br><span class="line">         &#125;));</span><br><span class="line">         ARouter.getInstance().build(<span class="string">&quot;/memberCenter/selectLoginActivity&quot;</span>).navigation((Activity)MemberCenterFragment.<span class="keyword">this</span>.getActivity(), <span class="string">&#x27;픍&#x27;</span>);</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onArrival</span><span class="params">(<span class="meta">@Nullable</span> Postcard postcard)</span> </span>&#123;</span><br><span class="line">      &#125;</span><br><span class="line">   &#125;);</span><br></pre></td></tr></table></figure>
+
+<p>后来因为其他的地方也用到类似的代码,所以抽取了一个公用的callBack,重新赋值该变量如下:</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Route(path = <span class="meta-string">&quot;/memberCenter/memberCenter&quot;</span>)</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MemberCenterFragment</span> : <span class="type">BaseMvcFragment</span></span>() &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">val</span> loginCallBack =  LoginNVCallBack(activity,FecBaseFragment.REQUEST_REFRESH_KEY) &#123;</span><br><span class="line">        member_center_tv_name.post &#123;</span><br><span class="line">            initView2Start()</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//使用activity(实际调用getActivity()方法)时的 Decompile java:</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">MemberCenterFragment</span> <span class="keyword">extends</span> <span class="title">BaseMvcFragment</span> </span>&#123;</span><br><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> LoginNVCallBack loginCallBack = <span class="keyword">new</span> LoginNVCallBack((Activity)<span class="keyword">this</span>.getActivity(), <span class="string">&#x27;픍&#x27;</span>, (Function0)(<span class="keyword">new</span> Function0() &#123;</span><br><span class="line">     <span class="comment">// $FF: synthetic method</span></span><br><span class="line">     <span class="comment">// $FF: bridge method</span></span><br><span class="line">     <span class="function"><span class="keyword">public</span> Object <span class="title">invoke</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.invoke();</span><br><span class="line">        <span class="keyword">return</span> Unit.INSTANCE;</span><br><span class="line">     &#125;</span><br><span class="line"></span><br><span class="line">     <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">void</span> <span class="title">invoke</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        ((TextView)MemberCenterFragment.<span class="keyword">this</span>._$_findCachedViewById(id.member_center_tv_name)).post((Runnable)(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">           <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">              MemberCenterFragment.<span class="keyword">this</span>.initView2Start();</span><br><span class="line">           &#125;</span><br><span class="line">        &#125;));</span><br><span class="line">     &#125;</span><br><span class="line">  &#125;));</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//使用mActivity,(自己定义的字段)时的 Decompile java:</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">MemberCenterFragment</span> <span class="keyword">extends</span> <span class="title">BaseMvcFragment</span> </span>&#123;</span><br><span class="line"><span class="meta">@NotNull</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> LoginNVCallBack loginCallBack;<span class="comment">//注意:初始化被放到了构造方法中</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">MemberCenterFragment</span><span class="params">()</span> </span>&#123;</span><br><span class="line">   <span class="keyword">this</span>.loginCallBack = <span class="keyword">new</span> LoginNVCallBack(<span class="keyword">this</span>.mActivity, <span class="string">&#x27;픍&#x27;</span>, (Function0)(<span class="keyword">new</span> Function0() &#123;</span><br><span class="line">      <span class="comment">// $FF: synthetic method</span></span><br><span class="line">      <span class="comment">// $FF: bridge method</span></span><br><span class="line">      <span class="function"><span class="keyword">public</span> Object <span class="title">invoke</span><span class="params">()</span> </span>&#123;</span><br><span class="line">         <span class="keyword">this</span>.invoke();</span><br><span class="line">         <span class="keyword">return</span> Unit.INSTANCE;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">void</span> <span class="title">invoke</span><span class="params">()</span> </span>&#123;</span><br><span class="line">         ((TextView)MemberCenterFragment.<span class="keyword">this</span>._$_findCachedViewById(id.member_center_tv_name)).post((Runnable)(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">               MemberCenterFragment.<span class="keyword">this</span>.initView2Start();</span><br><span class="line">            &#125;</span><br><span class="line">         &#125;));</span><br><span class="line">      &#125;</span><br><span class="line">   &#125;));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">LoginNVCallBack</span></span>(<span class="keyword">val</span> context: Context?, <span class="keyword">val</span> requestCode: <span class="built_in">Int</span> = FecBaseActivity.REQUEST_REFRESH_KEY,<span class="keyword">private</span> <span class="keyword">var</span> callback: (() -&gt; <span class="built_in">Unit</span>)? = <span class="literal">null</span>) : NavCallback() &#123;</span><br><span class="line">    <span class="keyword">constructor</span>(activity: Activity?, requestCode: <span class="built_in">Int</span> = FecBaseActivity.REQUEST_REFRESH_KEY, callback: (() -&gt; <span class="built_in">Unit</span>)? = <span class="literal">null</span>) : <span class="keyword">this</span>(activity <span class="keyword">as</span> Context, requestCode, callback)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onArrival</span><span class="params">(postcard: <span class="type">Postcard</span>?)</span></span> &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onInterrupt</span><span class="params">(postcard: <span class="type">Postcard</span>?)</span></span> &#123;</span><br><span class="line">        callback?.invoke()</span><br><span class="line">        <span class="keyword">if</span> (context <span class="keyword">is</span> Activity) &#123;</span><br><span class="line">            ARouter.getInstance().build(<span class="string">&quot;/memberCenter/selectLoginActivity&quot;</span>).navigation(context, requestCode)</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            ARouter.getInstance().build(<span class="string">&quot;/memberCenter/selectLoginActivity&quot;</span>).navigation(context)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>看起来和之前的代码并没有太大差距,但正式因为这点改动造成了这个Fragment的反射实例化失败.为什么呢?是因为在loginCallBack新建的时候引用到的activity(实际调用的是getActivity()方法)还没有赋值吗?很有可能.就算使用mActivity还一样的结果.还是因为使用的函数,在编译后成为匿名类,引用了外面的Fragment? 通过后面的java代码查看,感觉应该是activity为空的原因,不管是直接赋值还是在构造方法中,getActivity()和mActivity都是为null的.但是在onCreate()的时候都不为空了.</p>
+<p>修改如下解决问题:</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Route(path = <span class="meta-string">&quot;/memberCenter/memberCenter&quot;</span>)</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MemberCenterFragment</span> : <span class="type">BaseMvcFragment</span></span>() &#123;</span><br><span class="line">   <span class="keyword">lateinit</span> <span class="keyword">var</span> loginCallBack : LoginNVCallBack</span><br><span class="line"></span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">init</span><span class="params">(savedInstanceState: <span class="type">Bundle</span>?)</span></span> &#123;<span class="comment">//该方法调用的时候mActivity已经赋值</span></span><br><span class="line">        loginCallBack =  LoginNVCallBack(mActivity,FecBaseFragment.REQUEST_REFRESH_KEY) &#123;</span><br><span class="line">            member_center_tv_name.post &#123;</span><br><span class="line">                initView2Start()</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>具体的原因还需要继续研究.在研究这个问题的时候发现了一个小细节:</p>
+<p>loginCallBack在使用activity,(实际调用的是getActivity()方法)的时候被直接赋值初始化,在使用mActivity(自己定义的字段在onCreate()方法中被赋值为getActivity())的时候,初始化则被放到了构造方法中.</p>
+<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>最终找到原因,比较以外的问题出在LoginNVCallBack上面:</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">LoginNVCallBack</span></span>(<span class="keyword">var</span> context: Context?,<span class="keyword">val</span> requestCode: <span class="built_in">Int</span> = FecBaseActivity.REQUEST_REFRESH_KEY,<span class="keyword">private</span> <span class="keyword">var</span> callback: (() -&gt; <span class="built_in">Unit</span>)? = <span class="literal">null</span>) : NavCallback() &#123;</span><br><span class="line">    <span class="keyword">constructor</span>(activity: Activity?, requestCode: <span class="built_in">Int</span> = FecBaseActivity.REQUEST_REFRESH_KEY, callback: (() -&gt; <span class="built_in">Unit</span>)? = <span class="literal">null</span>) : <span class="keyword">this</span>(activity <span class="keyword">as</span> Context?,<span class="comment">//前面在这里强转为非空类型</span></span><br><span class="line">        requestCode, callback)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onArrival</span><span class="params">(postcard: <span class="type">Postcard</span>?)</span></span> &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onInterrupt</span><span class="params">(postcard: <span class="type">Postcard</span>?)</span></span> &#123;</span><br><span class="line">        callback?.invoke()</span><br><span class="line">        <span class="keyword">if</span> (context <span class="keyword">is</span> Activity) &#123;</span><br><span class="line">            ARouter.getInstance().build(<span class="string">&quot;/memberCenter/selectLoginActivity&quot;</span>).navigation(context <span class="keyword">as</span> Activity, requestCode)</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            ARouter.getInstance().build(<span class="string">&quot;/memberCenter/selectLoginActivity&quot;</span>).navigation(context)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>因为前面在被赋值的时候,MemberCenterFragment里面不管的getActivity()还是mActivity都是为null的. LoginNVCallBack构造方法的activity: Activity?也为null,但是在调用主构造方法的时候被强转为非空类型,所以出现了异常.可能以为混编的问题,错误日志也没有得到输出.造成了上述的问题,以后要注意.</p>
+
+    </div>
+
+    <div class="about">
+        <h2>关于本文</h2>
+        <p>本文作者 longforus，采用 <a href="https://creativecommons.org/licenses/by-nc/4.0" target="_blank" rel="noopener">CC BY-NC 4.0</a> 许可协议。转载请注明出处。</p>
+    </div>
+
+    
+        
+    
+</article>
+
+        <footer>
+    <div class="inner">
+        <div class="links">
+            
+            <div class="group">
+                <h4 class="title">站点</h4>
+                
+                
+                <a href="../../../../index.html" class="item">首页</a>
+                
+                
+                <a href="../../../../archives" class="item">归档</a>
+                
+                
+                <a href="../../../../tags" class="item">标签</a>
+                
+                
+                <a href="../../../../categories" class="item">分类</a>
+                
+                
+                <a href="../../../../about" class="item">关于</a>
+                
+            </div>
+            
+            <div class="group">
+                <h4 class="title">项目</h4>
+                
+                
+                <a href="https://github.com/longforus/MvpAutoCodePlus" class="item" target="_blank" rel="noopener">MvpAutoCodePlus</a>
+                
+                
+                <a href="https://github.com/longforus/pgyerUpload4AndroidStudio" class="item" target="_blank" rel="noopener">pgyerUpload4AndroidStudio</a>
+                
+                
+                <a href="https://github.com/longforus/Android-drawable-preview-plugin" class="item" target="_blank" rel="noopener">Android-drawable-preview-plugin</a>
+                
+            </div>
+            
+            <div class="group">
+                <h4 class="title">联系</h4>
+                
+                
+                <a href="https://github.com/longforus" class="item" target="_blank" rel="noopener">GitHub</a>
+                
+                
+                <a href="mailto:longforus@outlook.com" class="item" target="_blank" rel="noopener">Email</a>
+                
+            </div>
+            
+        </div>
+        &copy; 2026 longforus<br />
+        驱动自 <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+</footer>
+
+        
+<script src="../js/main.js"></script>
+
+        
+<script src="../js/custom.js"></script>
+
+        
+    </body>
+</html>

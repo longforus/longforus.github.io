@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+
+  <title>单盘黑群晖更换硬盘实操记录 - longforus</title>
+
+  
+    <link rel="shortcut icon" href="../../../../favicon.svg">
+  
+
+  <meta name="description" content="去年在咸鱼上买了个游娱宝盒的黑群晖,装着以前笔记本用的2.5&#34;2T的盘在跑.最近想要一个移动硬盘,网上看来看去都不便宜,后来灵机一动,干嘛不买一个大一点的3.5&#34;的盘换下这个2.5&#34;的盘,再买个盒子.不就移动硬盘也有了,…">
+  
+  <meta name="keywords" content="Android,Java,Kotlin,逆向,Linux,Hexo">
+  
+  <meta name="author" content="longforus">
+  <meta name="theme-color" content="#0a84ff">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="单盘黑群晖更换硬盘实操记录">
+  <meta property="og:description" content="去年在咸鱼上买了个游娱宝盒的黑群晖,装着以前笔记本用的2.5&#34;2T的盘在跑.最近想要一个移动硬盘,网上看来看去都不便宜,后来灵机一动,干嘛不买一个大一点的3.5&#34;的盘换下这个2.5&#34;的盘,再买个盒子.不就移动硬盘也有了,…">
+  <meta property="og:site_name" content="longforus">
+
+  
+<link rel="stylesheet" href="../../../../css/var.css">
+
+  
+<link rel="stylesheet" href="../../../../css/main.css">
+
+  
+<link rel="stylesheet" href="../../../../css/typography.css">
+
+  
+<link rel="stylesheet" href="../../../../css/code-highlighting.css">
+
+  
+<link rel="stylesheet" href="../../../../css/components.css">
+
+  
+<link rel="stylesheet" href="../../../../css/nav.css">
+
+  
+<link rel="stylesheet" href="../../../../css/paginator.css">
+
+  
+<link rel="stylesheet" href="../../../../css/footer.css">
+
+  
+<link rel="stylesheet" href="../../../../css/post-list.css">
+
+  
+<link rel="stylesheet" href="../../../../css/waline.css">
+
+  
+  
+  
+<link rel="stylesheet" href="../../../../css/post.css">
+
+  
+  
+<link rel="stylesheet" href="../../../../css/custom.css">
+
+
+  
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+    <body>
+        <nav id="theme-nav">
+    <div class="inner">
+        <a class="title" href="../../../../index.html">longforus</a>
+        <div class="nav-arrow"></div>
+        <div class="nav-items">
+            <a class="nav-item nav-item-home" href="../../../../index.html">主页</a>
+            
+            
+            
+            <a class="nav-item" href="../../../../archives">归档</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../tags">标签</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../categories">分类</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../about">关于</a>
+            
+            
+            
+            
+            <a class="nav-item nav-item-github nav-item-icon" href="https://github.com/longforus" target="_blank" rel="noopener" aria-label="GitHub">&nbsp;</a>
+            
+            
+        </div>
+    </div>
+</nav>
+
+        
+<article class="post">
+    <div class="meta">
+        <div class="post-meta">
+            <span class="post-date">2020-11-23</span>
+            
+            <span class="dot">·</span>
+            <span class="post-updated">更新于 2021-11-18</span>
+            
+            <span class="dot">·</span>
+            <span class="post-reading">4 分钟阅读</span>
+        </div>
+
+        <h1 class="title">单盘黑群晖更换硬盘实操记录</h1>
+
+        
+        <div class="post-taxonomy">
+            
+            <a class="chip chip-category" href="../../../../categories/%E7%B3%BB%E7%BB%9F%E8%BF%90%E7%BB%B4/">系统运维</a>
+            
+            
+            <a class="chip" href="../../../../tags/%E7%BE%A4%E6%99%96/"># 群晖</a>
+            
+            <a class="chip" href="../../../../tags/NAS/"># NAS</a>
+            
+            <a class="chip" href="../../../../tags/%E7%A1%AC%E7%9B%98/"># 硬盘</a>
+            
+        </div>
+        
+    </div>
+
+    <div class="divider"></div>
+
+    
+    <details class="toc-card">
+        <summary>目录</summary>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BF%87%E7%A8%8B"><span class="toc-text">过程</span></a></li></ol>
+    </details>
+    
+
+    <div class="content">
+        <p>  去年在咸鱼上买了个游娱宝盒的黑群晖,装着以前笔记本用的2.5”2T的盘在跑.最近想要一个移动硬盘,网上看来看去都不便宜,后来灵机一动,干嘛不买一个大一点的3.5”的盘换下这个2.5”的盘,再买个盒子.不就移动硬盘也有了,NAS空间也大了么?简直一箭双雕.</p>
+<p>硬盘买回来,怎么换是个问题,毕竟之前NAS上的数据都还想要的.期间根据网上的教程,尝试多次,耗时几天,方勉强成功,坑是非常的多.记录一下:</p>
+<h2 id="过程"><a href="#过程" class="headerlink" title="过程"></a>过程</h2><ul>
+<li><p>新旧盘对拷,新盘是4T的,比旧盘大,要是Windows的话,直接用ghost硬盘对拷就行了,但是群晖是Linux啊,旧盘的存储分区格式是btrfs,在Windows或PE下用傲梅分区助手和磁盘精灵,都不能良好的识别分区,进行磁盘或者分区克隆.</p>
+</li>
+<li><p>群晖官方支持中心: <a target="_blank" rel="noopener" href="https://www.synology.cn/zh-cn/knowledgebase/DSM/tutorial/Storage/Can_I_use_larger_hard_drive_s_to_expand_the_storage_capacity_on_Synology_Product_for_DSM_2_2_and_onward">请问我是否可以更换硬盘来扩大 Synology 产品上的储存容量(适用于 DSM 2.2 与之前的版本）？</a>这个才他么的是坑爹的.看他是这么说的:</p>
+  <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">是。您可以在不丢失数据的前提下，按照下列步骤更换硬盘。</span><br><span class="line"></span><br><span class="line">针对 1 颗硬盘机种：</span><br><span class="line"></span><br><span class="line">关闭 Synology 产品。</span><br><span class="line">把内部硬盘更换成较大容量的硬盘。</span><br><span class="line">打开 Synology 产品。</span><br><span class="line">重新安装系统。</span><br><span class="line">使用外部硬盘驱动盒，将置换下来的硬盘接上 USB 或 eSATA 端口。</span><br><span class="line">将数据从置换下来的硬盘复制到新硬盘上。</span><br><span class="line">取下置换下来的硬盘。</span><br></pre></td></tr></table></figure>
+
+<p>  前一个方法不行,我只能寄托希望于这个方法了,等了2天移动硬盘盒到了,装是旧盘,插入,可以识别到插入了移动硬盘,但是FileStation里面不会显示旧盘,用ssh登陆到群晖下,/dev下有旧盘,但是无法mount,提示<code> unknown filesystem type &#39;linux_raid_member&#39;</code>,自己的系统下啊,都不能识别.今天看到有网友说<a target="_blank" rel="noopener" href="https://tieba.baidu.com/p/6322629484?red_tag=2098980120">需要购买套件内的extACCESS。 黑裙是无法买的。</a></p>
+</li>
+<li><p>尝试加载btrfs文件系统,后来搜到一篇文章<a target="_blank" rel="noopener" href="https://blog.csdn.net/endzhi/article/details/91389826?biz_id=102&utm_term=mdadm%20--assemble%20--scan&utm_medium=distribute.pc_search_result.none-task-blog-2~all~sobaiduweb~default-4-91389826&spm=1018.2118.3001.4449">&lt;Centos7挂载ESXI黑群晖NAS磁盘&gt;</a>按照操作终于用MBP连接硬盘盒内装的旧盘,在VMware的centOS7虚拟机下挂载成功.但是死活连不上群晖的NFS,而且无线网没有千兆,考虑到速度的最终没有在MBP的虚拟机下传输.</p>
+</li>
+<li><p>再次拆下新旧盘连接到PC的SATA接口上,PC安装VMware虚拟机安装centOS7,并连接新旧盘到虚拟机,结果不知道什么原因,PC上的虚拟机十次起动,win10八次都蓝屏重启,不知道是不是20H2的问题,自从win10从1909升级以来,新版edge频繁奔溃,小问题多多,哎,心累啊</p>
+</li>
+<li><p>在PC上分出空闲空间,实机安装centOS双系统,进入系统后,按照之前的方法挂载btrfs分区,结果只能挂载一个盘,要么新盘,要么旧盘,因为他们是在一个群晖上初始化的,分区的name是一样的,挂载了一个之后,因为重名就不能挂载另外一个了,也不知道怎么改名,没有办法最终还是把新盘装入群晖,打开NFS,PC挂载旧盘的btrfs分区后,连接到群晖NFS,通过千兆网,复制整个分区的文件,速度不是很快,开始复制就睡了,第二天起来就发现传完了.</p>
+<p>  整个过程还是比较曲折的,新盘虽然重新初始化成了ext4,但是因为群晖的存储格式,也是不能直接mount的.之前安装的套件也需要重新安装,但是数据没弄丢还是庆幸的.</p>
+</li>
+</ul>
+
+    </div>
+
+    <div class="about">
+        <h2>关于本文</h2>
+        <p>本文作者 longforus，采用 <a href="https://creativecommons.org/licenses/by-nc/4.0" target="_blank" rel="noopener">CC BY-NC 4.0</a> 许可协议。转载请注明出处。</p>
+    </div>
+
+    
+        
+    
+</article>
+
+        <footer>
+    <div class="inner">
+        <div class="links">
+            
+            <div class="group">
+                <h4 class="title">站点</h4>
+                
+                
+                <a href="../../../../index.html" class="item">首页</a>
+                
+                
+                <a href="../../../../archives" class="item">归档</a>
+                
+                
+                <a href="../../../../tags" class="item">标签</a>
+                
+                
+                <a href="../../../../categories" class="item">分类</a>
+                
+                
+                <a href="../../../../about" class="item">关于</a>
+                
+            </div>
+            
+            <div class="group">
+                <h4 class="title">项目</h4>
+                
+                
+                <a href="https://github.com/longforus/MvpAutoCodePlus" class="item" target="_blank" rel="noopener">MvpAutoCodePlus</a>
+                
+                
+                <a href="https://github.com/longforus/pgyerUpload4AndroidStudio" class="item" target="_blank" rel="noopener">pgyerUpload4AndroidStudio</a>
+                
+                
+                <a href="https://github.com/longforus/Android-drawable-preview-plugin" class="item" target="_blank" rel="noopener">Android-drawable-preview-plugin</a>
+                
+            </div>
+            
+            <div class="group">
+                <h4 class="title">联系</h4>
+                
+                
+                <a href="https://github.com/longforus" class="item" target="_blank" rel="noopener">GitHub</a>
+                
+                
+                <a href="mailto:longforus@outlook.com" class="item" target="_blank" rel="noopener">Email</a>
+                
+            </div>
+            
+        </div>
+        &copy; 2026 longforus<br />
+        驱动自 <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+</footer>
+
+        
+<script src="../js/main.js"></script>
+
+        
+<script src="../js/custom.js"></script>
+
+        
+    </body>
+</html>

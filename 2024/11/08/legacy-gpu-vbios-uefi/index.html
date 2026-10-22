@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+
+  <title>不支持 UEFI 的老显卡修改 vBIOS 进行支持 - longforus</title>
+
+  
+    <link rel="shortcut icon" href="../../../../favicon.svg">
+  
+
+  <meta name="description" content="为不支持 UEFI 的老显卡修改 vBIOS，使其支持 UEFI 启动的记录。">
+  
+  <meta name="keywords" content="Android,Java,Kotlin,逆向,Linux,Hexo">
+  
+  <meta name="author" content="longforus">
+  <meta name="theme-color" content="#0a84ff">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="不支持 UEFI 的老显卡修改 vBIOS 进行支持">
+  <meta property="og:description" content="为不支持 UEFI 的老显卡修改 vBIOS，使其支持 UEFI 启动的记录。">
+  <meta property="og:site_name" content="longforus">
+
+  
+<link rel="stylesheet" href="../../../../css/var.css">
+
+  
+<link rel="stylesheet" href="../../../../css/main.css">
+
+  
+<link rel="stylesheet" href="../../../../css/typography.css">
+
+  
+<link rel="stylesheet" href="../../../../css/code-highlighting.css">
+
+  
+<link rel="stylesheet" href="../../../../css/components.css">
+
+  
+<link rel="stylesheet" href="../../../../css/nav.css">
+
+  
+<link rel="stylesheet" href="../../../../css/paginator.css">
+
+  
+<link rel="stylesheet" href="../../../../css/footer.css">
+
+  
+<link rel="stylesheet" href="../../../../css/post-list.css">
+
+  
+<link rel="stylesheet" href="../../../../css/waline.css">
+
+  
+  
+  
+<link rel="stylesheet" href="../../../../css/post.css">
+
+  
+  
+<link rel="stylesheet" href="../../../../css/custom.css">
+
+
+  
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+    <body>
+        <nav id="theme-nav">
+    <div class="inner">
+        <a class="title" href="../../../../index.html">longforus</a>
+        <div class="nav-arrow"></div>
+        <div class="nav-items">
+            <a class="nav-item nav-item-home" href="../../../../index.html">主页</a>
+            
+            
+            
+            <a class="nav-item" href="../../../../archives">归档</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../tags">标签</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../categories">分类</a>
+            
+            
+            
+            
+            <a class="nav-item" href="../../../../about">关于</a>
+            
+            
+            
+            
+            <a class="nav-item nav-item-github nav-item-icon" href="https://github.com/longforus" target="_blank" rel="noopener" aria-label="GitHub">&nbsp;</a>
+            
+            
+        </div>
+    </div>
+</nav>
+
+        
+<article class="post">
+    <div class="meta">
+        <div class="post-meta">
+            <span class="post-date">2024-11-08</span>
+            
+            <span class="dot">·</span>
+            <span class="post-reading">3 分钟阅读</span>
+        </div>
+
+        <h1 class="title">不支持 UEFI 的老显卡修改 vBIOS 进行支持</h1>
+
+        
+        <div class="post-taxonomy">
+            
+            <a class="chip chip-category" href="../../../../categories/%E7%A1%AC%E4%BB%B6/">硬件</a>
+            
+            
+            <a class="chip" href="../../../../tags/%E6%98%BE%E5%8D%A1/"># 显卡</a>
+            
+            <a class="chip" href="../../../../tags/vBIOS/"># vBIOS</a>
+            
+            <a class="chip" href="../../../../tags/UEFI/"># UEFI</a>
+            
+        </div>
+        
+    </div>
+
+    <div class="divider"></div>
+
+    
+
+    <div class="content">
+        <p>  前段时间要在办公室玩恐怖黎明,但是联想自带的GT730实在是有点慢,后来闲鱼收了一张HD7750,虽然也是老掉牙,但是性能也有3成提升,聊胜于无吧.但是存在HD7750不支持UEFI的问题.具体表现为:</p>
+<p> 系统是win11未进系统时,什么都不显示,不能进BIOS.刚换卡未装驱动的时候,即使已经进入系统,仍然什么都不显示.开始还以为显卡是坏的.但是小键盘灯是可以相应的.后来用远程连到电脑上,才发现确实已经进入系统了,通过远程安装AMD的显卡驱动后,可以正常驱动,但是开机,重启未进入系统的时候还是什么都不显示.用GPU-Z看显卡参数,UEFI是没有打钩的.虽然也能将就着用,但是比较糟心,要是后面遇到问题需要进BIOS,就麻烦了,导致GT730我都不敢卖掉.</p>
+<p>  爽玩了几天游戏以后,决定看看能不能解决这个问题,先在<a target="_blank" rel="noopener" href="https://www.techpowerup.com/%E4%B8%8A%E6%89%BEHD7750%E7%9A%84%E6%98%BE%E5%8D%A1BIOS,%E6%9C%89%E4%BA%9B%E6%98%AF%E8%BF%AA%E5%85%B0%E7%9A%84%E6%9C%89%E4%BA%9B%E4%B8%8D%E6%98%AF,%E7%BD%91%E4%B8%8A%E4%B9%9F%E8%AF%B4%E9%9D%9E%E5%90%8C%E5%93%81%E7%89%8C%E7%9A%84%E6%98%BE%E5%8D%A1BIOS%E4%B8%8D%E8%83%BD%E6%B7%B7%E5%88%B7,%E4%BD%9C%E7%BD%A2">https://www.techpowerup.com/上找HD7750的显卡BIOS,有些是迪兰的有些不是,网上也说非同品牌的显卡BIOS不能混刷,作罢</a>.</p>
+<p>  后来在B站找到一些视频说,这种情况需要打开电脑BIOS里面的CSM支持,但是也需要先找其他支持UEFI的显卡进电脑BIOS去操作,我也不确定我的联想品牌机是否有CSM的选项,而且用这种方式假如主板电池掉电的话,还需要重新进行设置,颇为麻烦,结果是评论区看到有人说可以用一个批处理,修改显卡BIOS添加UEFI的支持,但是他又不说是什么,好不容易找了一会儿,还是给我找到了.</p>
+<p>  参考的文章是<a target="_blank" rel="noopener" href="https://blog.csdn.net/zhangliang19950813/article/details/120283475">AMD显卡更新UEFI GOP_amd and nvidia gop update-CSDN博客</a>,用的软件就是<a target="_blank" rel="noopener" href="https://edef5.pcloud.com/cBZN3X39RZA5l3ChZZZzq17XkZ2ZZkUJZkZeQQ6Z2FZkVZdkZLXZ0XZe7Z2XZJVZiZ1ZyXZO7ZnXZHVZUzB8ZrsgduIa27mVQfF42ndb9obPlNGf7/GOP_Updater_v1.9.6.5.k_mod_v0.5.2.zip">GOP_Updater_v1.9.6.5.k_mod_v0.5.2</a>,我的显卡是HD7750找了几个版本的显卡BIOS刷新工具,后面成功的是<a target="_blank" rel="noopener" href="https://uk1-dl.techpowerup.com/files/sAyyIR-lJ58p5HPOiIFBAQ/1731094408/atiflash_284.zip">atiflash_284</a>.按照操作步骤.</p>
+<ol>
+<li>先用GPU-Z保存现有的显卡BIOS文件,</li>
+<li>拖入GOPupd.bat中,添加UFEI支持,生成新的显卡bios文件.</li>
+<li>用atiflash刷入就好了.</li>
+</ol>
+<p>刷入后需要重启,这个时候已经做好了变砖的准备,结果一发入魂,一重启久违的重启界面就出现了,进入系统后,用GPU-Z查看,UEFI支持的√也打上了.</p>
+<p><img src="hd7750gpuz.jpg" alt="hd7750gpuz"></p>
+<p>至此完美解决.感谢分享经验和软件的大佬们.</p>
+
+    </div>
+
+    <div class="about">
+        <h2>关于本文</h2>
+        <p>本文作者 longforus，采用 <a href="https://creativecommons.org/licenses/by-nc/4.0" target="_blank" rel="noopener">CC BY-NC 4.0</a> 许可协议。转载请注明出处。</p>
+    </div>
+
+    
+        
+    
+</article>
+
+        <footer>
+    <div class="inner">
+        <div class="links">
+            
+            <div class="group">
+                <h4 class="title">站点</h4>
+                
+                
+                <a href="../../../../index.html" class="item">首页</a>
+                
+                
+                <a href="../../../../archives" class="item">归档</a>
+                
+                
+                <a href="../../../../tags" class="item">标签</a>
+                
+                
+                <a href="../../../../categories" class="item">分类</a>
+                
+                
+                <a href="../../../../about" class="item">关于</a>
+                
+            </div>
+            
+            <div class="group">
+                <h4 class="title">项目</h4>
+                
+                
+                <a href="https://github.com/longforus/MvpAutoCodePlus" class="item" target="_blank" rel="noopener">MvpAutoCodePlus</a>
+                
+                
+                <a href="https://github.com/longforus/pgyerUpload4AndroidStudio" class="item" target="_blank" rel="noopener">pgyerUpload4AndroidStudio</a>
+                
+                
+                <a href="https://github.com/longforus/Android-drawable-preview-plugin" class="item" target="_blank" rel="noopener">Android-drawable-preview-plugin</a>
+                
+            </div>
+            
+            <div class="group">
+                <h4 class="title">联系</h4>
+                
+                
+                <a href="https://github.com/longforus" class="item" target="_blank" rel="noopener">GitHub</a>
+                
+                
+                <a href="mailto:longforus@outlook.com" class="item" target="_blank" rel="noopener">Email</a>
+                
+            </div>
+            
+        </div>
+        &copy; 2026 longforus<br />
+        驱动自 <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+</footer>
+
+        
+<script src="../js/main.js"></script>
+
+        
+<script src="../js/custom.js"></script>
+
+        
+    </body>
+</html>
